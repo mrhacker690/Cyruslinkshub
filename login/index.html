@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login | CyrusLinksHub Portal</title>
+    <title>System Access Control | CyrusLinksHub Portal</title>
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 
     <style>
-        /* ================= PREMIUM LOGIN CORE LAYOUT ================= */
+        /* ================= PREMIUM PORTAL CORE LAYOUT ================= */
         body {
             margin: 0;
             padding: 0;
@@ -48,9 +48,9 @@
             position: relative;
         }
 
-        /* ================= LEFT SIDE: AUTH INPUT FORM ================= */
+        /* ================= LEFT SIDE: AUTH FORM ================= */
         .auth-form-side {
-            padding: 50px 60px;
+            padding: 45px 55px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -76,8 +76,8 @@
         }
 
         .auth-header {
-            margin-top: 35px;
-            margin-bottom: 30px;
+            margin-top: 25px;
+            margin-bottom: 25px;
         }
         .auth-header h1 {
             font-family: 'Orbitron', sans-serif;
@@ -94,17 +94,23 @@
             font-weight: 500;
         }
 
-        /* Form Controls */
+        /* Input Controls Layout Grid */
+        .form-grid-row {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 14px;
+            margin-bottom: 14px;
+        }
+        
         .input-block {
-            margin-bottom: 18px;
             position: relative;
         }
         .input-block label {
             display: block;
             color: rgba(255, 255, 255, 0.6);
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
@@ -113,16 +119,16 @@
             display: flex;
             align-items: center;
         }
-        .input-wrapper i {
+        .input-wrapper i.input-icon {
             position: absolute;
             left: 16px;
             color: rgba(255, 255, 255, 0.3);
-            font-size: 16px;
+            font-size: 15px;
             transition: 0.3s;
         }
         .portal-input {
             width: 100%;
-            padding: 14px 16px 14px 45px;
+            padding: 12px 16px 12px 45px;
             background: rgba(255, 255, 255, 0.02);
             border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 12px;
@@ -138,7 +144,7 @@
             background: rgba(27, 231, 255, 0.03);
             box-shadow: 0 0 15px rgba(27, 231, 255, 0.15);
         }
-        .portal-input:focus + i {
+        .portal-input:focus + i.input-icon {
             color: #1be7ff;
         }
         
@@ -153,13 +159,13 @@
             color: #1be7ff !important;
         }
 
-        /* Custom Action Buttons */
+        /* System Action Control Button */
         .btn-submit {
             width: 100%;
             background: linear-gradient(135deg, #6e6bff, #1be7ff);
             border: none;
             color: white;
-            padding: 15px;
+            padding: 14px;
             border-radius: 12px;
             font-family: 'Orbitron', sans-serif;
             font-weight: 700;
@@ -167,26 +173,26 @@
             font-size: 14px;
             text-transform: uppercase;
             letter-spacing: 1px;
-            margin-top: 10px;
             transition: 0.3s;
             box-shadow: 0 4px 15px rgba(27, 231, 255, 0.2);
+            margin-top: 10px;
         }
         .btn-submit:hover {
             transform: translateY(-2px);
             box-shadow: 0 0 25px rgba(27, 231, 255, 0.45);
         }
 
-        /* OAuth Provider Divider */
+        /* Identity Stack Matrix Boundaries */
         .oauth-divider {
             display: flex;
             align-items: center;
             text-align: center;
             color: rgba(255, 255, 255, 0.25);
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 1px;
-            margin: 22px 0;
+            margin: 18px 0;
         }
         .oauth-divider::before, .oauth-divider::after {
             content: '';
@@ -196,18 +202,17 @@
         .oauth-divider:not(:empty)::before { margin-right: .75em; }
         .oauth-divider:not(:empty)::after { margin-left: .75em; }
 
-        /* Full Stack Identity Stack Layout Change */
         .oauth-column {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
         }
         .btn-oauth {
             background: rgba(255, 255, 255, 0.02);
             border: 1px solid rgba(255, 255, 255, 0.06);
             border-radius: 12px;
             color: #fff;
-            padding: 13px 16px;
+            padding: 11px 16px;
             font-family: 'Rajdhani', sans-serif;
             font-weight: 600;
             font-size: 15px;
@@ -234,7 +239,7 @@
         .btn-oauth.google-provider:hover { border-color: #4285F4; background: rgba(66, 133, 244, 0.05); }
 
         .auth-footer {
-            margin-top: 40px;
+            margin-top: 30px;
             display: flex;
             justify-content: space-between;
             font-size: 14px;
@@ -271,7 +276,6 @@
             overflow: hidden;
         }
 
-        /* Close Corner Cross Overlay Component */
         .portal-close {
             position: absolute;
             top: 25px;
@@ -297,22 +301,15 @@
             transform: rotate(90deg);
         }
 
-        /* HUD Live Component Badges mirroring sample data widgets */
         .hud-badge-floating {
-            background: rgba(231, 76, 60, 0.15);
-            border: 1px solid rgba(231, 76, 60, 0.3);
-            border-left: 3px solid #e74c3c;
+            background: rgba(27, 231, 255, 0.06);
+            border: 1px solid rgba(27, 231, 255, 0.15);
+            border-left: 3px solid #1be7ff;
             padding: 12px 16px;
             border-radius: 8px;
             width: fit-content;
             margin-bottom: 15px;
             animation: float 4s ease-in-out infinite;
-        }
-        .hud-badge-floating.alt {
-            background: rgba(27, 231, 255, 0.06);
-            border: 1px solid rgba(27, 231, 255, 0.15);
-            border-left: 3px solid #1be7ff;
-            animation: float 4s ease-in-out infinite 1.5s;
         }
         .hud-badge-floating span {
             display: block;
@@ -329,7 +326,6 @@
             font-size: 14px;
         }
 
-        /* Modern Glass Calendar Overlay Module Match */
         .glass-hud-widget {
             background: rgba(255, 255, 255, 0.02);
             border: 1px solid rgba(255, 255, 255, 0.05);
@@ -341,34 +337,6 @@
             -webkit-backdrop-filter: blur(10px);
         }
         
-        .timeline-strip {
-            display: flex;
-            justify-content: space-between;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-            padding-bottom: 12px;
-            margin-bottom: 12px;
-        }
-        .day-node {
-            text-align: center;
-        }
-        .day-node.active .day-lbl { color: #1be7ff; font-weight: 700; }
-        .day-node.active .day-num { background: #1be7ff; color: #040814; font-weight: 700; border-radius: 6px; }
-        .day-lbl {
-            font-size: 11px;
-            color: rgba(255, 255, 255, 0.3);
-            text-transform: uppercase;
-            font-weight: 600;
-            display: block;
-            margin-bottom: 4px;
-        }
-        .day-num {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 13px;
-            color: #fff;
-            padding: 4px 6px;
-            display: block;
-        }
-
         .widget-meta {
             display: flex;
             align-items: center;
@@ -381,40 +349,8 @@
             border-radius: 50%;
             box-shadow: 0 0 8px #1be7ff;
         }
-        .widget-meta p {
-            margin: 0;
-            font-weight: 600;
-            font-size: 15px;
-            color: #fff;
-        }
-        .widget-meta span {
-            font-size: 12px;
-            color: rgba(255, 255, 255, 0.4);
-            margin-left: auto;
-        }
+        .widget-meta p { margin: 0; font-weight: 600; font-size: 15px; color: #fff; }
 
-        /* Stacked Avatar Array Components */
-        .avatar-pile {
-            display: flex;
-            align-items: center;
-            margin-top: 15px;
-        }
-        .user-avatar {
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            border: 2px solid #0a1020;
-            margin-right: -8px;
-            background: #111;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 10px;
-            font-weight: 700;
-            color: #fff;
-        }
-
-        /* Responsive Layout Overrides */
         @media (max-width: 850px) {
             .auth-container { grid-template-columns: 1fr; }
             .auth-graphic-side { display: none; }
@@ -430,9 +366,7 @@
 
 <body>
 
-    <!-- Ambient FX Core Particle Vector Canvas -->
     <canvas id="particles"></canvas>
-
     <div class="bg-glow glow-left"></div>
     <div class="bg-glow glow-right"></div>
     <div class="bg-glow glow-bottom"></div>
@@ -440,52 +374,49 @@
     <div class="portal-wrapper">
         <div class="auth-container">
             
-            <!-- ================= LEFT ACCOUNT INPUT CONTROL BLOCK ================= -->
             <div class="auth-form-side">
                 
                 <div class="brand-pill">
-                    <i class="fa-solid fa-shield-halved"></i> CyrusLinksHub Core Secure
+                    <i class="fa-solid fa-shield-halved"></i> CyrusLinksHub Gateway
                 </div>
 
                 <div class="auth-header">
-                    <h1>Create an account</h1>
-                    <p>Secure pipeline access initialization</p>
+                    <h1>Portal Login</h1>
+                    <p>Enter your credentials to access system telemetry</p>
                 </div>
 
-                <form autocomplete="off" onsubmit="event.preventDefault();">
+                <form autocomplete="off" onsubmit="return handleLogin(event);">
                     
-                    <div class="input-block">
-                        <label>Full Name</label>
-                        <div class="input-wrapper">
-                            <input type="text" class="portal-input" placeholder="Amélie Laurent" required>
-                            <i class="fa-regular fa-user"></i>
+                    <div class="form-grid-row">
+                        <div class="input-block">
+                            <label>Email Address</label>
+                            <div class="input-wrapper">
+                                <input type="email" class="portal-input" placeholder=your@gmail.com" required>
+                                <i class="fa-regular fa-envelope input-icon"></i>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="input-block">
-                        <label>Email Address</label>
-                        <div class="input-wrapper">
-                            <input type="email" class="portal-input" placeholder="your@gmail.com" required>
-                            <i class="fa-regular fa-envelope"></i>
+                    <div class="form-grid-row">
+                        <div class="input-block">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                                <label style="margin-bottom: 0;">Password</label>
+                                <a href="forgot-password.html" style="color: #1be7ff; font-size: 13px; font-weight: 600; text-decoration: none; text-transform: uppercase; letter-spacing: 0.5px; transition: 0.3s;" onmouseover="this.style.textShadow='0 0 8px #1be7ff'" onmouseout="this.style.textShadow='none'">Forgot Password?</a>
+                            </div>
+                            <div class="input-wrapper">
+                                <input type="password" id="loginPasswordInput" class="portal-input" placeholder="••••••••••••••••••••" required>
+                                <i class="fa-solid fa-lock input-icon"></i>
+                                <i class="fa-regular fa-eye toggle-password" onclick="togglePasswordVisibility('loginPasswordInput', this)"></i>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="input-block">
-                        <label>Password</label>
-                        <div class="input-wrapper">
-                            <input type="password" id="passwordInput" class="portal-input" placeholder="••••••••••••••••••••" required>
-                            <i class="fa-solid fa-lock"></i>
-                            <i class="fa-regular fa-eye toggle-password" onclick="togglePasswordVisibility()"></i>
-                        </div>
-                    </div>
-
-                    <button type="submit" class="btn-submit">Submit Details</button>
+                    <button type="submit" class="btn-submit">Authenticate Account</button>
 
                 </form>
 
                 <div class="oauth-divider">Or Continue With</div>
 
-                <!-- Updated full stack authorization options row -->
                 <div class="oauth-column">
                     <button class="btn-oauth discord-provider"><i class="fa-brands fa-discord" style="color: #5865F2;"></i> Continue with Discord</button>
                     <button class="btn-oauth github-provider"><i class="fa-brands fa-github"></i> Continue with GitHub</button>
@@ -493,58 +424,32 @@
                 </div>
 
                 <div class="auth-footer">
-                    <span>Have any account? <a href="register">Sign in</a></span>
-                    <a href="about">Terms & Conditions</a>
+                    <span>New to the hub? <a href="register">Create account</a></span>
+                    <a href="about.html">System Status</a>
                 </div>
 
             </div>
 
-            <!-- ================= RIGHT VISUAL DIAGNOSTIC CORE PANEL ================= -->
             <div class="auth-graphic-side">
                 
-                <!-- Escape Cross Anchor Routing Home -->
-                <a href="index.html" class="portal-close" title="Cancel Vector Mapping">
+                <a href="/" class="portal-close" title="Cancel Interface Handshake">
                     <i class="fa-solid fa-xmark"></i>
                 </a>
 
-                <!-- Floating System Telemetry Telecommunication Widgets -->
                 <div style="margin-top: 20px;">
                     <div class="hud-badge-floating">
-                        <span>Task Review With Team</span>
-                        <h4>09:30am - 10:00am</h4>
-                    </div>
-                    <div class="hud-badge-floating alt">
-                        <span>System Architecture Latency</span>
-                        <h4>Active Connection Mapping</h4>
+                        <span>Gateway Security Status</span>
+                        <h4>Systems Operational</h4>
                     </div>
                 </div>
 
-                <!-- Live Glass UI Metrics HUD Layer Component Matrix Mapping -->
                 <div class="glass-hud-widget">
-                    <div class="timeline-strip">
-                        <div class="day-node"><span class="day-lbl">Sun</span><span class="day-num">22</span></div>
-                        <div class="day-node active"><span class="day-lbl">Mon</span><span class="day-num">23</span></div>
-                        <div class="day-node"><span class="day-lbl">Tue</span><span class="day-num">24</span></div>
-                        <div class="day-node"><span class="day-lbl">Wed</span><span class="day-num">25</span></div>
-                        <div class="day-node"><span class="day-lbl">Thu</span><span class="day-num">26</span></div>
-                        <div class="day-node"><span class="day-lbl">Fri</span><span class="day-num">27</span></div>
-                        <div class="day-node"><span class="day-lbl">Sat</span><span class="day-num">28</span></div>
-                    </div>
-
                     <div class="widget-meta">
                         <div class="status-dot"></div>
                         <div>
-                            <p>Daily Sync Routine</p>
-                            <span style="display:block; font-size:12px; color:rgba(255,255,255,0.4); font-weight:500; margin-top:2px;">12:00pm - 01:00pm</span>
+                            <p>Global Link Pipeline</p>
+                            <span style="display:block; font-size:12px; color:rgba(255,255,255,0.4); font-weight:500; margin-top:2px;">Node Connection Stable</span>
                         </div>
-                    </div>
-
-                    <!-- Micro User Avatars Array Node Matrix Stack -->
-                    <div class="avatar-pile">
-                        <div class="user-avatar" style="background: #3498db;">AL</div>
-                        <div class="user-avatar" style="background: #e67e22;">JD</div>
-                        <div class="user-avatar" style="background: #2ecc71;">CH</div>
-                        <div class="user-avatar" style="background: rgba(255,255,255,0.08); font-size:9px;">+4</div>
                     </div>
                 </div>
 
@@ -552,21 +457,26 @@
 
         </div>
     </div>
-       <!-- Interface Script Logic Hooks -->
+
     <script>
-        function togglePasswordVisibility() {
-            const passwordField = document.getElementById("passwordInput");
-            const toggleIcon = document.querySelector(".toggle-password");
-            if (passwordField.type === "password") {
-                passwordField.type = "text";
-                toggleIcon.classList.replace("fa-eye", "fa-eye-slash");
+        function togglePasswordVisibility(fieldId, iconEl) {
+            const field = document.getElementById(fieldId);
+            if (field.type === "password") {
+                field.type = "text";
+                iconEl.classList.replace("fa-eye", "fa-eye-slash");
             } else {
-                passwordField.type = "password";
-                toggleIcon.classList.replace("fa-eye-slash", "fa-eye");
+                field.type = "password";
+                iconEl.classList.replace("fa-eye-slash", "fa-eye");
             }
         }
 
-        /* Particle Background Engine Infrastructure Synchronization */
+        function handleLogin(e) {
+            e.preventDefault();
+            alert("Credentials acknowledged. Authorizing link network handshake...");
+            return true;
+        }
+
+        /* Canvas Particle Array Engine Background Link */
         const canvas = document.getElementById("particles");
         if (canvas) {
             const ctx = canvas.getContext("2d");
