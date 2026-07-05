@@ -1,0 +1,19 @@
+{
+  "hosting": {
+    "public": ".",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      { "source": "/movies", "destination": "/movies.html" },
+      { "source": "/apks", "destination": "/apks.html" },
+      { "source": "/tools", "destination": "/tools.html" },
+      { "source": "/games", "destination": "/games.html" },
+      { "source": "/dashboard", "destination": "/dashboard.html" },
+      { "source": "/login", "destination": "/login.html" },
+      { "source": "/register", "destination": "/register.html" }
+    ]
+  }
+}
