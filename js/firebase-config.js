@@ -1,11 +1,15 @@
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+// Firebase Configuration
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
+
+import {
+  getAuth,
+  setPersistence,
+  browserLocalPersistence
+} from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
+
+// Your Firebase configuration
+
 const firebaseConfig = {
   apiKey: "AIzaSyCpPP-1g0y9j8AMhnK4CZ0_982BojFqrnE",
   authDomain: "cyruslinkshub0.firebaseapp.com",
@@ -17,5 +21,17 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
+
 const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+
+// Initialize Authentication
+
+const auth = getAuth(app);
+
+// Keep users signed in
+
+await setPersistence(auth, browserLocalPersistence);
+
+// Export Authentication
+
+export { auth };
