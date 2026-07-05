@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register | CyrusLinksHub Portal</title>
+    <title>Create System Account | CyrusLinksHub Portal</title>
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -50,7 +50,7 @@
 
         /* ================= LEFT SIDE: REGISTRATION FORM ================= */
         .auth-form-side {
-            padding: 50px 60px;
+            padding: 45px 55px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -76,8 +76,8 @@
         }
 
         .auth-header {
-            margin-top: 35px;
-            margin-bottom: 30px;
+            margin-top: 25px;
+            margin-bottom: 25px;
         }
         .auth-header h1 {
             font-family: 'Orbitron', sans-serif;
@@ -94,17 +94,23 @@
             font-weight: 500;
         }
 
-        /* Form Controls */
+        /* Input Controls Layout Grid */
+        .form-grid-row {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 14px;
+            margin-bottom: 14px;
+        }
+        
         .input-block {
-            margin-bottom: 18px;
             position: relative;
         }
         .input-block label {
             display: block;
             color: rgba(255, 255, 255, 0.6);
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
@@ -113,16 +119,16 @@
             display: flex;
             align-items: center;
         }
-        .input-wrapper i {
+        .input-wrapper i.input-icon {
             position: absolute;
             left: 16px;
             color: rgba(255, 255, 255, 0.3);
-            font-size: 16px;
+            font-size: 15px;
             transition: 0.3s;
         }
         .portal-input {
             width: 100%;
-            padding: 14px 16px 14px 45px;
+            padding: 12px 16px 12px 45px;
             background: rgba(255, 255, 255, 0.02);
             border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 12px;
@@ -138,7 +144,7 @@
             background: rgba(27, 231, 255, 0.03);
             box-shadow: 0 0 15px rgba(27, 231, 255, 0.15);
         }
-        .portal-input:focus + i {
+        .portal-input:focus + i.input-icon {
             color: #1be7ff;
         }
         
@@ -153,13 +159,92 @@
             color: #1be7ff !important;
         }
 
-        /* Submit Action Gradient Button */
+        /* Password Verification Metrics Meter */
+        .password-strength-container {
+            margin-top: -6px;
+            margin-bottom: 12px;
+        }
+        .strength-meter-bar {
+            height: 4px;
+            border-radius: 2px;
+            background: rgba(255, 255, 255, 0.06);
+            width: 100%;
+            overflow: hidden;
+            position: relative;
+        }
+        .strength-fill {
+            height: 100%;
+            width: 0%;
+            background: #ff4d4d;
+            transition: 0.4s ease-in-out;
+        }
+        .strength-text {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.4);
+            font-weight: 600;
+            margin-top: 4px;
+            display: block;
+            text-align: right;
+        }
+
+        /* Explicit Acceptance Checkbox Layer */
+        .agreement-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 16px;
+            cursor: pointer;
+        }
+        .agreement-row input[type="checkbox"] {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.02);
+            cursor: pointer;
+            position: relative;
+            display: inline-block;
+            margin-top: 2px;
+            flex-shrink: 0;
+        }
+        .agreement-row input[type="checkbox"]:checked {
+            background: #1be7ff;
+            border-color: #1be7ff;
+        }
+        .agreement-row input[type="checkbox"]:checked::after {
+            content: '\f00c';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            font-size: 10px;
+            color: #040814;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .agreement-text {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 14px;
+            line-height: 1.3;
+            user-select: none;
+        }
+        .agreement-text a {
+            color: #1be7ff;
+            text-decoration: none;
+        }
+        .agreement-text a:hover {
+            text-decoration: underline;
+        }
+
+        /* System Action Interactive State Control Button */
         .btn-submit {
             width: 100%;
             background: linear-gradient(135deg, #6e6bff, #1be7ff);
             border: none;
             color: white;
-            padding: 15px;
+            padding: 14px;
             border-radius: 12px;
             font-family: 'Orbitron', sans-serif;
             font-weight: 700;
@@ -167,7 +252,6 @@
             font-size: 14px;
             text-transform: uppercase;
             letter-spacing: 1px;
-            margin-top: 10px;
             transition: 0.3s;
             box-shadow: 0 4px 15px rgba(27, 231, 255, 0.2);
         }
@@ -176,17 +260,17 @@
             box-shadow: 0 0 25px rgba(27, 231, 255, 0.45);
         }
 
-        /* OAuth Stack Divider */
+        /* Identity Stack Matrix Boundaries */
         .oauth-divider {
             display: flex;
             align-items: center;
             text-align: center;
             color: rgba(255, 255, 255, 0.25);
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 1px;
-            margin: 22px 0;
+            margin: 18px 0;
         }
         .oauth-divider::before, .oauth-divider::after {
             content: '';
@@ -196,18 +280,17 @@
         .oauth-divider:not(:empty)::before { margin-right: .75em; }
         .oauth-divider:not(:empty)::after { margin-left: .75em; }
 
-        /* Identity Providers Column List */
         .oauth-column {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
         }
         .btn-oauth {
             background: rgba(255, 255, 255, 0.02);
             border: 1px solid rgba(255, 255, 255, 0.06);
             border-radius: 12px;
             color: #fff;
-            padding: 13px 16px;
+            padding: 11px 16px;
             font-family: 'Rajdhani', sans-serif;
             font-weight: 600;
             font-size: 15px;
@@ -234,7 +317,7 @@
         .btn-oauth.google-provider:hover { border-color: #4285F4; background: rgba(66, 133, 244, 0.05); }
 
         .auth-footer {
-            margin-top: 40px;
+            margin-top: 30px;
             display: flex;
             justify-content: space-between;
             font-size: 14px;
@@ -271,7 +354,6 @@
             overflow: hidden;
         }
 
-        /* Close Corner Cross Overlay Component */
         .portal-close {
             position: absolute;
             top: 25px;
@@ -297,7 +379,6 @@
             transform: rotate(90deg);
         }
 
-        /* HUD Live Component Badges mirroring sample data widgets */
         .hud-badge-floating {
             background: rgba(231, 76, 60, 0.15);
             border: 1px solid rgba(231, 76, 60, 0.3);
@@ -329,7 +410,6 @@
             font-size: 14px;
         }
 
-        /* Modern Glass Calendar Overlay Module Match */
         .glass-hud-widget {
             background: rgba(255, 255, 255, 0.02);
             border: 1px solid rgba(255, 255, 255, 0.05);
@@ -348,26 +428,11 @@
             padding-bottom: 12px;
             margin-bottom: 12px;
         }
-        .day-node {
-            text-align: center;
-        }
+        .day-node { text-align: center; }
         .day-node.active .day-lbl { color: #1be7ff; font-weight: 700; }
         .day-node.active .day-num { background: #1be7ff; color: #040814; font-weight: 700; border-radius: 6px; }
-        .day-lbl {
-            font-size: 11px;
-            color: rgba(255, 255, 255, 0.3);
-            text-transform: uppercase;
-            font-weight: 600;
-            display: block;
-            margin-bottom: 4px;
-        }
-        .day-num {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 13px;
-            color: #fff;
-            padding: 4px 6px;
-            display: block;
-        }
+        .day-lbl { font-size: 11px; color: rgba(255, 255, 255, 0.3); text-transform: uppercase; font-weight: 600; display: block; margin-bottom: 4px; }
+        .day-num { font-family: 'Orbitron', sans-serif; font-size: 13px; color: #fff; padding: 4px 6px; display: block; }
 
         .widget-meta {
             display: flex;
@@ -381,19 +446,8 @@
             border-radius: 50%;
             box-shadow: 0 0 8px #1be7ff;
         }
-        .widget-meta p {
-            margin: 0;
-            font-weight: 600;
-            font-size: 15px;
-            color: #fff;
-        }
-        .widget-meta span {
-            font-size: 12px;
-            color: rgba(255, 255, 255, 0.4);
-            margin-left: auto;
-        }
+        .widget-meta p { margin: 0; font-weight: 600; font-size: 15px; color: #fff; }
 
-        /* Stacked Avatar Array Components */
         .avatar-pile {
             display: flex;
             align-items: center;
@@ -414,7 +468,6 @@
             color: #fff;
         }
 
-        /* Responsive Layout Overrides */
         @media (max-width: 850px) {
             .auth-container { grid-template-columns: 1fr; }
             .auth-graphic-side { display: none; }
@@ -430,9 +483,7 @@
 
 <body>
 
-    <!-- Ambient FX Core Particle Vector Canvas -->
     <canvas id="particles"></canvas>
-
     <div class="bg-glow glow-left"></div>
     <div class="bg-glow glow-right"></div>
     <div class="bg-glow glow-bottom"></div>
@@ -440,52 +491,83 @@
     <div class="portal-wrapper">
         <div class="auth-container">
             
-            <!-- ================= LEFT ACCOUNT INPUT CONTROL BLOCK ================= -->
+            <!-- ================= LEFT ACCOUNT REGISTRATION MODULE ================= -->
             <div class="auth-form-side">
                 
                 <div class="brand-pill">
-                    <i class="fa-solid fa-shield-halved"></i> CyrusLinksHub Core Secure
+                    <i class="fa-solid fa-shield-halved"></i> CyrusLinksHub Access Control
                 </div>
 
                 <div class="auth-header">
-                    <h1>Create an account</h1>
-                    <p>Secure pipeline access initialization</p>
+                    <h1>Register Workspace</h1>
+                    <p>Initialize your pipeline operations credentials</p>
                 </div>
 
-                <form autocomplete="off" onsubmit="event.preventDefault();">
+                <form autocomplete="off" onsubmit="return validateRegistrationForm(event);">
                     
-                    <div class="input-block">
-                        <label>Full Name</label>
-                        <div class="input-wrapper">
-                            <input type="text" class="portal-input" placeholder="Amélie Laurent" required>
-                            <i class="fa-regular fa-user"></i>
+                    <div class="form-grid-row">
+                        <div class="input-block">
+                            <label>Full Name</label>
+                            <div class="input-wrapper">
+                                <input type="text" class="portal-input" placeholder="Amélie Laurent" required>
+                                <i class="fa-regular fa-user input-icon"></i>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="input-block">
-                        <label>Email Address</label>
-                        <div class="input-wrapper">
-                            <input type="email" class="portal-input" placeholder="amélielaurent7622@gmail.com" required>
-                            <i class="fa-regular fa-envelope"></i>
+                    <div class="form-grid-row">
+                        <div class="input-block">
+                            <label>Email Address</label>
+                            <div class="input-wrapper">
+                                <input type="email" class="portal-input" placeholder="amélielaurent7622@gmail.com" required>
+                                <i class="fa-regular fa-envelope input-icon"></i>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="input-block">
-                        <label>Password</label>
-                        <div class="input-wrapper">
-                            <input type="password" id="passwordInput" class="portal-input" placeholder="••••••••••••••••••••" required>
-                            <i class="fa-solid fa-lock"></i>
-                            <i class="fa-regular fa-eye toggle-password" onclick="togglePasswordVisibility()"></i>
+                     <!-- Password Fields & Validation Engine Layout -->
+                    <div class="form-grid-row">
+                        <div class="input-block">
+                            <label>Password</label>
+                            <div class="input-wrapper">
+                                <input type="password" id="passwordInput" class="portal-input" placeholder="••••••••••••••••••••" oninput="checkPasswordStrength()" required>
+                                <i class="fa-solid fa-lock input-icon"></i>
+                                <i class="fa-regular fa-eye toggle-password" onclick="togglePasswordVisibility('passwordInput', this)"></i>
+                            </div>
                         </div>
                     </div>
 
-                    <button type="submit" class="btn-submit">Submit Details</button>
+                    <!-- Dynamic Live Strength Interface Indicator Container -->
+                    <div class="password-strength-container">
+                        <div class="strength-meter-bar"><div id="strengthBar" class="strength-fill"></div></div>
+                        <span id="strengthText" class="strength-text">Security Status: Unverified</span>
+                    </div>
+
+                    <div class="form-grid-row">
+                        <div class="input-block">
+                            <label>Confirm Password</label>
+                            <div class="input-wrapper">
+                                <input type="password" id="confirmPasswordInput" class="portal-input" placeholder="••••••••••••••••••••" required>
+                                <i class="fa-solid fa-shield-check input-icon" style="font-family: 'Font Awesome 6 Free'; font-weight: 900;"></i>
+                                <i class="fa-regular fa-eye toggle-password" onclick="togglePasswordVisibility('confirmPasswordInput', this)"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Legal Operations Checkbox Acceptance Check -->
+                    <label class="agreement-row">
+                        <input type="checkbox" id="termsAgreement" required>
+                        <span class="agreement-text">
+                            I verify authorization request criteria and accept the <a href="terms.html">Terms of Service</a> & <a href="privacy.html">Privacy Policy</a>.
+                        </span>
+                    </label>
+
+                    <button type="submit" class="btn-submit">Initialize Registration</button>
 
                 </form>
 
                 <div class="oauth-divider">Or Continue With</div>
 
-                <!-- Complete Full Height Auth Provider Options Stack -->
                 <div class="oauth-column">
                     <button class="btn-oauth discord-provider"><i class="fa-brands fa-discord" style="color: #5865F2;"></i> Continue with Discord</button>
                     <button class="btn-oauth github-provider"><i class="fa-brands fa-github"></i> Continue with GitHub</button>
@@ -502,12 +584,10 @@
             <!-- ================= RIGHT VISUAL DIAGNOSTIC CORE PANEL ================= -->
             <div class="auth-graphic-side">
                 
-                <!-- Escape Cross Anchor Routing Home -->
                 <a href="index.html" class="portal-close" title="Cancel Vector Mapping">
                     <i class="fa-solid fa-xmark"></i>
                 </a>
 
-                <!-- Floating System Telemetry Telecommunication Widgets -->
                 <div style="margin-top: 20px;">
                     <div class="hud-badge-floating">
                         <span>Task Review With Team</span>
@@ -519,7 +599,6 @@
                     </div>
                 </div>
 
-                <!-- Live Glass UI Metrics HUD Layer Component Matrix Mapping -->
                 <div class="glass-hud-widget">
                     <div class="timeline-strip">
                         <div class="day-node"><span class="day-lbl">Sun</span><span class="day-num">22</span></div>
@@ -539,7 +618,6 @@
                         </div>
                     </div>
 
-                    <!-- Micro User Avatars Array Node Matrix Stack -->
                     <div class="avatar-pile">
                         <div class="user-avatar" style="background: #3498db;">AL</div>
                         <div class="user-avatar" style="background: #e67e22;">JD</div>
@@ -552,21 +630,67 @@
 
         </div>
     </div>
-    <!-- Interface Script Logic Hooks -->
+
+    <!-- Active Registration Script Engine Logic -->
     <script>
-        function togglePasswordVisibility() {
-            const passwordField = document.getElementById("passwordInput");
-            const toggleIcon = document.querySelector(".toggle-password");
-            if (passwordField.type === "password") {
-                passwordField.type = "text";
-                toggleIcon.classList.replace("fa-eye", "fa-eye-slash");
+        function togglePasswordVisibility(fieldId, iconEl) {
+            const field = document.getElementById(fieldId);
+            if (field.type === "password") {
+                field.type = "text";
+                iconEl.classList.replace("fa-eye", "fa-eye-slash");
             } else {
-                passwordField.type = "password";
-                toggleIcon.classList.replace("fa-eye-slash", "fa-eye");
+                field.type = "password";
+                iconEl.classList.replace("fa-eye-slash", "fa-eye");
             }
         }
 
-        /* Particle Background Engine Infrastructure Synchronization */
+        /* Real-time Registration Password Complexity Diagnostics Engine */
+        function checkPasswordStrength() {
+            const pass = document.getElementById("passwordInput").value;
+            const bar = document.getElementById("strengthBar");
+            const txt = document.getElementById("strengthText");
+            let score = 0;
+
+            if (pass.length >= 8) score++;
+            if (/[A-Z]/.test(pass)) score++;
+            if (/[0-9]/.test(pass)) score++;
+            if (/[^A-Za-z0-9]/.test(pass)) score++;
+
+            if(pass.length === 0) {
+                bar.style.width = "0%";
+                txt.innerText = "Security Status: Unverified";
+                txt.style.color = "rgba(255,255,255,0.4)";
+            } else if (score <= 2) {
+                bar.style.width = "35%";
+                bar.style.background = "#ff4d4d";
+                txt.innerText = "Security Status: Weak Vector";
+                txt.style.color = "#ff4d4d";
+            } else if (score === 3) {
+                bar.style.width = "65%";
+                bar.style.background = "#ffa502";
+                txt.innerText = "Security Status: Moderate Configuration";
+                txt.style.color = "#ffa502";
+            } else {
+                bar.style.width = "100%";
+                bar.style.background = "#2ecc71";
+                txt.innerText = "Security Status: Encrypted & Secure";
+                txt.style.color = "#2ecc71";
+            }
+        }
+
+        /* Form Submissions Data Logic Cross Check Integrity Routing */
+        function validateRegistrationForm(e) {
+            const pass = document.getElementById("passwordInput").value;
+            const confirmPass = document.getElementById("confirmPasswordInput").value;
+
+            if (pass !== confirmPass) {
+                alert("Security mismatch: Registration confirmation vector mapping failed. Passwords must match.");
+                return false;
+            }
+            return true;
+        }
+
+        /* Particles Array Engine Background Mapping Link */
         const canvas = document.getElementById("particles");
         if (canvas) {
             const ctx = canvas.getContext("2d");
