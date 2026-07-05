@@ -2,144 +2,520 @@
 <html lang="en">
 
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reset Password | CyrusLinksHub Portal</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 
-<meta charset="UTF-8">
+    <style>
+        /* ================= PREMIUM PORTAL CORE LAYOUT ================= */
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Rajdhani', sans-serif;
+            overflow-x: hidden;
+            background: #040814;
+        }
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+        .portal-wrapper {
+            width: 100%;
+            max-width: 1050px;
+            margin: 20px;
+            z-index: 10;
+            position: relative;
+        }
 
-<title>Forgot Password | CyrusLinksHub</title>
+        /* Twin-Panel Architecture Frame */
+        .auth-container {
+            background: rgba(10, 16, 32, 0.45);
+            border: 1px solid rgba(27, 231, 255, 0.12);
+            border-radius: 24px;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4), 
+                        0 0 40px rgba(27, 231, 255, 0.05);
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            overflow: hidden;
+            position: relative;
+        }
 
-<link rel="stylesheet" href="style.css">
+        /* ================= LEFT SIDE: DYNAMIC WORKFLOW FORM ================= */
+        .auth-form-side {
+            padding: 50px 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            min-height: 520px;
+        }
 
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+        .brand-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 8px 16px;
+            border-radius: 30px;
+            width: fit-content;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 600;
+            font-size: 14px;
+            letter-spacing: 0.5px;
+        }
+        .brand-pill i {
+            color: #1be7ff;
+        }
 
-<link rel="stylesheet"
-href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+        .auth-header {
+            margin-top: 30px;
+            margin-bottom: 30px;
+        }
+        .auth-header h1 {
+            font-family: 'Orbitron', sans-serif;
+            color: #fff;
+            font-size: 32px;
+            margin: 0 0 8px 0;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+        .auth-header p {
+            color: rgba(255, 255, 255, 0.5);
+            margin: 0;
+            font-size: 16px;
+            font-weight: 500;
+            line-height: 1.4;
+        }
 
+        /* Form Layout Architecture */
+        .form-stage {
+            display: none;
+            transition: opacity 0.3s ease;
+        }
+        .form-stage.active {
+            display: block;
+        }
+
+        .input-block {
+            margin-bottom: 24px;
+            position: relative;
+        }
+        .input-block label {
+            display: block;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .input-wrapper i {
+            position: absolute;
+            left: 16px;
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 16px;
+            transition: 0.3s;
+        }
+        .portal-input {
+            width: 100%;
+            padding: 14px 16px 14px 45px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            color: #fff;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 16px;
+            font-weight: 500;
+            outline: none;
+            transition: 0.3s;
+        }
+        .portal-input:focus {
+            border-color: #1be7ff;
+            background: rgba(27, 231, 255, 0.03);
+            box-shadow: 0 0 15px rgba(27, 231, 255, 0.15);
+        }
+        .portal-input:focus + i {
+            color: #1be7ff;
+        }
+
+        /* 6-Digit Verification Matrix UI */
+        .otp-matrix-wrapper {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin: 25px 0;
+        }
+        .otp-cell {
+            width: 50px;
+            height: 52px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            color: #1be7ff;
+            text-align: center;
+            outline: none;
+            transition: 0.3s;
+        }
+        .otp-cell:focus {
+            border-color: #1be7ff;
+            background: rgba(27, 231, 255, 0.04);
+            box-shadow: 0 0 12px rgba(27, 231, 255, 0.2);
+        }
+
+        .timer-badge {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.4);
+            font-weight: 500;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .timer-badge span {
+            color: #ff4d94;
+            font-weight: 700;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        /* Action Controls Layout Buttons */
+        .btn-submit {
+            width: 100%;
+            background: linear-gradient(135deg, #6e6bff, #1be7ff);
+            border: none;
+            color: white;
+            padding: 15px;
+            border-radius: 12px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: 0.3s;
+            box-shadow: 0 4px 15px rgba(27, 231, 255, 0.2);
+        }
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 25px rgba(27, 231, 255, 0.45);
+        }
+
+        .auth-footer {
+            margin-top: 40px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            font-weight: 500;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding-top: 20px;
+        }
+        .auth-footer a {
+            color: rgba(255, 255, 255, 0.4);
+            text-decoration: none;
+            transition: 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .auth-footer a:hover {
+            color: #1be7ff;
+        }
+
+        /* ================= RIGHT SIDE: HERO SYSTEM GRAPHIC ================= */
+        .auth-graphic-side {
+            background: linear-gradient(145deg, rgba(9, 18, 44, 0.8), rgba(4, 8, 20, 0.95));
+            border-left: 1px solid rgba(27, 231, 255, 0.08);
+            padding: 50px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow: hidden;
+        }
+
+        .portal-close {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            width: 36px;
+            height: 36px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255, 255, 255, 0.4);
+            cursor: pointer;
+            transition: 0.3s;
+            text-decoration: none;
+            z-index: 5;
+        }
+        .portal-close:hover {
+            background: rgba(255, 77, 148, 0.1);
+            border-color: #ff4d94;
+            color: #ff4d94;
+            transform: rotate(90deg);
+        }
+
+        .hud-badge-floating {
+            background: rgba(27, 231, 255, 0.06);
+            border: 1px solid rgba(27, 231, 255, 0.15);
+            border-left: 3px solid #1be7ff;
+            padding: 12px 16px;
+            border-radius: 8px;
+            width: fit-content;
+            margin-bottom: 15px;
+            animation: float 4s ease-in-out infinite;
+        }
+        .hud-badge-floating span {
+            display: block;
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+        .hud-badge-floating h4 {
+            font-family: 'Orbitron', sans-serif;
+            color: #fff;
+            margin: 3px 0 0 0;
+            font-size: 14px;
+        }
+
+        .glass-hud-widget {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 20px;
+            margin-top: auto;
+            margin-bottom: 25px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .widget-meta {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #ff4d94;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #ff4d94;
+        }
+        .widget-meta p { margin: 0; font-weight: 600; font-size: 15px; color: #fff; }
+        .widget-meta span { font-size: 12px; color: rgba(255, 255, 255, 0.4); margin-left: auto; }
+
+        @media (max-width: 850px) {
+            .auth-container { grid-template-columns: 1fr; }
+            .auth-graphic-side { display: none; }
+            .auth-form-side { padding: 40px 30px; }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+        }
+    </style>
 </head>
 
 <body>
 
-<canvas id="particles"></canvas>
+    <canvas id="particles"></canvas>
+    <div class="bg-glow glow-left"></div>
+    <div class="bg-glow glow-right"></div>
+    <div class="bg-glow glow-bottom"></div>
 
-<div class="bg-glow glow-left"></div>
-<div class="bg-glow glow-right"></div>
+    <div class="portal-wrapper">
+        <div class="auth-container">
+            
+            <div class="auth-form-side">
+                
+                <div class="brand-pill">
+                    <i class="fa-solid fa-key"></i> CyrusLinksHub SecOps
+                </div>
 
-<header class="header">
+                <div id="stageRequest" class="form-stage active">
+                    <div class="auth-header">
+                        <h1>Forgot Password?</h1>
+                        <p>Enter your verified email configuration routing to issue a global safety override link.</p>
+                    </div>
 
-<div class="container navbar">
+                    <form autocomplete="off" onsubmit="transitionToMFA(event)">
+                        <div class="input-block">
+                            <label>Account Email</label>
+                            <div class="input-wrapper">
+                                <input type="email" id="recoveryEmail" class="portal-input" placeholder="amélielaurent7622@gmail.com" required>
+                                <i class="fa-regular fa-envelope"></i>
+                            </div>
+                        </div>
 
-<a href="index.html" class="logo">
+                        <button type="submit" class="btn-submit">Send Recovery Token</button>
+                    </form>
+                </div>
 
-<span class="animated-logo">
+                <div id="stageVerify" class="form-stage">
+                    <div class="auth-header">
+                        <h1>Verify Identity</h1>
+                        <p>An authentication token was routed to <span id="targetEmailLabel" style="color:#1be7ff;">your email</span>. Provide the matrix sequence below.</p>
+                    </div>
 
-CYRUSLINKSHUB
+                    <form autocomplete="off" onsubmit="verifyTokenSequence(event)">
+                        <div class="otp-matrix-wrapper">
+                            <input type="text" class="otp-cell" maxlength="1" required oninput="shiftOtpFocus(this, 1)">
+                            <input type="text" class="otp-cell" maxlength="1" required oninput="shiftOtpFocus(this, 2)">
+                            <input type="text" class="otp-cell" maxlength="1" required oninput="shiftOtpFocus(this, 3)">
+                            <input type="text" class="otp-cell" maxlength="1" required oninput="shiftOtpFocus(this, 4)">
+                            <input type="text" class="otp-cell" maxlength="1" required oninput="shiftOtpFocus(this, 5)">
+                            <input type="text" class="otp-cell" maxlength="1" required oninput="shiftOtpFocus(this, 6)">
+                        </div>
 
-</span>
+                        <div class="timer-badge">
+                            <i class="fa-regular fa-clock"></i> Security window expires in: <span id="countdown">02:00</span>
+                        </div>
 
-</a>
+                        <button type="submit" class="btn-submit">Validate Matrix Token</button>
+                    </form>
+                </div>
 
-<nav>
+                <div class="auth-footer">
+                    <a href="login.html"><i class="fa-solid fa-arrow-left-long"></i> Back to sign in</a>
+                    <a href="about.html">Contact Support</a>
+                </div>
 
-<ul class="nav-links">
+            </div>
 
-<li><a href="index.html">Home</a></li>
-<li><a href="tools.html">Tools</a></li>
-<li><a href="games.html">Games</a></li>
-<li><a href="about.html">About</a></li>
+            <div class="auth-graphic-side">
+                
+                <a href="index.html" class="portal-close" title="Cancel Operations Matrix">
+                    <i class="fa-solid fa-xmark"></i>
+                </a>
 
-</ul>
+                <div style="margin-top: 20px;">
+                    <div class="hud-badge-floating">
+                        <span>Identity Lock System</span>
+                        <h4>Credential Encryption Layer</h4>
+                    </div>
+                </div>
 
-</nav>
+                <div class="glass-hud-widget">
+                    <div class="widget-meta">
+                        <div class="status-dot"></div>
+                        <div>
+                            <p>Authentication Vector Status</p>
+                            <span style="display:block; font-size:12px; color:rgba(255,255,255,0.4); font-weight:500; margin-top:2px;">Awaiting Handshake Protocol</span>
+                        </div>
+                    </div>
+                </div>
 
-</div>
+            </div>
 
-</header>
+        </div>
+    </div>
 
-<main class="auth-page">
+    <script>
+        // Transition workflow cleanly between email prompt and MFA grid matrix
+        function transitionToMFA(e) {
+            e.preventDefault();
+            const emailInput = document.getElementById('recoveryEmail').value;
+            document.getElementById('targetEmailLabel').innerText = emailInput;
+            
+            document.getElementById('stageRequest').classList.remove('active');
+            document.getElementById('stageVerify').classList.add('active');
+            
+            // Focus on first dynamic cell index instantly
+            document.querySelectorAll('.otp-cell')[0].focus();
+            initializeCountdownTimer();
+        }
 
-<div class="glass-card auth-card">
+        // Shift cell inputs automatically on typing metrics
+        function shiftOtpFocus(currentCell, index) {
+            if (currentCell.value.length >= 1 && index < 6) {
+                document.querySelectorAll('.otp-cell')[index].focus();
+            }
+        }
 
-<div class="auth-header">
+        // Security Countdown Engine Logic
+        function initializeCountdownTimer() {
+            let duration = 120; // 2 minutes metric duration window
+            const display = document.getElementById('countdown');
+            const interval = setInterval(() => {
+                let minutes = Math.floor(duration / 60);
+                let seconds = duration % 60;
+                minutes = minutes < 10 ? "0" + minutes : minutes;
+                seconds = seconds < 10 ? "0" + seconds : seconds;
+                display.innerText = minutes + ":" + seconds;
 
-<i class="fa-solid fa-key auth-icon"></i>
+                if (--duration < 0) {
+                    clearInterval(interval);
+                    display.innerText = "EXPIRED";
+                    alert("The dynamic verification window expired. Please re-initialize token request.");
+                }
+            }, 1000);
+        }
 
-<h1>Forgot Password</h1>
+        function verifyTokenSequence(e) {
+            e.preventDefault();
+            alert("Matrix mapping secure. Global override authorization acknowledged.");
+        }
 
-<p>
+        /* Particle System Array Engine Background Link */
+        const canvas = document.getElementById("particles");
+        if (canvas) {
+            const ctx = canvas.getContext("2d");
+            function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+            resize();
+            window.addEventListener("resize", resize);
 
-Enter your email address to receive a password reset link.
+            const particles = [];
+            for (let i = 0; i < 140; i++) {
+                particles.push({
+                    x: Math.random() * window.innerWidth,
+                    y: Math.random() * window.innerHeight,
+                    r: Math.random() * 2 + 0.5,
+                    dx: (Math.random() - 0.5) * 0.2,
+                    dy: (Math.random() - 0.5) * 0.2
+                });
+            }
 
-</p>
-
-</div>
-
-<form id="forgotPasswordForm">
-
-<div class="input-group">
-
-<label>Email Address</label>
-
-<input
-type="email"
-id="resetEmail"
-placeholder="example@email.com"
-required>
-
-</div>
-
-<button
-type="submit"
-class="btn btn-primary auth-btn">
-
-<i class="fa-solid fa-paper-plane"></i>
-
-Send Reset Link
-
-</button>
-
-</form>
-
-<div class="divider">
-
-<span>OR</span>
-
-</div>
-
-<div class="auth-footer">
-
-Remember your password?
-
-<a href="login.html">
-
-Login
-
-</a>
-
-</div>
-
-<div class="auth-footer">
-
-Don't have an account?
-
-<a href="register.html">
-
-Create Account
-
-</a>
-
-</div>
-
-<div id="forgotMessage"></div>
-
-</div>
-
-</main>
-
-<script type="module" src="js/firebase-config.js"></script>
-
-<script type="module" src="js/forgot-password.js"></script>
-
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                particles.forEach(p => {
+                    p.x += p.dx; p.y += p.dy;
+                    if (p.x < 0) p.x = canvas.width;
+                    if (p.x > canvas.width) p.x = 0;
+                    if (p.y < 0) p.y = canvas.height;
+                    if (p.y > canvas.height) p.y = 0;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                    ctx.fillStyle = "rgba(27, 231, 255, 0.7)";
+                    ctx.fill();
+                });
+                requestAnimationFrame(animate);
+            }
+            animate();
+        }
+    </script>
+    <script src="protection.js"></script>
 </body>
 
 </html>
