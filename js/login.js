@@ -3,39 +3,31 @@ import { auth, googleProvider, githubProvider } from "./firebase-config.js";
 import {
     signInWithEmailAndPassword,
     signInWithPopup,
-    sendPasswordResetEmail,
     onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
 
 
-// ================================
-// 🔐 AUTO REDIRECT IF LOGGED IN
-// ================================
+// =========================
+// 🔐 AUTO LOGIN CHECK
+// =========================
 onAuthStateChanged(auth, (user) => {
-
-    const loader = document.getElementById("authLoader");
 
     if (user) {
         window.location.href = "/dashboard";
-    } else {
-        if (loader) loader.style.display = "none";
     }
 
 });
 
 
-// ================================
+// =========================
 // 📧 EMAIL LOGIN
-// ================================
-document.getElementById("loginBtn").addEventListener("click", async () => {
+// =========================
+window.handleLogin = async function (e) {
 
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
+    e.preventDefault();
 
-    if (!email || !password) {
-        alert("Please fill all fields");
-        return;
-    }
+    const email = document.querySelector('input[type="email"]').value;
+    const password = document.getElementById("loginPasswordInput").value;
 
     try {
 
@@ -47,14 +39,13 @@ document.getElementById("loginBtn").addEventListener("click", async () => {
         alert("Login Failed: " + error.message);
 
     }
+};
 
-});
 
-
-// ================================
+// =========================
 // 🌐 GOOGLE LOGIN
-// ================================
-document.getElementById("googleLogin").addEventListener("click", async () => {
+// =========================
+document.querySelector(".google-provider").addEventListener("click", async () => {
 
     try {
 
@@ -70,10 +61,10 @@ document.getElementById("googleLogin").addEventListener("click", async () => {
 });
 
 
-// ================================
+// =========================
 // 🐙 GITHUB LOGIN
-// ================================
-document.getElementById("githubLogin").addEventListener("click", async () => {
+// =========================
+document.querySelector(".github-provider").addEventListener("click", async () => {
 
     try {
 
@@ -87,35 +78,3 @@ document.getElementById("githubLogin").addEventListener("click", async () => {
     }
 
 });
-
-
-// ================================
-// 🔑 FORGOT PASSWORD
-// ================================
-document.getElementById("forgotPassword").addEventListener("click", async () => {
-
-    const email = document.getElementById("email").value;
-
-    if (!email) {
-        alert("Enter your email first");
-        return;
-    }
-
-    try {
-
-        await sendPasswordResetEmail(auth, email);
-        alert("Password reset email sent!");
-
-    } catch (error) {
-
-        alert("Error: " + error.message);
-
-    }
-
-});
-
-
-// ================================
-// ⚡ DEBUG (optional)
-// ================================
-console.log("Login system loaded successfully 🚀");
