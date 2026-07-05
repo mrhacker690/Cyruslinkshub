@@ -196,31 +196,42 @@
         .oauth-divider:not(:empty)::before { margin-right: .75em; }
         .oauth-divider:not(:empty)::after { margin-left: .75em; }
 
-        .oauth-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
+        /* Full Stack Identity Stack Layout Change */
+        .oauth-column {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
         .btn-oauth {
             background: rgba(255, 255, 255, 0.02);
             border: 1px solid rgba(255, 255, 255, 0.06);
             border-radius: 12px;
             color: #fff;
-            padding: 12px;
+            padding: 13px 16px;
             font-family: 'Rajdhani', sans-serif;
             font-weight: 600;
             font-size: 15px;
             cursor: pointer;
             display: flex;
             align-items: center;
-            justify-content: center;
-            gap: 8px;
+            justify-content: flex-start;
+            gap: 14px;
             transition: 0.3s;
+            width: 100%;
+        }
+        .btn-oauth i {
+            font-size: 18px;
+            width: 20px;
+            text-align: center;
         }
         .btn-oauth:hover {
             background: rgba(255, 255, 255, 0.05);
-            border-color: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.15);
+            transform: translateX(4px);
         }
+        .btn-oauth.discord-provider:hover { border-color: #5865F2; background: rgba(88, 101, 242, 0.05); }
+        .btn-oauth.github-provider:hover { border-color: #24292e; background: rgba(255, 255, 255, 0.08); }
+        .btn-oauth.google-provider:hover { border-color: #4285F4; background: rgba(66, 133, 244, 0.05); }
 
         .auth-footer {
             margin-top: 40px;
@@ -419,6 +430,7 @@
 
 <body>
 
+    <!-- Ambient FX Core Particle Vector Canvas -->
     <canvas id="particles"></canvas>
 
     <div class="bg-glow glow-left"></div>
@@ -428,6 +440,7 @@
     <div class="portal-wrapper">
         <div class="auth-container">
             
+            <!-- ================= LEFT ACCOUNT INPUT CONTROL BLOCK ================= -->
             <div class="auth-form-side">
                 
                 <div class="brand-pill">
@@ -436,7 +449,7 @@
 
                 <div class="auth-header">
                     <h1>Create an account</h1>
-                    <p>Sign up and get 30 day free trial</p>
+                    <p>Secure pipeline access initialization</p>
                 </div>
 
                 <form autocomplete="off" onsubmit="event.preventDefault();">
@@ -470,11 +483,13 @@
 
                 </form>
 
-                <div class="oauth-divider">Or Identity Verification Via</div>
+                <div class="oauth-divider">Or Continue With</div>
 
-                <div class="oauth-row">
-                    <button class="btn-oauth"><i class="fa-brands fa-apple"></i> Apple</button>
-                    <button class="btn-oauth"><i class="fa-brands fa-google" style="color: #ea4335;"></i> Google</button>
+                <!-- Updated full stack authorization options row -->
+                <div class="oauth-column">
+                    <button class="btn-oauth discord-provider"><i class="fa-brands fa-discord" style="color: #5865F2;"></i> Continue with Discord</button>
+                    <button class="btn-oauth github-provider"><i class="fa-brands fa-github"></i> Continue with GitHub</button>
+                    <button class="btn-oauth google-provider"><i class="fa-brands fa-google" style="color: #ea4335;"></i> Continue with Google</button>
                 </div>
 
                 <div class="auth-footer">
@@ -484,12 +499,15 @@
 
             </div>
 
+            <!-- ================= RIGHT VISUAL DIAGNOSTIC CORE PANEL ================= -->
             <div class="auth-graphic-side">
                 
+                <!-- Escape Cross Anchor Routing Home -->
                 <a href="index.html" class="portal-close" title="Cancel Vector Mapping">
                     <i class="fa-solid fa-xmark"></i>
                 </a>
 
+                <!-- Floating System Telemetry Telecommunication Widgets -->
                 <div style="margin-top: 20px;">
                     <div class="hud-badge-floating">
                         <span>Task Review With Team</span>
@@ -501,6 +519,7 @@
                     </div>
                 </div>
 
+                <!-- Live Glass UI Metrics HUD Layer Component Matrix Mapping -->
                 <div class="glass-hud-widget">
                     <div class="timeline-strip">
                         <div class="day-node"><span class="day-lbl">Sun</span><span class="day-num">22</span></div>
@@ -520,6 +539,7 @@
                         </div>
                     </div>
 
+                    <!-- Micro User Avatars Array Node Matrix Stack -->
                     <div class="avatar-pile">
                         <div class="user-avatar" style="background: #3498db;">AL</div>
                         <div class="user-avatar" style="background: #e67e22;">JD</div>
@@ -532,7 +552,7 @@
 
         </div>
     </div>
-
+       <!-- Interface Script Logic Hooks -->
     <script>
         function togglePasswordVisibility() {
             const passwordField = document.getElementById("passwordInput");
@@ -571,7 +591,7 @@
                     p.x += p.dx; p.y += p.dy;
                     if (p.x < 0) p.x = canvas.width;
                     if (p.x > canvas.width) p.x = 0;
-                    if (p.y < 0) p.y = canvas.heigh
+                    if (p.y < 0) p.y = canvas.height;
                     if (p.y > canvas.height) p.y = 0;
                     ctx.beginPath();
                     ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
