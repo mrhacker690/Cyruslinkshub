@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>System Authentication Portal | CyrusLinksHub</title>
+    <title>System Access Control | CyrusLinksHub Portal</title>
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -48,7 +48,7 @@
             position: relative;
         }
 
-        /* ================= LEFT SIDE: AUTHENTICATION FORM ================= */
+        /* ================= LEFT SIDE: AUTH FORM ================= */
         .auth-form-side {
             padding: 45px 55px;
             display: flex;
@@ -99,7 +99,7 @@
             display: grid;
             grid-template-columns: 1fr;
             gap: 14px;
-            margin-bottom: 18px;
+            margin-bottom: 14px;
         }
         
         .input-block {
@@ -159,61 +159,7 @@
             color: #1be7ff !important;
         }
 
-        /* Auxiliary Actions (Remember Me / Forgot Pass) */
-        .form-aux-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-        }
-        .remember-me {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 14px;
-            user-select: none;
-        }
-        .remember-me input[type="checkbox"] {
-            appearance: none;
-            -webkit-appearance: none;
-            width: 16px;
-            height: 16px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 4px;
-            background: rgba(255, 255, 255, 0.02);
-            cursor: pointer;
-            position: relative;
-        }
-        .remember-me input[type="checkbox"]:checked {
-            background: #1be7ff;
-            border-color: #1be7ff;
-        }
-        .remember-me input[type="checkbox"]:checked::after {
-            content: '\f00c';
-            font-family: 'Font Awesome 6 Free';
-            font-weight: 900;
-            font-size: 10px;
-            color: #040814;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-        }
-        .forgot-link {
-            color: #6e6bff;
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 600;
-            transition: 0.3s;
-        }
-        .forgot-link:hover {
-            color: #1be7ff;
-            text-decoration: underline;
-        }
-
-        /* Interactive Action Control Button */
+        /* System Action Control Button */
         .btn-submit {
             width: 100%;
             background: linear-gradient(135deg, #6e6bff, #1be7ff);
@@ -229,6 +175,7 @@
             letter-spacing: 1px;
             transition: 0.3s;
             box-shadow: 0 4px 15px rgba(27, 231, 255, 0.2);
+            margin-top: 10px;
         }
         .btn-submit:hover {
             transform: translateY(-2px);
@@ -236,13 +183,13 @@
         }
         .btn-submit:disabled {
             background: #222a3a;
-            color: rgba(255,255,255,0.3);
+            color: rgba(255, 255, 255, 0.3);
             cursor: not-allowed;
             transform: none;
             box-shadow: none;
         }
 
-        /* Identity Federated Stack Boundaries */
+        /* Identity Stack Matrix Boundaries */
         .oauth-divider {
             display: flex;
             align-items: center;
@@ -324,7 +271,7 @@
             text-decoration: underline;
         }
 
-        /* ================= RIGHT SIDE: HERO DIAGNOSTIC GRAPHIC ================= */
+        /* ================= RIGHT SIDE: HERO SYSTEM GRAPHIC ================= */
         .auth-graphic-side {
             background: linear-gradient(145deg, rgba(9, 18, 44, 0.8), rgba(4, 8, 20, 0.95));
             border-left: 1px solid rgba(27, 231, 255, 0.08);
@@ -397,19 +344,6 @@
             -webkit-backdrop-filter: blur(10px);
         }
         
-        .timeline-strip {
-            display: flex;
-            justify-content: space-between;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-            padding-bottom: 12px;
-            margin-bottom: 12px;
-        }
-        .day-node { text-align: center; }
-        .day-node.active .day-lbl { color: #1be7ff; font-weight: 700; }
-        .day-node.active .day-num { background: #1be7ff; color: #040814; font-weight: 700; border-radius: 6px; }
-        .day-lbl { font-size: 11px; color: rgba(255, 255, 255, 0.3); text-transform: uppercase; font-weight: 600; display: block; margin-bottom: 4px; }
-        .day-num { font-family: 'Orbitron', sans-serif; font-size: 13px; color: #fff; padding: 4px 6px; display: block; }
-
         .widget-meta {
             display: flex;
             align-items: center;
@@ -442,30 +376,29 @@
     <canvas id="particles"></canvas>
     <div class="bg-glow glow-left"></div>
     <div class="bg-glow glow-right"></div>
+    <div class="bg-glow glow-bottom"></div>
 
     <div class="portal-wrapper">
         <div class="auth-container">
             
-            <!-- ================= LEFT ACCOUNT AUTH MODULE ================= -->
             <div class="auth-form-side">
                 
                 <div class="brand-pill">
-                    <i class="fa-solid fa-shield-halved"></i> CyrusLinksHub Control Matrix
+                    <i class="fa-solid fa-shield-halved"></i> CyrusLinksHub Gateway
                 </div>
 
                 <div class="auth-header">
-                    <h1>Portal Access</h1>
-                    <p>Mount system initialization configurations</p>
+                    <h1>Portal Login</h1>
+                    <p>Enter your credentials to access system telemetry</p>
                 </div>
 
-                <!-- Live Hook for Real Firebase Verification Workflow Engine -->
-                <form autocomplete="off" onsubmit="handleFirebaseLogin(event);">
+                <form autocomplete="off" onsubmit="handleFirebaseLogin(event)">
                     
                     <div class="form-grid-row">
                         <div class="input-block">
-                            <label>Identity Email</label>
+                            <label>Email Address</label>
                             <div class="input-wrapper">
-                                <input type="email" id="loginEmailInput" class="portal-input" placeholder="operator@cyruslinkshub.com" required>
+                                <input type="email" id="loginEmailInput" class="portal-input" placeholder="your@gmail.com" required>
                                 <i class="fa-regular fa-envelope input-icon"></i>
                             </div>
                         </div>
@@ -473,7 +406,10 @@
 
                     <div class="form-grid-row">
                         <div class="input-block">
-                            <label>Secure Token / Password</label>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                                <label style="margin-bottom: 0;">Password</label>
+                                <a href="forgot-password.html" style="color: #1be7ff; font-size: 13px; font-weight: 600; text-decoration: none; text-transform: uppercase; letter-spacing: 0.5px; transition: 0.3s;" onmouseover="this.style.textShadow='0 0 8px #1be7ff'" onmouseout="this.style.textShadow='none'">Forgot Password?</a>
+                            </div>
                             <div class="input-wrapper">
                                 <input type="password" id="loginPasswordInput" class="portal-input" placeholder="••••••••••••••••••••" required>
                                 <i class="fa-solid fa-lock input-icon"></i>
@@ -482,63 +418,44 @@
                         </div>
                     </div>
 
-                    <div class="form-aux-row">
-                        <label class="remember-me">
-                            <input type="checkbox" id="rememberMe">
-                            <span>Keep Node Connected</span>
-                        </label>
-                        <a href="forgot.html" class="forgot-link">Recover Credentials</a>
-                    </div>
-
-                    <button type="submit" class="btn-submit">Authenticate Node</button>
+                    <button type="submit" class="btn-submit">Authenticate Account</button>
 
                 </form>
 
-                <div class="oauth-divider">Or Open Vector Via</div>
+                <div class="oauth-divider">Or Continue With</div>
 
                 <div class="oauth-column">
-                    <button class="btn-oauth discord-provider"><i class="fa-brands fa-discord" style="color: #5865F2;"></i> Open via Discord</button>
-                    <button class="btn-oauth github-provider"><i class="fa-brands fa-github"></i> Open via GitHub</button>
-                    <button class="btn-oauth google-provider"><i class="fa-brands fa-google" style="color: #ea4335;"></i> Open via Google</button>
+                    <button class="btn-oauth discord-provider"><i class="fa-brands fa-discord" style="color: #5865F2;"></i> Continue with Discord</button>
+                    <button class="btn-oauth github-provider"><i class="fa-brands fa-github"></i> Continue with GitHub</button>
+                    <button class="btn-oauth google-provider"><i class="fa-brands fa-google" style="color: #ea4335;"></i> Continue with Google</button>
                 </div>
 
                 <div class="auth-footer">
-                    <span>New Terminal? <a href="register.html">Register here</a></span>
-                    <a href="about.html">System Terms</a>
+                    <span>New to the hub? <a href="register.html">Create account</a></span>
+                    <a href="about.html">System Status</a>
                 </div>
 
             </div>
 
-            <!-- ================= RIGHT VISUAL DIAGNOSTIC PANEL ================= -->
             <div class="auth-graphic-side">
                 
-                <a href="index.html" class="portal-close" title="Terminate Operations Frame">
+                <a href="/" class="portal-close" title="Cancel Interface Handshake">
                     <i class="fa-solid fa-xmark"></i>
                 </a>
 
                 <div style="margin-top: 20px;">
                     <div class="hud-badge-floating">
-                        <span>Cluster Environment Status</span>
-                        <h4>Secure Channel Verification</h4>
+                        <span>Gateway Security Status</span>
+                        <h4>Systems Operational</h4>
                     </div>
                 </div>
 
                 <div class="glass-hud-widget">
-                    <div class="timeline-strip">
-                        <div class="day-node"><span class="day-lbl">Sun</span><span class="day-num">22</span></div>
-                        <div class="day-node active"><span class="day-lbl">Mon</span><span class="day-num">23</span></div>
-                        <div class="day-node"><span class="day-lbl">Tue</span><span class="day-num">24</span></div>
-                        <div class="day-node"><span class="day-lbl">Wed</span><span class="day-num">25</span></div>
-                        <div class="day-node"><span class="day-lbl">Thu</span><span class="day-num">26</span></div>
-                        <div class="day-node"><span class="day-lbl">Fri</span><span class="day-num">27</span></div>
-                        <div class="day-node"><span class="day-lbl">Sat</span><span class="day-num">28</span></div>
-                    </div>
-
                     <div class="widget-meta">
                         <div class="status-dot"></div>
                         <div>
-                            <p>Global Synchronization Pipeline</p>
-                            <span style="display:block; font-size:12px; color:rgba(255,255,255,0.4); font-weight:500; margin-top:2px;">Online Operational Node</span>
+                            <p>Global Link Pipeline</p>
+                            <span style="display:block; font-size:12px; color:rgba(255,255,255,0.4); font-weight:500; margin-top:2px;">Node Connection Stable</span>
                         </div>
                     </div>
                 </div>
@@ -548,11 +465,10 @@
         </div>
     </div>
 
-    <!-- Active Firebase Configuration Integration Point -->
     <script type="module" src="firebase-config.js"></script>
 
     <script>
-        // Real-Time Firebase Account Authentication Pipeline Controller
+        // 4. Real-Time Firebase Account Authentication Pipeline Controller
         async function handleFirebaseLogin(e) {
             e.preventDefault();
 
@@ -560,23 +476,23 @@
             const pass = document.getElementById("loginPasswordInput").value;
             const submitBtn = e.target.querySelector('.btn-submit');
 
-            // 1. Lock execution interface layers
+            // Lock execution interface layers
             submitBtn.innerText = "AUTHENTICATING PIPELINE...";
             submitBtn.disabled = true;
 
             try {
-                // 2. Transmit auth challenge context across initialization vectors
+                // Transmit auth challenge context across initialization vectors
                 await window.signInWithEmailAndPassword(window.auth, email, pass);
                 
                 alert("Matrix Authorization Clear! Relaying to system terminal dashboard...");
-                window.location.href = "dashboard.html"; // Dynamic portal target landing page
+                window.location.href = "dashboard.html"; // Target landing page on success
                 
             } catch (error) {
                 console.error(error);
                 alert(`Authorization Failed: ${error.message}`);
                 
                 // Rollback interactive submission structures on faults
-                submitBtn.innerText = "Authenticate Node";
+                submitBtn.innerText = "Authenticate Account";
                 submitBtn.disabled = false;
             }
         }
@@ -592,7 +508,7 @@
             }
         }
 
-        /* Ambient Dynamic Background Particle Grid Array */
+        /* Canvas Particle Array Engine Background Link */
         const canvas = document.getElementById("particles");
         if (canvas) {
             const ctx = canvas.getContext("2d");
@@ -633,4 +549,3 @@
 </body>
 
 </html>
-   
