@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- ===== FAVICON START ===== -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/android-chrome-192x192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/android-chrome-512x512.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <link rel="manifest" href="/site.webmanifest">
+
+    <meta name="theme-color" content="#0a66d6">
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "CyrusLinksHub",
+      "url": "https://www.cyruslinkshub.com",
+      "logo": "https://www.cyruslinkshub.com/android-chrome-192x192.png"
+    }
+    </script>
+    <!-- ===== FAVICON END ===== -->
+
+    <title>CyrusLinksHub | Home</title>
+    <meta name="description" content="CyrusLinksHub - Premium Minecraft Tools, Gaming Resources, APKs, Movies, Music and Community.">
+
+    <link rel="stylesheet" href="style.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+</head>
+
+<body>
+
+    <canvas id="particles"></canvas>
+
+    <div class="bg-glow glow-left"></div>
+    <div class="bg-glow glow-right"></div>
+    <div class="bg-glow glow-bottom"></div>
+
+    <header class="header">
+        <div class="container">
+            <!-- Top Row: Animated Brand Title & Discord Button -->
+            <div class="brand-bar">
+                <a href="/" class="brand-text">cyruslinkshub</a>
+                <a href="https://discord.gg/" target="_blank" class="discord-btn">
+                    <i class="fab fa-discord"></i> Join Discord
+                </a>
+            </div>
+            
+            <!-- Bottom Row: Scrollable Glowing Navbar -->
+            <nav class="navbar">
+                <ul class="nav-links">
+                    <li>
+                        <a class="active" href="/">
+                            <i class="fa-solid fa-house"></i> Home
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/tools/">
+                            <i class="fa-solid fa-screwdriver-wrench"></i> Tools
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/games/">
+                            <i class="fa-solid fa-gamepad"></i> Games
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/apk/">
+                            <i class="fa-solid fa-mobile-screen-button"></i> APK
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/movies/">
+                            <i class="fa-solid fa-film"></i> Movies
+                        </a>
+                    </li>
+                    <li>
+                        <a href="about">
+                            <i class="fa-solid fa-circle-info"></i> About
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="container">
+                <div class="hero-content">
+                    <div class="hero-badge">
+                        <i class="fas fa-bolt"></i> Powerful • Fast • Secure • Community Driven
+                    </div>
+                    <h1>WELCOME TO <span>CYRUSLINKSHUB</span></h1>
+                    <p class="hero-subtitle">The Ultimate Gaming & Utility Platform</p>
+                    <div class="typing-box">
+                        <span id="typing"></span>
+                    </div>
+                    <div class="hero-buttons">
+                        <a href="tools.html" class="btn btn-primary">
+                            <i class="fas fa-rocket"></i> Explore Tools
+                        </a>
+                        <a href="https://discord.gg/" target="_blank" class="btn btn-secondary">
+                            <i class="fab fa-discord"></i> Join Discord
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ABOUT SECTION -->
+        <section id="about" class="about-section">
+            <div class="container">
+                <div class="section-title">
+                    <h2>Why Choose CyrusLinksHub</h2>
+                    <p>Your Modern Gaming & Utility Platform</p>
+                </div>
+                <div class="glass-card about-card">
+                    <div class="about-icon">
+                        <i class="fas fa-cube"></i>
+                    </div>
+                    <div class="about-content">
+                        <h3>Built for Gamers, Creators & Developers</h3>
+                        <p>CyrusLinksHub is a premium platform providing Minecraft tools, gaming resources, APK collections, entertainment content and online utilities through a fast, modern and secure interface.</p>
+                        <p>Our mission is to build one powerful hub where everyone can discover useful tools, downloads, tutorials and an active community.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- WHAT WE OFFER -->
+        <section class="features-section">
+            <div class="container">
+                <div class="section-title">
+                    <h2>What We Offer</h2>
+                    <p>Everything in one place.</p>
+                </div>
+                <div class="feature-grid">
+                    <div class="glass-card feature-card">
+                        <div class="feature-icon">🛠️</div>
+                        <h3>Online Tools</h3>
+                        <p>Minecraft utilities, generators, server checkers and developer tools.</p>
+                        <a href="tools.html" class="card-btn">Explore <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                    <div class="glass-card feature-card">
+                        <div class="feature-icon">🎮</div>
+                        <h3>Gaming</h3>
+                        <p>Gaming resources, mods, downloads, guides and much more.</p>
+                        <a href="games.html" class="card-btn">Explore <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                    <div class="glass-card feature-card">
+                        <div class="feature-icon">📱</div>
+                        <h3>APK Collection</h3>
+                        <p>Safe Android applications, utilities and premium apps.</p>
+                        <a href="apk.html" class="card-btn">Explore <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                    <div class="glass-card feature-card">
+                        <div class="feature-icon">🎬</div>
+                        <h3>Movies</h3>
+                        <p>Entertainment resources, movie collections and updates.</p>
+                        <a href="movies.html" class="card-btn">Explore <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                    <div class="glass-card feature-card">
+                        <div class="feature-icon">🎵</div>
+                        <h3>Music</h3>
+                        <p>Music streaming, albums and entertainment resources.</p>
+                        <a href="music.html" class="card-btn">Explore <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                    <div class="glass-card feature-card">
+                        <div class="feature-icon">💬</div>
+                        <h3>Community</h3>
+                        <p>Join our growing Discord community, events and announcements.</p>
+                        <a href="https://discord.gg/" target="_blank" class="card-btn">Join <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- WHY CHOOSE US -->
+        <section class="why-section">
+            <div class="container">
+                <div class="section-title">
+                    <h2>Why Choose CyrusLinksHub?</h2>
+                    <p>Designed with performance and simplicity.</p>
+                </div>
+                <div class="why-grid">
+                    <div class="glass-card why-card">
+                        <i class="fas fa-bolt"></i>
+                        <h3>Lightning Fast</h3>
+                        <p>Optimized pages with smooth performance across desktop and mobile.</p>
+                    </div>
+                    <div class="glass-card why-card">
+                        <i class="fas fa-shield-halved"></i>
+                        <h3>Secure Platform</h3>
+                        <p>Safe downloads, verified tools and trusted resources.</p>
+                    </div>
+                    <div class="glass-card why-card">
+                        <i class="fas fa-users"></i>
+                        <h3>Community Driven</h3>
+                        <p>Suggestions, updates and improvements from real users.</p>
+                    </div>
+                    <div class="glass-card why-card">
+                        <i class="fas fa-wand-magic-sparkles"></i>
+                        <h3>Premium Design</h3>
+                        <p>Modern SaaS interface, glassmorphism cards and responsive layouts.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- COMMUNITY + STATS -->
+        <section id="community" class="community-section">
+            <div class="container">
+                <div class="section-title">
+                    <h2>Join Our Community</h2>
+                    <p>Become part of the CyrusLinksHub family.</p>
+                </div>
+                <div class="community-grid">
+                    <div class="glass-card community-card">
+                        <h3><i class="fab fa-discord"></i> Discord Community</h3>
+                        <ul>
+                            <li><i class="fas fa-check-circle"></i> Friendly Members</li>
+                            <li><i class="fas fa-check-circle"></i> Instant Support</li>
+                            <li><i class="fas fa-check-circle"></i> Giveaways & Events</li>
+                            <li><i class="fas fa-check-circle"></i> Latest Updates</li>
+                            <li><i class="fas fa-check-circle"></i> Early Tool Releases</li>
+                            <li><i class="fas fa-check-circle"></i> Suggestions & Feedback</li>
+                        </ul>
+                        <a href="https://discord.gg/" target="_blank" class="btn btn-primary">
+                            <i class="fab fa-discord"></i> Join Discord
+                        </a>
+                    </div>
+                    <div class="glass-card stats-card">
+                        <h3>Platform Statistics</h3>
+                        <div class="stats-grid">
+                            <div class="stat-box">
+                                <h2 class="counter" data-target="750">0</h2>
+                                <span>Total Requests</span>
+                            </div>
+                            <div class="stat-box">
+                                <h2 class="counter" data-target="5">0</h2>
+                                <span>Categories</span>
+                            </div>
+                            <div class="stat-box">
+                                <h2>99.9%</h2>
+                                <span>Availability</span>
+                            </div>
+                            <div class="stat-box">
+                                <h2>24/7</h2>
+                                <span>Community</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ -->
+        <section class="faq-section">
+            <div class="container">
+                <div class="section-title">
+                    <h2>Frequently Asked Questions</h2>
+                    <p>Everything you need to know.</p>
+                </div>
+                <div class="faq-list">
+                    <div class="glass-card faq-item">
+                        <button class="faq-question">
+                            What is CyrusLinksHub? <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <p>CyrusLinksHub is an all-in-one platform for gaming tools, Minecraft resources, APK downloads, entertainment, utilities and community content.</p>
+                        </div>
+                    </div>
+                    <div class="glass-card faq-item">
+                        <button class="faq-question">
+                            Are all tools free? <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Yes. Almost every tool on CyrusLinksHub is completely free to use directly from your browser.</p>
+                        </div>
+                    </div>
+                    <div class="glass-card faq-item">
+                        <button class="faq-question">
+                            How often is the website updated? <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <p>We regularly add new tools, features, games, downloads and improvements.</p>
+                        </div>
+                    </div>
+                    <div class="glass-card faq-item">
+                        <button class="faq-question">
+                            Can I suggest new tools? <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Absolutely! Join our Discord server and submit your ideas.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CALL TO ACTION -->
+        <section class="cta-section">
+            <div class="container">
+                <div class="glass-card cta-card">
+                    <div>
+                        <h2>Ready To Explore?</h2>
+                        <p>Discover premium tools, downloads, gaming resources and become part of the community.</p>
+                    </div>
+                    <div class="cta-buttons">
+                        <a href="tools.html" class="btn btn-primary">
+                            <i class="fas fa-rocket"></i> Explore Tools
+                        </a>
+                        <a href="https://discord.gg/" target="_blank" class="btn btn-secondary">
+                            <i class="fab fa-discord"></i> Join Discord
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-column">
+                    <div class="footer-brand">
+                        <span class="footer-brand-text">Enjoy!</span>
+                    </div>
+                </div>
+                <div class="footer-column">
+                    <h4>Navigation</h4>
+                    <ul>
+                        <li><a href="">Home</a></li>
+                        <li><a href="">Tools</a></li>
+                        <li><a href="">Games</a></li>
+                        <li><a href="">About</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h4>Resources</h4>
+                    <ul>
+                        <li><a href="">APK</a></li>
+                        <li><a href="">Movies</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h4>Community</h4>
+                    <ul>
+                        <li><a href="https://discord.gg/" target="_blank">Discord</a></li>
+                        <li><a href="https://github.com/" target="_blank">GitHub</a></li>
+                        <li><a href="https://youtube.com/" target="_blank">YouTube</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2026 CyrusLinksHub. All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <button id="topBtn">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <script>
+        const words = ["Powerful Online Platform", "Fast & Secure Experience", "Built For Everyone", "Join Our Community"];
+        let wordIndex = 0, charIndex = 0, deleting = false;
+        const typing = document.getElementById("typing");
+
+        function typeEffect() {
+            const current = words[wordIndex];
+            if (!deleting) {
+                typing.textContent = current.substring(0, charIndex++);
+                if (charIndex > current.length) {
+                    deleting = true;
+                    setTimeout(typeEffect, 1400);
+                    return;
+                }
+            } else {
+                typing.textContent = current.substring(0, charIndex--);
+                if (charIndex === 0) {
+                    deleting = false;
+                    wordIndex = (wordIndex + 1) % words.length;
+                }
+            }
+            setTimeout(typeEffect, deleting ? 40 : 80);
+        }
+        typeEffect();
+
+        document.querySelectorAll(".counter").forEach(counter => {
+            const update = () => {
+                const target = +counter.dataset.target;
+                const count = +counter.innerText;
+                const speed = target / 80;
+                if (count < target) {
+                    counter.innerText = Math.ceil(count + speed);
+                    requestAnimationFrame(update);
+                } else {
+                    counter.innerText = target;
+                }
+            };
+            update();
+        });
+
+        document.querySelectorAll(".faq-question").forEach(btn => {
+            btn.onclick = () => { btn.parentElement.classList.toggle("active"); };
+        });
+
+        const topBtn = document.getElementById("topBtn");
+        window.addEventListener("scroll", () => { topBtn.style.display = window.scrollY > 300 ? "flex" : "none"; });
+        topBtn.onclick = () => { window.scrollTo({ top: 0, behavior: "smooth" }); };
+
+        const canvas = document.getElementById("particles");
+        const ctx = canvas.getContext("2d");
+        function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        resize();
+        window.addEventListener("resize", resize);
+
+        const particles = [];
+        for (let i = 0; i < 180; i++) {
+            particles.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                r: Math.random() * 2 + 0.6,
+                dx: (Math.random() - 0.5) * 0.25,
+                dy: (Math.random() - 0.5) * 0.25
+            });
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => {
+                p.x += p.dx; p.y += p.dy;
+                if (p.x < 0) p.x = canvas.width;
+                if (p.x > canvas.width) p.x = 0;
+                if (p.y < 0) p.y = canvas.height;
+                if (p.y > canvas.height) p.y = 0;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                ctx.fillStyle = "#26F4FF";
+                ctx.shadowColor = "#26F4FF";
+                ctx.shadowBlur = 12;
+                ctx.fill();
+            });
+            requestAnimationFrame(animate);
+        }
+        animate();
+    </script>
+    <script type="module" src="js/ultra-auth.js"></script>
+    
+</body>
+</html>
