@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>PROJECT ECHO — 3D Web Adventure</title>
+    <!-- Three.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        :root {
+            --bg-glass: rgba(15, 23, 42, 0.82);
+            --border-glass: rgba(255, 255, 255, 0.15);
+            --accent-gold: #f59e0b;
+            --accent-cyan: #06b6d4;
+            --accent-purple: #a855f7;
+            --accent-green: #10b981;
+            --text-main: #f8fafc;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #030712;
+            color: var(--text-main);
+        }
+
+        #canvas-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        /* HUD OVERLAY */
+        #ui-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 24px;
+        }
+
+        .interactive {
+            pointer-events: auto;
+        }
+
+        /* TOP BAR */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 20px;
+        }
+
+        .glass-card {
+            background: var(--bg-glass);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border-glass);
+            border-radius: 14px;
+            padding: 16px 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .stats-panel {
+            min-width: 280px;
+        }
+
+        .stat-bar-container {
+            margin-top: 10px;
+        }
+
+        .stat-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+            color: #94a3b8;
+        }
+
+        .bar-outer {
+            width: 100%;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .bar-inner {
+            height: 100%;
+            width: 100%;
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        #hp-bar { background: linear-gradient(90deg, #ef4444, #f87171); }
+        #energy-bar { background: linear-gradient(90deg, var(--accent-cyan), #38bdf8); }
+        #xp-bar { background: linear-gradient(90deg, var(--accent-gold), #fbbf24); }
+
+        /* REALITY BADGE */
+        .reality-badge {
+            border: 2px solid var(--accent-cyan);
+            border-radius: 40px;
+            padding: 10px 28px;
+            text-align: center;
+            box-shadow: 0 0 25px rgba(6, 182, 212, 0.35);
+            transition: all 0.4s ease;
+        }
+
+        .reality-badge h3 {
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #94a3b8;
+        }
+
+        .reality-badge h1 {
+            font-size: 1.5rem;
+            letter-spacing: 1.5px;
+            font-weight: 800;
+        }
+
+        /* ABILITIES HUD */
+        .abilities-bar {
+            display: flex;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .ability-slot {
+            width: 48px;
+            height: 48px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border-glass);
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: bold;
+            position: relative;
+            transition: all 0.2s;
+        }
+
+        .ability-slot.active {
+            border-color: var(--accent-gold);
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.4);
+            background: rgba(245, 158, 11, 0.15);
+        }
+
+        .ability-key {
+            position: absolute;
+            top: 2px;
+            left: 4px;
+            font-size: 0.6rem;
+            color: var(--accent-cyan);
+        }
+
+        /* BOTTOM BAR & CONTROLS */
+        .bottom-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .controls-hint {
+            font-size: 0.82rem;
+            color: #94a3b8;
+            display: flex;
+            gap: 16px;
+        }
+
+        .key {
+            background: rgba(255,255,255,0.15);
+            padding: 2px 7px;
+            border-radius: 4px;
+            color: #fff;
+            font-weight: bold;
+        }
+
+        /* TOAST NOTIFICATION */
+        #toast {
+            position: absolute;
+            top: 18%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.9);
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid var(--accent-gold);
+            border-radius: 30px;
+            padding: 12px 28px;
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #fff;
+            box-shadow: 0 0 30px rgba(245, 158, 11, 0.4);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        #toast.active {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        /* MODALS & OVERLAYS */
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(3, 7, 18, 0.88);
+            backdrop-filter: blur(12px);
+            z-index: 200;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+            transition: opacity 0.3s ease;
+        }
+
+        .overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .overlay h1 {
+            font-size: 3.8rem;
+            letter-spacing: 8px;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, #fff 30%, var(--accent-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .overlay p {
+            color: #94a3b8;
+            max-width: 540px;
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, var(--accent-gold), #d97706);
+            border: none;
+            color: #fff;
+            padding: 14px 38px;
+            font-size: 1.1rem;
+            border-radius: 30px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            cursor: pointer;
+            box-shadow: 0 0 25px rgba(245, 158, 11, 0.4);
+            transition: all 0.2s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 0 35px rgba(245, 158, 11, 0.6);
+        }
+
+        .level-select {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 30px;
+        }
+
+        .level-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-glass);
+            border-radius: 12px;
+            padding: 16px 24px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .level-card:hover, .level-card.selected {
+            border-color: var(--accent-cyan);
+            background: rgba(6, 182, 212, 0.15);
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.3);
+        }
+
+        .level-card h4 { font-size: 1.1rem; color: #fff; }
+        .level-card p { font-size: 0.8rem; color: #94a3b8; margin: 4px 0 0 0; }
+    </style>
+</head>
+<body>
+
+    <div id="canvas-container"></div>
+
+    <!-- UI HUD -->
+    <div id="ui-layer">
+        <div class="top-bar">
+            <div class="glass-card stats-panel interactive">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <strong id="player-name">Echo Operative</strong>
+                    <span id="player-level" style="color: var(--accent-gold); font-weight: bold;">Lvl 1</span>
+                </div>
+                <div class="stat-bar-container">
+                    <div class="stat-label"><span>Health</span><span id="hp-text">100/100</span></div>
+                    <div class="bar-outer"><div id="hp-bar" class="bar-inner"></div></div>
+                </div>
+                <div class="stat-bar-container">
+                    <div class="stat-label"><span>Energy</span><span id="energy-text">100/100</span></div>
+                    <div class="bar-outer"><div id="energy-bar" class="bar-inner"></div></div>
+                </div>
+                <div class="stat-bar-container">
+                    <div class="stat-label"><span>Score Progress</span><span id="xp-text">0/1000</span></div>
+                    <div class="bar-outer"><div id="xp-bar" class="bar-inner"></div></div>
+                </div>
+
+                <!-- Abilities Status -->
+                <div class="abilities-bar">
+                    <div class="ability-slot" id="buff-shield"><span class="ability-key">1</span>Shield</div>
+                    <div class="ability-slot" id="buff-magnet"><span class="ability-key">2</span>Magnet</div>
+                    <div class="ability-slot" id="buff-boost"><span class="ability-key">3</span>Boost</div>
+                </div>
+            </div>
+
+            <div class="glass-card reality-badge interactive" id="reality-badge">
+                <h3>Current Reality</h3>
+                <h1 id="reality-name" style="color: var(--accent-cyan);">PRESENT</h1>
+            </div>
+
+            <div class="glass-card interactive" style="max-width: 280px;">
+                <h4 style="color: var(--accent-gold); font-size: 0.85rem; text-transform: uppercase;">Mission Objective</h4>
+                <p id="mission-text" style="font-size: 0.9rem; color: #cbd5e1; margin-top: 4px;">Harvest Echo Crystals & purge void hazards across dimensions.</p>
+                <div style="margin-top: 8px; font-size: 0.85rem; font-weight: bold; color: var(--accent-cyan);" id="score-text">Score: 0</div>
+            </div>
+        </div>
+
+        <div class="bottom-bar">
+            <div class="glass-card controls-hint interactive">
+                <div><span class="key">W</span><span class="key">A</span><span class="key">S</span><span class="key">D</span> Move</div>
+                <div><span class="key">SPACE</span> Pulse Attack</div>
+                <div><span class="key">R</span> Shift Dimension</div>
+                <div><span class="key">1</span>-<span class="key">3</span> Abilities</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast">Dimension Shift Initiated</div>
+
+    <!-- Start & Level Select Screen -->
+    <div class="overlay" id="start-overlay">
+        <h1>PROJECT ECHO</h1>
+        <p>A 3D Dimensional Action Adventure.<br>Shift between parallel realities to defeat anomalies and stabilize the temporal rift.</p>
+        
+        <div class="level-select">
+            <div class="level-card selected" onclick="selectLevel(0)">
+                <h4>Level 1</h4>
+                <p>Neon Outpost</p>
+            </div>
+            <div class="level-card" onclick="selectLevel(1)">
+                <h4>Level 2</h4>
+                <p>Temporal Rift</p>
+            </div>
+            <div class="level-card" onclick="selectLevel(2)">
+                <h4>Level 3</h4>
+                <p>Void Breach</p>
+            </div>
+        </div>
+
+        <button class="btn" id="start-btn">ENGAGE RIFT</button>
+    </div>
+
+    <!-- Game Over Screen -->
+    <div class="overlay hidden" id="game-over-overlay">
+        <h1 id="game-over-title" style="background: linear-gradient(135deg, #ef4444, #f87171); -webkit-background-clip: text;">SYSTEM DESYNCHRONIZED</h1>
+        <p id="game-over-desc">Your echo collapsed within the void rift.</p>
+        <button class="btn" onclick="location.reload()">RE-INITIALIZE</button>
+    </div>
+
+    <script>
+        /* =========================================================================
+           1. PROCEDURAL WEBAUDIO SYNTHESIZER
+           ========================================================================= */
+        class SoundEngine {
+            constructor() {
+                this.ctx = null;
+            }
+
+            init() {
+                if (!this.ctx) {
+                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+            }
+
+            playTone(freq, type = 'sine', duration = 0.15, vol = 0.2) {
+                if (!this.ctx) return;
+                try {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = type;
+                    osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+                    gain.gain.setValueAtTime(vol, this.ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + duration);
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start();
+                    osc.stop(this.ctx.currentTime + duration);
+                } catch (e) {}
+            }
+
+            playShiftSFX() {
+                if (!this.ctx) return;
+                const now = this.ctx.currentTime;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(150, now);
+                osc.frequency.exponentialRampToValueAtTime(900, now + 0.35);
+                gain.gain.setValueAtTime(0.25, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+                osc.stop(now + 0.35);
+            }
+
+            playPulseSFX() {
+                this.playTone(280, 'triangle', 0.12, 0.3);
+            }
+
+            playHitSFX() {
+                this.playTone(80, 'square', 0.2, 0.4);
+            }
+
+            playPickupSFX() {
+                if (!this.ctx) return;
+                this.playTone(523.25, 'sine', 0.1, 0.2);
+                setTimeout(() => this.playTone(659.25, 'sine', 0.15, 0.25), 70);
+            }
+
+            playBuffSFX() {
+                if (!this.ctx) return;
+                this.playTone(440, 'sine', 0.08, 0.2);
+                setTimeout(() => this.playTone(880, 'sine', 0.2, 0.3), 80);
+            }
+        }
+
+        const audio = new SoundEngine();
+
+        /* =========================================================================
+           2. CONFIGURATIONS & DATA
+           ========================================================================= */
+        const REALITIES = {
+            PRESENT: { name: 'PRESENT', color: '#06b6d4', sky: 0x070d19, fog: 0x070d19, ground: 0x1e293b, light: 0xffffff },
+            PAST: { name: 'PAST', color: '#10b981', sky: 0x022c22, fog: 0x022c22, ground: 0x065f46, light: 0xfef08a },
+            FUTURE: { name: 'FUTURE', color: '#38bdf8', sky: 0x030712, fog: 0x030712, ground: 0x1e1b4b, light: 0x38bdf8 },
+            VOID: { name: 'VOID', color: '#a855f7', sky: 0x090514, fog: 0x090514, ground: 0x4c1d95, light: 0xc084fc }
+        };
+
+        const REALITY_KEYS = ['PRESENT', 'PAST', 'FUTURE', 'VOID'];
+
+        const LEVEL_CONFIGS = [
+            { level: 1, title: 'Neon Outpost', targetScore: 1000, speed: 0.25, hazards: 15, cores: 18 },
+            { level: 2, title: 'Temporal Rift', targetScore: 2500, speed: 0.35, hazards: 25, cores: 22 },
+            { level: 3, title: 'Void Breach', targetScore: 5000, speed: 0.45, hazards: 35, cores: 28 }
+        ];
+
+        let selectedLevelIndex = 0;
+        function selectLevel(idx) {
+            selectedLevelIndex = idx;
+            document.querySelectorAll('.level-card').forEach((card, i) => {
+                card.classList.toggle('selected', i === idx);
+            });
+        }
+
+        /* =========================================================================
+           3. THREE.JS GAME ENGINE
+           ========================================================================= */
+        class GameEngine {
+            constructor() {
+                this.container = document.getElementById('canvas-container');
+                this.currentRealityIndex = 0;
+                this.currentReality = REALITIES[REALITY_KEYS[0]];
+                this.levelConfig = LEVEL_CONFIGS[0];
+
+                this.playerState = {
+                    hp: 100,
+                    maxHp: 100,
+                    energy: 100,
+                    maxEnergy: 100,
+                    score: 0,
+                    buffs: { shield: false, magnet: false, boost: false }
+                };
+
+                this.keys = {};
+                this.hazards = [];
+                this.cores = [];
+                this.particles = [];
+                this.isRunning = false;
+
+                this.initThree();
+                this.createPlayer();
+                this.bindEvents();
+            }
+
+            initThree() {
+                this.scene = new THREE.Scene();
+                this.scene.background = new THREE.Color(this.currentReality.sky);
+                this.scene.fog = new THREE.FogExp2(this.currentReality.fog, 0.02);
+
+                this.camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 1000);
+                this.camera.position.set(0, 18, 22);
+                this.camera.lookAt(0, 0, 0);
+
+                this.renderer = new THREE.WebGLRenderer({ antialias: true });
+                this.renderer.setSize(window.innerWidth, window.innerHeight);
+                this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+                this.renderer.shadowMap.enabled = true;
+                this.container.appendChild(this.renderer.domElement);
+
+                this.ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+                this.scene.add(this.ambientLight);
+
+                this.dirLight = new THREE.DirectionalLight(this.currentReality.light, 1.2);
+                this.dirLight.position.set(20, 40, 20);
+                this.dirLight.castShadow = true;
+                this.scene.add(this.dirLight);
+
+                // Ground Grid
+                const groundGeo = new THREE.PlaneGeometry(160, 160);
+                this.groundMat = new THREE.MeshStandardMaterial({ color: this.currentReality.ground, roughness: 0.8 });
+                this.ground = new THREE.Mesh(groundGeo, this.groundMat);
+                this.ground.rotation.x = -Math.PI / 2;
+                this.ground.receiveShadow = true;
+                this.scene.add(this.ground);
+
+                this.grid = new THREE.GridHelper(160, 40, 0x06b6d4, 0x1e293b);
+                this.grid.position.y = 0.02;
+                this.scene.add(this.grid);
+            }
+
+            createPlayer() {
+     
