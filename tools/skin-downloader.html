@@ -4,21 +4,40 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Minecraft Skin Viewer & Downloader</title>
+
+    <!-- YOUR CSS -->
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 </head>
 <body>
 
-    <div class="header">
-        <h1><i class="fa-solid fa-user-astronaut"></i> Minecraft Skin Viewer & Downloader</h1>
+<div class="container">
+
+    <!-- HEADER -->
+    <div class="glass header-card">
+        <h1>
+            <i class="fa-solid fa-user-astronaut"></i>
+            Minecraft Skin Viewer & Downloader
+        </h1>
         <p>View skins in 3D and download them instantly</p>
     </div>
 
-    <div class="search-section">
-        <label for="usernameInput">Minecraft Username</label>
+    <!-- SEARCH -->
+    <div class="glass search-card">
+        <label>Minecraft Username</label>
         <input type="text" id="usernameInput" placeholder="Enter username... Example: Notch">
-        <button onclick="loadSkin()"><i class="fa-solid fa-magnifying-glass"></i> Load Skin</button>
+        <br><br>
+        <button id="loadBtn" onclick="loadSkin()">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            Load Skin
+        </button>
+
+        <br><br>
+
         <div class="quick-names">
-            <span>Try:</span>
+            <span>Quick try:</span>
             <button onclick="quickLoad('Notch')">Notch</button>
             <button onclick="quickLoad('Technoblade')">Technoblade</button>
             <button onclick="quickLoad('Dream')">Dream</button>
@@ -26,352 +45,362 @@
         </div>
     </div>
 
+    <!-- STATUS -->
     <div id="errorMsg" class="error-msg"></div>
     <div id="successMsg" class="success-msg"></div>
-    <div id="loadingMsg" class="loading-msg"><i class="fa-solid fa-spinner fa-spin"></i> Loading...</div>
+    <div id="loadingMsg" class="loading-msg">
+        <i class="fa-solid fa-spinner fa-spin"></i> Loading...
+    </div>
 
-    <div class="viewer-container">
+    <!-- 3D VIEWER -->
+    <div class="glass viewer-card">
+        <h2><i class="fa-solid fa-cube"></i> 3D Skin Preview</h2>
+        <hr>
         <canvas id="skinCanvas" width="500" height="500"></canvas>
+        <p class="controls-hint">
+            <i class="fa-solid fa-hand-pointer"></i>
+            Drag to rotate • Scroll to zoom
+        </p>
     </div>
 
-    <div class="skin-info">
-        <div class="info-box">
-            <strong>Player Name</strong>
-            <span id="playerName">-</span>
-        </div>
-        <div class="info-box">
-            <strong>Skin Type</strong>
-            <span id="skinType">-</span>
-        </div>
-        <div class="info-box">
-            <strong>Skin URL</strong>
-            <a id="skinUrlDisplay" href="#" target="_blank">No skin loaded</a>
-        </div>
+    <!-- SKIN INFO -->
+    <div class="glass result-card">
+        <h2><i class="fa-solid fa-circle-info"></i> Skin Information</h2>
+        <hr>
+
+        <p><strong>Player Name</strong></p>
+        <h3 id="playerName">-</h3>
+
+        <p><strong>Skin Type</strong></p>
+        <h3 id="skinType">-</h3>
+
+        <p><strong>Skin URL</strong></p>
+        <h3 id="skinUrlDisplay">No skin loaded</h3>
+
+        <br>
+
+        <a id="skinUrlLink" href="#" target="_blank" style="display:none;">
+            <button>
+                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                Open Skin URL
+            </button>
+        </a>
     </div>
 
-    <div class="actions">
-        <button id="downloadBtn" onclick="downloadSkin()" disabled><i class="fa-solid fa-download"></i> Download Skin</button>
-        <button id="copyUrlBtn" onclick="copySkinUrl()" disabled><i class="fa-solid fa-copy"></i> Copy URL</button>
-        <button id="openUrlBtn" onclick="openSkinUrl()" disabled><i class="fa-solid fa-arrow-up-right-from-square"></i> Open URL</button>
+    <!-- ACTIONS -->
+    <div class="glass actions-card">
+        <button id="downloadBtn" onclick="downloadSkin()" disabled>
+            <i class="fa-solid fa-download"></i>
+            Download Skin
+        </button>
+
+        <button id="copyUrlBtn" onclick="copySkinUrl()" disabled>
+            <i class="fa-solid fa-copy"></i>
+            Copy Skin URL
+        </button>
     </div>
 
-    <div class="footer">
-        <p>Minecraft Skin Viewer & Downloader — Powered by Minotar.net</p>
+    <!-- FOOTER -->
+    <div class="glass footer-card">
+        <p>
+            Minecraft Skin Viewer & Downloader
+            <br><br>
+            Powered by Minotar.net & SkinView3D
+            <br><br>
+            No API Key Required
+        </p>
     </div>
 
-    <!-- Load skinview3d with fallback CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/skinview3d@3.0.1/bundles/skinview3d.min.js"
-            onerror="loadFallbackCDN()"></script>
+</div>
 
-    <script>
-    /* ===========================================================
-       FALLBACK CDN LOADER
-    =========================================================== */
-    function loadFallbackCDN() {
-        console.log('Primary CDN failed, trying fallback...');
-        var script = document.createElement('script');
-        script.src = 'https://unpkg.com/skinview3d@3.0.1/bundles/skinview3d.min.js';
-        script.onload = function () {
-            console.log('Fallback CDN loaded successfully');
-            initViewer();
-        };
-        script.onerror = function () {
-            showError('Failed to load 3D library. Check internet connection.');
-        };
-        document.head.appendChild(script);
+<!-- SkinView3D Library -->
+<script src="https://cdn.jsdelivr.net/npm/skinview3d@3.0.1/bundles/skinview3d.min.js"
+        onerror="loadFallback()"></script>
+
+<script>
+/* ===========================================================
+   FALLBACK CDN
+=========================================================== */
+function loadFallback() {
+    console.log('Primary CDN failed, trying fallback...');
+    var s = document.createElement('script');
+    s.src = 'https://unpkg.com/skinview3d@3.0.1/bundles/skinview3d.min.js';
+    s.onload = function() {
+        console.log('Fallback loaded');
+        initViewer();
+    };
+    s.onerror = function() {
+        showError('3D library failed to load. Check internet connection.');
+    };
+    document.head.appendChild(s);
+}
+
+/* ===========================================================
+   GLOBALS
+=========================================================== */
+var skinViewer = null;
+var currentSkinUrl = null;
+var currentUsername = null;
+var viewerReady = false;
+
+/* ===========================================================
+   INIT 3D VIEWER
+=========================================================== */
+function initViewer() {
+    if (typeof skinview3d === 'undefined') {
+        showError('3D library not loaded. Refresh the page.');
+        return;
     }
 
-    /* ===========================================================
-       GLOBAL VARIABLES
-    =========================================================== */
-    var skinViewer = null;
-    var currentSkinUrl = null;
-    var currentUsername = null;
-    var viewerReady = false;
+    var canvas = document.getElementById('skinCanvas');
 
-    /* ===========================================================
-       INITIALIZE 3D VIEWER
-    =========================================================== */
-    function initViewer() {
-        if (typeof skinview3d === 'undefined') {
-            console.error('skinview3d library not loaded');
-            showError('3D library failed to load. Refresh the page.');
-            return;
-        }
-
-        var canvas = document.getElementById('skinCanvas');
-
-        try {
-            skinViewer = new skinview3d.SkinViewer({
-                canvas: canvas,
-                width: 500,
-                height: 500
-            });
-
-            // Load default Steve skin
-            skinViewer.loadSkin('https://minotar.net/skin/MHF_Steve', 'default');
-
-            // Controls
-            skinViewer.controls.enableRotate = true;
-            skinViewer.controls.enableZoom = true;
-            skinViewer.controls.enablePan = false;
-
-            // Auto rotate
-            skinViewer.autoRotate = true;
-            skinViewer.autoRotateSpeed = 2;
-
-            // Walking animation
-            skinViewer.animations = new skinview3d.CompositeAnimation();
-            skinViewer.animations.add(skinview3d.WalkingAnimation);
-
-            viewerReady = true;
-            console.log('3D Viewer ready');
-
-        } catch (error) {
-            console.error('Viewer init error:', error);
-            showError('Failed to start 3D viewer: ' + error.message);
-        }
-    }
-
-    /* ===========================================================
-       LOAD SKIN BY USERNAME
-    =========================================================== */
-    function loadSkin() {
-        var username = document.getElementById('usernameInput').value.trim();
-
-        if (!username) {
-            showError('Please enter a username');
-            return;
-        }
-
-        if (!viewerReady) {
-            showError('3D viewer is still loading. Please wait...');
-            return;
-        }
-
-        showLoading(true);
-        hideError();
-        hideSuccess();
-
-        var skinUrl = 'https://minotar.net/skin/' + username;
-
-        // Test if skin exists
-        var testImg = new Image();
-        testImg.crossOrigin = 'anonymous';
-
-        testImg.onload = function () {
-            currentSkinUrl = skinUrl;
-            currentUsername = username;
-
-            // Update 3D model
-            skinViewer.loadSkin(skinUrl, 'default');
-
-            // Update UI
-            document.getElementById('playerName').textContent = username;
-            document.getElementById('skinUrlDisplay').textContent = skinUrl;
-            document.getElementById('skinUrlDisplay').href = skinUrl;
-
-            // Enable buttons
-            document.getElementById('downloadBtn').disabled = false;
-            document.getElementById('copyUrlBtn').disabled = false;
-            document.getElementById('openUrlBtn').disabled = false;
-
-            // Detect skin type
-            detectSkinType(skinUrl);
-
-            showSuccess('Skin loaded for ' + username + '!');
-            showLoading(false);
-            console.log('Skin loaded:', skinUrl);
-        };
-
-        testImg.onerror = function () {
-            showError('Player "' + username + '" not found or has no skin.');
-            showLoading(false);
-        };
-
-        testImg.src = skinUrl;
-    }
-
-    /* ===========================================================
-       DETECT SKIN TYPE
-    =========================================================== */
-    function detectSkinType(url) {
-        var img = new Image();
-        img.crossOrigin = 'anonymous';
-
-        img.onload = function () {
-            var canvas = document.createElement('canvas');
-            canvas.width = img.width;
-            canvas.height = img.height;
-            var ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0);
-
-            try {
-                // Check left arm area for slim model detection
-                var pixel = ctx.getImageData(54, 20, 1, 1).data;
-                if (pixel[3] === 0) {
-                    document.getElementById('skinType').textContent = 'Classic (Steve)';
-                } else {
-                    document.getElementById('skinType').textContent = 'Slim (Alex)';
-                }
-            } catch (e) {
-                document.getElementById('skinType').textContent = 'Classic (Steve)';
-            }
-        };
-
-        img.onerror = function () {
-            document.getElementById('skinType').textContent = 'Unknown';
-        };
-
-        img.src = url;
-    }
-
-    /* ===========================================================
-       QUICK LOAD
-    =========================================================== */
-    function quickLoad(username) {
-        document.getElementById('usernameInput').value = username;
-        loadSkin();
-    }
-
-    /* ===========================================================
-       DOWNLOAD SKIN
-    =========================================================== */
-    function downloadSkin() {
-        if (!currentSkinUrl) {
-            showError('No skin loaded');
-            return;
-        }
-
-        showLoading(true);
-
-        fetch(currentSkinUrl)
-            .then(function (response) {
-                return response.blob();
-            })
-            .then(function (blob) {
-                var blobUrl = window.URL.createObjectURL(blob);
-                var a = document.createElement('a');
-                a.href = blobUrl;
-                a.download = (currentUsername || 'minecraft') + '_skin.png';
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                window.URL.revokeObjectURL(blobUrl);
-                showSuccess('Skin downloaded!');
-                showLoading(false);
-            })
-            .catch(function (error) {
-                console.error('Download error:', error);
-                // Fallback: open in new tab
-                window.open(currentSkinUrl, '_blank');
-                showSuccess('Opened in new tab. Right-click and Save As to download.');
-                showLoading(false);
-            });
-    }
-
-    /* ===========================================================
-       COPY URL
-    =========================================================== */
-    function copySkinUrl() {
-        if (!currentSkinUrl) {
-            showError('No skin URL to copy');
-            return;
-        }
-
-        if (navigator.clipboard) {
-            navigator.clipboard.writeText(currentSkinUrl).then(function () {
-                showSuccess('URL copied to clipboard!');
-                setTimeout(hideSuccess, 2000);
-            }).catch(function () {
-                fallbackCopy();
-            });
-        } else {
-            fallbackCopy();
-        }
-    }
-
-    function fallbackCopy() {
-        var textArea = document.createElement('textarea');
-        textArea.value = currentSkinUrl;
-        textArea.style.position = 'fixed';
-        textArea.style.left = '-9999px';
-        document.body.appendChild(textArea);
-        textArea.select();
-        try {
-            document.execCommand('copy');
-            showSuccess('URL copied to clipboard!');
-            setTimeout(hideSuccess, 2000);
-        } catch (e) {
-            showError('Failed to copy URL');
-        }
-        document.body.removeChild(textArea);
-    }
-
-    /* ===========================================================
-       OPEN URL
-    =========================================================== */
-    function openSkinUrl() {
-        if (!currentSkinUrl) {
-            showError('No skin URL to open');
-            return;
-        }
-        window.open(currentSkinUrl, '_blank');
-    }
-
-    /* ===========================================================
-       UI HELPERS
-    =========================================================== */
-    function showError(msg) {
-        var el = document.getElementById('errorMsg');
-        el.textContent = msg;
-        el.style.display = 'block';
-        document.getElementById('successMsg').style.display = 'none';
-    }
-
-    function hideError() {
-        document.getElementById('errorMsg').style.display = 'none';
-    }
-
-    function showSuccess(msg) {
-        var el = document.getElementById('successMsg');
-        el.textContent = msg;
-        el.style.display = 'block';
-        document.getElementById('errorMsg').style.display = 'none';
-    }
-
-    function hideSuccess() {
-        document.getElementById('successMsg').style.display = 'none';
-    }
-
-    function showLoading(show) {
-        document.getElementById('loadingMsg').style.display = show ? 'block' : 'none';
-    }
-
-    /* ===========================================================
-       INITIALIZE ON PAGE LOAD
-    =========================================================== */
-    window.addEventListener('load', function () {
-        // Hide status messages initially
-        hideError();
-        hideSuccess();
-        showLoading(false);
-
-        // Initialize 3D viewer if library loaded
-        if (typeof skinview3d !== 'undefined') {
-            initViewer();
-        } else {
-            console.log('Waiting for CDN fallback...');
-        }
-
-        // Enter key support
-        document.getElementById('usernameInput').addEventListener('keydown', function (e) {
-            if (e.key === 'Enter') {
-                loadSkin();
-            }
+    try {
+        skinViewer = new skinview3d.SkinViewer({
+            canvas: canvas,
+            width: 500,
+            height: 500,
+            skin: 'https://minotar.net/skin/MHF_Steve'
         });
+
+        skinViewer.controls.enableRotate = true;
+        skinViewer.controls.enableZoom = true;
+        skinViewer.controls.enablePan = false;
+
+        skinViewer.autoRotate = true;
+        skinViewer.autoRotateSpeed = 2;
+
+        skinViewer.animations = new skinview3d.CompositeAnimation();
+        skinViewer.animations.add(skinview3d.WalkingAnimation);
+
+        viewerReady = true;
+        console.log('3D Viewer initialized');
+
+    } catch (e) {
+        console.error('Init error:', e);
+        showError('Failed to start 3D viewer: ' + e.message);
+    }
+}
+
+/* ===========================================================
+   LOAD SKIN
+=========================================================== */
+function loadSkin() {
+    var username = document.getElementById('usernameInput').value.trim();
+
+    if (!username) {
+        showError('Please enter a username');
+        return;
+    }
+
+    if (!viewerReady) {
+        showError('3D viewer still loading. Please wait...');
+        return;
+    }
+
+    showLoading(true);
+    hideError();
+    hideSuccess();
+
+    var skinUrl = 'https://minotar.net/skin/' + username;
+
+    var testImg = new Image();
+    testImg.crossOrigin = 'anonymous';
+
+    testImg.onload = function() {
+        currentSkinUrl = skinUrl;
+        currentUsername = username;
+
+        // Update 3D model
+        skinViewer.loadSkin(skinUrl, 'default');
+
+        // Update UI
+        document.getElementById('playerName').textContent = username;
+        document.getElementById('skinUrlDisplay').textContent = skinUrl;
+
+        var urlLink = document.getElementById('skinUrlLink');
+        urlLink.href = skinUrl;
+        urlLink.style.display = 'inline-block';
+
+        // Enable buttons
+        document.getElementById('downloadBtn').disabled = false;
+        document.getElementById('copyUrlBtn').disabled = false;
+
+        // Detect type
+        detectSkinType(skinUrl);
+
+        showSuccess('Skin loaded for ' + username + '!');
+        showLoading(false);
+        console.log('Skin loaded:', skinUrl);
+    };
+
+    testImg.onerror = function() {
+        showError('Player "' + username + '" not found or has no skin.');
+        showLoading(false);
+    };
+
+    testImg.src = skinUrl;
+}
+
+/* ===========================================================
+   DETECT SKIN TYPE
+=========================================================== */
+function detectSkinType(url) {
+    var img = new Image();
+    img.crossOrigin = 'anonymous';
+
+    img.onload = function() {
+        var c = document.createElement('canvas');
+        c.width = img.width;
+        c.height = img.height;
+        var ctx = c.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+
+        try {
+            var pixel = ctx.getImageData(54, 20, 1, 1).data;
+            if (pixel[3] === 0) {
+                document.getElementById('skinType').textContent = 'Classic (Steve)';
+            } else {
+                document.getElementById('skinType').textContent = 'Slim (Alex)';
+            }
+        } catch(e) {
+            document.getElementById('skinType').textContent = 'Classic (Steve)';
+        }
+    };
+
+    img.onerror = function() {
+        document.getElementById('skinType').textContent = 'Unknown';
+    };
+
+    img.src = url;
+}
+
+/* ===========================================================
+   QUICK LOAD
+=========================================================== */
+function quickLoad(username) {
+    document.getElementById('usernameInput').value = username;
+    loadSkin();
+}
+
+/* ===========================================================
+   DOWNLOAD SKIN
+=========================================================== */
+function downloadSkin() {
+    if (!currentSkinUrl) {
+        showError('No skin loaded');
+        return;
+    }
+
+    showLoading(true);
+
+    fetch(currentSkinUrl)
+        .then(function(res) { return res.blob(); })
+        .then(function(blob) {
+            var url = window.URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = (currentUsername || 'minecraft') + '_skin.png';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+            showSuccess('Skin downloaded!');
+            showLoading(false);
+        })
+        .catch(function(err) {
+            console.error('Download error:', err);
+            window.open(currentSkinUrl, '_blank');
+            showSuccess('Opened in new tab. Right-click → Save As to download.');
+            showLoading(false);
+        });
+}
+
+/* ===========================================================
+   COPY URL
+=========================================================== */
+function copySkinUrl() {
+    if (!currentSkinUrl) {
+        showError('No skin URL');
+        return;
+    }
+
+    if (navigator.clipboard) {
+        navigator.clipboard.writeText(currentSkinUrl)
+            .then(function() {
+                showSuccess('URL copied!');
+                setTimeout(hideSuccess, 2000);
+            })
+            .catch(function() { fallbackCopy(); });
+    } else {
+        fallbackCopy();
+    }
+}
+
+function fallbackCopy() {
+    var ta = document.createElement('textarea');
+    ta.value = currentSkinUrl;
+    ta.style.position = 'fixed';
+    ta.style.left = '-9999px';
+    document.body.appendChild(ta);
+    ta.select();
+    try {
+        document.execCommand('copy');
+        showSuccess('URL copied!');
+        setTimeout(hideSuccess, 2000);
+    } catch(e) {
+        showError('Copy failed');
+    }
+    document.body.removeChild(ta);
+}
+
+/* ===========================================================
+   UI HELPERS
+=========================================================== */
+function showError(msg) {
+    var el = document.getElementById('errorMsg');
+    el.textContent = msg;
+    el.style.display = 'block';
+    document.getElementById('successMsg').style.display = 'none';
+}
+
+function hideError() {
+    document.getElementById('errorMsg').style.display = 'none';
+}
+
+function showSuccess(msg) {
+    var el = document.getElementById('successMsg');
+    el.textContent = msg;
+    el.style.display = 'block';
+    document.getElementById('errorMsg').style.display = 'none';
+}
+
+function hideSuccess() {
+    document.getElementById('successMsg').style.display = 'none';
+}
+
+function showLoading(show) {
+    document.getElementById('loadingMsg').style.display = show ? 'block' : 'none';
+}
+
+/* ===========================================================
+   INIT ON LOAD
+=========================================================== */
+window.addEventListener('load', function() {
+    hideError();
+    hideSuccess();
+    showLoading(false);
+
+    if (typeof skinview3d !== 'undefined') {
+        initViewer();
+    } else {
+        console.log('Waiting for fallback CDN...');
+    }
+
+    document.getElementById('usernameInput').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') loadSkin();
     });
-    </script>
+});
+</script>
 
 </body>
-        </html>
+    </html>
