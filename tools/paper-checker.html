@@ -1,505 +1,112 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Paper Build Checker — All Minecraft Versions</title>
-
-<!--
-  ── HOW IT WORKS ─────────────────────────────────────────────
-  1. Put this file and your style.css in the same folder.
-  2. style.css is loaded AFTER the built-in fallback styles,
-     so your background / theme overrides win automatically.
-  3. Optional theme hooks you can set in style.css:
-     --bg, --panel, --text, --accent, --btn, --btn-gold
-  ─────────────────────────────────────────────────────────────
--->
-
-<!-- Fonts -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
-
-<style>
-/* ============================================================
-   BUILT-IN FALLBACK THEME (used only if style.css doesn't cover it)
-   ============================================================ */
-:root{
-  --bg:#10151b;
-  --panel:#20262e;
-  --panel-edge-lt:#3b4552;
-  --panel-edge-dk:#0d1116;
-  --text:#e9eff4;
-  --muted:#93a3b4;
-  --accent:#67b64c;
-  --accent-dk:#2c4a20;
-  --gold:#e0a92e;
-  --gold-dk:#7a5a12;
-  --danger:#e2574c;
-}
-*{box-sizing:border-box}
-[hidden]{display:none!important}
-html,body{margin:0}
-body{
-  min-height:100vh;
-  font-family:'Space Grotesk',system-ui,sans-serif;
-  color:var(--text);
-  background:
-    radial-gradient(1100px 560px at 85% -10%, rgba(58,120,72,.35), transparent 60%),
-    radial-gradient(900px 520px at -10% 110%, rgba(52,74,110,.35), transparent 55%),
-    var(--bg);
-  background-attachment:fixed;
-  overflow-x:hidden;
-}
-
-/* Ambient layers */
-.grid-overlay{
-  position:fixed;inset:0;z-index:0;pointer-events:none;
-  background-image:
-    linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);
-  background-size:36px 36px;
-  -webkit-mask-image:radial-gradient(ellipse at 50% 15%, #000, transparent 80%);
-          mask-image:radial-gradient(ellipse at 50% 15%, #000, transparent 80%);
-}
-#pixels{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
-#pixels span{
-  position:absolute;bottom:-24px;display:block;
-  animation:floatUp linear infinite;
-}
-@keyframes floatUp{to{transform:translateY(-115vh) rotate(120deg)}}
-
-/* Animated grass strip */
-.grass{
-  height:10px;width:100%;
-  background:repeating-linear-gradient(90deg,#67b64c 0 8px,#549e3b 8px 16px,#74c45a 16px 24px,#4c9334 24px 32px);
-  background-size:32px 100%;
-  animation:grassSlide 5s linear infinite;
-  box-shadow:0 3px 0 #3a2a17;
-}
-@keyframes grassSlide{to{background-position:32px 0}}
-
-.wrap{position:relative;z-index:1;max-width:980px;margin:0 auto;padding:34px 20px 90px}
-
-/* ── Masthead ─────────────────────────────────────────────── */
-.masthead{display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-bottom:34px}
-.logo{animation:bob 3.2s ease-in-out infinite;image-rendering:pixelated;flex:none}
-@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
-h1{
-  margin:0;font-family:'Press Start 2P',monospace;
-  font-size:clamp(17px,3.4vw,30px);line-height:1.35;letter-spacing:1px;
-  text-shadow:3px 3px 0 rgba(0,0,0,.55), 6px 6px 0 rgba(103,182,76,.28);
-}
-h1 em{font-style:normal;color:var(--accent)}
-.tagline{margin:8px 0 0;color:var(--muted);font-size:15px;font-weight:500}
-.api-pill{
-  margin-left:auto;display:inline-flex;align-items:center;gap:8px;
-  font-family:'Press Start 2P',monospace;font-size:9px;letter-spacing:1px;
-  padding:10px 12px;background:var(--panel);
-  border:2px solid;border-color:var(--panel-edge-lt) var(--panel-edge-dk) var(--panel-edge-dk) var(--panel-edge-lt);
-}
-.dot{width:9px;height:9px;background:#8a97a5;flex:none}
-.dot.live{background:#5dfc7a;box-shadow:0 0 8px #5dfc7a;animation:pulse 1.4s ease-in-out infinite}
-.dot.dead{background:var(--danger);box-shadow:0 0 8px var(--danger)}
-@keyframes pulse{50%{opacity:.35}}
-
-/* ── Panels & controls ────────────────────────────────────── */
-.mc-panel{
-  background:var(--panel);
-  border:2px solid;
-  border-color:var(--panel-edge-lt) var(--panel-edge-dk) var(--panel-edge-dk) var(--panel-edge-lt);
-  box-shadow:0 7px 0 rgba(0,0,0,.45), inset 0 0 0 2px rgba(255,255,255,.03);
-  padding:26px;
-}
-.field-label{
-  font-family:'Press Start 2P',monospace;font-size:10px;
-  color:var(--accent);letter-spacing:1px;margin:0 0 12px;
-}
-.checker-row{display:flex;gap:14px;flex-wrap:wrap;align-items:stretch}
-select{
-  flex:1;min-width:230px;appearance:none;-webkit-appearance:none;
-  font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:17px;
-  color:var(--text);background:#171c22;padding:0 46px 0 16px;
-  border:2px solid;border-color:var(--panel-edge-dk) var(--panel-edge-lt) var(--panel-edge-lt) var(--panel-edge-dk);
-  height:54px;cursor:pointer;transition:border-color .15s, box-shadow .15s;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='10'%3E%3Crect x='3' y='0' width='8' height='2' fill='%2367b64c'/%3E%3Crect x='5' y='2' width='4' height='2' fill='%2367b64c'/%3E%3Crect x='6' y='4' width='2' height='2' fill='%2367b64c'/%3E%3C/svg%3E");
-  background-repeat:no-repeat;background-position:right 16px center;
-}
-select:hover,select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(103,182,76,.22)}
-optgroup{font-family:'Press Start 2P',monospace;font-size:10px;color:var(--gold)}
-option{font-family:'Space Grotesk',sans-serif;font-weight:600}
-
-.btn{
-  font-family:'Press Start 2P',monospace;font-size:12px;color:#fff;
-  text-shadow:2px 2px 0 rgba(0,0,0,.5);text-decoration:none;text-align:center;
-  display:inline-flex;align-items:center;justify-content:center;gap:10px;
-  padding:0 22px;height:54px;cursor:pointer;user-select:none;
-  background:var(--btn,#5b8747);
-  border:2px solid;border-color:#94c971 var(--accent-dk) var(--accent-dk) #94c971;
-  box-shadow:0 4px 0 #16250f;
-  transition:transform .06s, box-shadow .06s, filter .15s;
-}
-.btn:hover{filter:brightness(1.12)}
-.btn:active{transform:translateY(3px);box-shadow:0 1px 0 #16250f}
-.btn:disabled{filter:grayscale(.7) brightness(.7);cursor:wait}
-.btn-gold{background:var(--btn-gold,#d8a531);border-color:#f5d470 var(--gold-dk) var(--gold-dk) #f5d470;box-shadow:0 4px 0 #4d3906;color:#241a02;text-shadow:none}
-.btn-gold:active{box-shadow:0 1px 0 #4d3906}
-.btn-stone{background:#3a424d;border-color:#5a6472 #1a1f26 #1a1f26 #5a6472;box-shadow:0 4px 0 #10141a;font-size:10px}
-.btn-stone:active{box-shadow:0 1px 0 #10141a}
-
-.quick{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px;align-items:center}
-.quick-label{font-size:12px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;font-weight:700}
-.chip{
-  font-family:'Press Start 2P',monospace;font-size:9px;color:#cfe3cf;
-  background:#2b323b;padding:9px 12px;border:0;cursor:pointer;
-  border:2px solid;border-color:#454f5c #151a20 #151a20 #454f5c;
-  transition:transform .1s, background .15s, color .15s;
-}
-.chip:hover{transform:translateY(-2px);background:var(--accent);color:#0c1a08}
-.hint{margin:16px 0 0;font-size:13px;color:var(--muted)}
-.hint b{color:var(--accent)}
-
-/* Loader */
-.px-loader{display:inline-flex;gap:4px}
-.px-loader i{width:7px;height:7px;background:#fff;display:block;animation:hop .55s ease-in-out infinite}
-.px-loader i:nth-child(2){animation-delay:.12s}
-.px-loader i:nth-child(3){animation-delay:.24s}
-@keyframes hop{40%{transform:translateY(-7px)}}
-
-/* ── Result ───────────────────────────────────────────────── */
-#result{margin-top:30px;display:flex;flex-direction:column;gap:22px}
-.reveal{animation:pop .4s cubic-bezier(.2,.9,.3,1.2) both}
-@keyframes pop{from{opacity:0;transform:translateY(16px) scale(.98)}}
-.rc-top{display:flex;gap:26px;flex-wrap:wrap;align-items:flex-end;margin-bottom:22px}
-.rc-label{font-family:'Press Start 2P',monospace;font-size:9px;color:var(--muted);letter-spacing:1px;margin-bottom:9px}
-.rc-version{font-family:'Press Start 2P',monospace;font-size:clamp(20px,4vw,32px);color:var(--text);text-shadow:3px 3px 0 rgba(0,0,0,.5)}
-.rc-arrow{font-family:'Press Start 2P',monospace;color:var(--accent);font-size:18px;padding-bottom:6px}
-.rc-build{font-family:'Press Start 2P',monospace;font-size:clamp(20px,4vw,32px);color:var(--gold);text-shadow:3px 3px 0 rgba(0,0,0,.5)}
-.rc-badges{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;padding-bottom:4px}
-.badge{
-  font-family:'Press Start 2P',monospace;font-size:8px;letter-spacing:1px;
-  padding:8px 10px;background:#171c22;color:#bcd0e0;
-  border:2px solid;border-color:#0d1116 #3b4552 #3b4552 #0d1116;
-}
-.badge.java{color:var(--gold)}
-.rc-actions{display:flex;gap:12px;flex-wrap:wrap}
-.rc-actions .btn{height:auto;padding:16px 20px;font-size:10px;line-height:1.6}
-.panel-title{font-family:'Press Start 2P',monospace;font-size:11px;margin:0 0 18px;color:var(--text);letter-spacing:1px}
-.panel-title .note{font-family:'Space Grotesk',sans-serif;font-size:12px;color:var(--muted);font-weight:500;letter-spacing:0}
-.builds-grid{display:flex;flex-wrap:wrap;gap:8px;max-height:340px;overflow-y:auto;padding:4px 4px 4px 0}
-.builds-grid::-webkit-scrollbar{width:10px}
-.builds-grid::-webkit-scrollbar-track{background:#171c22}
-.builds-grid::-webkit-scrollbar-thumb{background:var(--accent);border:2px solid #171c22}
-.build-chip{
-  font-family:'Press Start 2P',monospace;font-size:9px;text-decoration:none;
-  color:#cfe3cf;background:#2b323b;padding:10px 12px;
-  border:2px solid;border-color:#454f5c #151a20 #151a20 #454f5c;
-  transition:transform .1s, background .15s, color .15s;
-}
-.build-chip:hover{transform:translateY(-3px);background:#3f7a37;color:#fff}
-.build-chip.latest{background:var(--btn,#5b8747);border-color:#94c971 var(--accent-dk) var(--accent-dk) #94c971;color:#fff;box-shadow:0 3px 0 #16250f}
-
-/* Error */
-.error{
-  margin-top:26px;padding:18px 20px;font-weight:600;color:#ffd7d3;
-  background:#3a1714;border:2px solid;border-color:#7c332c #1c0806 #1c0806 #7c332c;
-}
-.error b{color:#ff9d94;font-family:'Press Start 2P',monospace;font-size:10px;display:block;margin-bottom:8px}
-
-footer{margin-top:60px;text-align:center;font-size:13px;color:var(--muted);line-height:1.9}
-footer a{color:var(--accent);text-decoration:none;border-bottom:2px dotted var(--accent)}
-footer a:hover{color:#fff;border-color:#fff}
-
-@media (prefers-reduced-motion:reduce){
-  *,*::before,*::after{animation:none!important;transition:none!important}
-}
-</style>
-
-<!-- YOUR THEME — overrides everything above -->
-<link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minecraft Paper Build Checker</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-<div class="grid-overlay" aria-hidden="true"></div>
-<div id="pixels" aria-hidden="true"></div>
-<div class="grass" aria-hidden="true"></div>
-
-<main class="wrap">
-
-  <!-- ── Masthead ── -->
-  <header class="masthead">
-    <svg class="logo" width="52" height="52" viewBox="0 0 11 11" shape-rendering="crispEdges" aria-hidden="true">
-      <rect x="1" y="1" width="9" height="9" fill="#8f9ba3"/>
-      <rect x="2" y="2" width="7" height="7" fill="#ffffff"/>
-      <rect x="3" y="3" width="5" height="1" fill="#c7d3da"/>
-      <rect x="3" y="5" width="5" height="1" fill="#c7d3da"/>
-      <rect x="3" y="7" width="3" height="1" fill="#c7d3da"/>
-      <rect x="7" y="1" width="3" height="3" fill="#6d7a82"/>
-      <rect x="7" y="2" width="2" height="2" fill="#dfe6ea"/>
-    </svg>
-    <div>
-      <h1>PAPER <em>BUILD</em> CHECKER</h1>
-      <p class="tagline">Every Minecraft version · official PaperMC download links</p>
-    </div>
-    <span class="api-pill"><span class="dot" id="apiDot"></span><span id="apiStatus">CONNECTING…</span></span>
-  </header>
-
-  <!-- ── Checker ── -->
-  <section class="mc-panel" aria-label="Version checker">
-    <p class="field-label">▸ SELECT MINECRAFT VERSION</p>
-    <div class="checker-row">
-      <select id="versionSelect" aria-label="Minecraft version">
-        <option>Loading versions…</option>
-      </select>
-      <button class="btn" id="checkBtn" disabled>
-        <span id="checkLabel">CHECK BUILD</span>
-      </button>
-    </div>
-    <div class="quick" id="quickChips" hidden>
-      <span class="quick-label">Quick pick:</span>
-    </div>
-    <p class="hint">Links point straight to <b>api.papermc.io</b> — the official Paper download service. No mirrors, no redirects.</p>
-  </section>
-
-  <div class="error" id="errorBox" hidden></div>
-
-  <!-- ── Result ── -->
-  <section id="result" hidden aria-live="polite">
-    <div class="mc-panel reveal">
-      <div class="rc-top">
-        <div>
-          <div class="rc-label">MINECRAFT</div>
-          <div class="rc-version" id="rVersion">—</div>
+    <div class="container">
+        <h1>Minecraft Paper Build Checker</h1>
+        
+        <div class="form-group">
+            <label for="version-select">Select Paper Version:</label>
+            <select id="version-select">
+                <option value="">Loading versions...</option>
+            </select>
         </div>
-        <div class="rc-arrow">▶▶</div>
-        <div>
-          <div class="rc-label">LATEST PAPER BUILD</div>
-          <div class="rc-build" id="rBuild">—</div>
+
+        <button id="check-btn">Check Build</button>
+
+        <div id="result" class="result hidden">
+            <p>Official build downloader link:</p>
+            <a id="download-link" href="#" target="_blank" rel="noopener noreferrer">Download Paper Build</a>
         </div>
-        <div class="rc-badges">
-          <span class="badge java" id="rJava">JAVA ?</span>
-          <span class="badge" id="rDate">—</span>
-          <span class="badge" id="rTotal">— BUILDS</span>
-        </div>
-      </div>
-      <div class="rc-actions">
-        <a class="btn btn-gold" id="rDownload" href="#" download>⬇ DOWNLOAD .JAR</a>
-        <button class="btn btn-stone" id="rCopy">COPY LINK</button>
-        <a class="btn btn-stone" id="rPage" href="#" target="_blank" rel="noopener">OFFICIAL PAGE ↗</a>
-      </div>
     </div>
 
-    <div class="mc-panel reveal">
-      <h3 class="panel-title">ALL BUILDS — <span id="bVersion"></span> <span class="note" id="bNote"></span></h3>
-      <div class="builds-grid" id="buildsGrid"></div>
-    </div>
-  </section>
+    <script>
+        const PAPER_API_BASE = 'https://api.papermc.io/v2/projects/paper';
+        const versionSelect = document.getElementById('version-select');
+        const checkBtn = document.getElementById('check-btn');
+        const resultDiv = document.getElementById('result');
+        const downloadLink = document.getElementById('download-link');
 
-  <footer>
-    Data served live from <a href="https://api.papermc.io" target="_blank" rel="noopener">api.papermc.io</a> ·
-    Downloads page: <a href="https://papermc.io/downloads" target="_blank" rel="noopener">papermc.io/downloads</a><br>
-    Fan-made tool — not affiliated with Mojang Studios or the PaperMC team.
-  </footer>
-</main>
+        // Load available Paper versions
+        async function loadVersions() {
+            try {
+                const res = await fetch(`${PAPER_API_BASE}/versions`);
+                const data = await res.json();
+                const versions = data.versions;
 
-<script>
-(function () {
-  "use strict";
-
-  const API   = "https://api.papermc.io/v2/projects/paper";
-  const $     = (s) => document.querySelector(s);
-  const sel   = $("#versionSelect");
-  const btn   = $("#checkBtn");
-  const label = $("#checkLabel");
-
-  let versions = [];
-  let busy = false;
-
-  /* helpers ------------------------------------------------ */
-  const cv = (a, b) => {
-    const x = a.split(".").map(Number), y = b.split(".").map(Number);
-    for (let i = 0; i < 3; i++) if ((x[i] || 0) !== (y[i] || 0)) return (x[i] || 0) - (y[i] || 0);
-    return 0;
-  };
-  const jarURL = (v, b) => `${API}/versions/${v}/builds/${b}/downloads/paper-${v}-${b}.jar`;
-
-  const javaFor = (v) => {
-    const p = v.split(".").map(Number), minor = p[1] || 0, patch = p[2] || 0;
-    if (minor > 20 || (minor === 20 && patch >= 5)) return "JAVA 21";
-    if (minor >= 18) return "JAVA 17";
-    if (minor === 17) return "JAVA 16";
-    return "JAVA 8";
-  };
-
-  const setStatus = (cls, text) => {
-    $("#apiDot").className = "dot " + cls;
-    $("#apiStatus").textContent = text;
-  };
-
-  const showError = (html) => {
-    const box = $("#errorBox");
-    box.innerHTML = "<b>✖ ERROR</b>" + html;
-    box.hidden = false;
-    $("#result").hidden = true;
-  };
-  const hideError = () => { $("#errorBox").hidden = true; };
-
-  /* load versions ------------------------------------------ */
-  async function loadVersions() {
-    try {
-      const r = await fetch(API);
-      if (!r.ok) throw new Error("HTTP " + r.status);
-      const j = await r.json();
-      versions = (j.versions || []).slice().sort(cv).reverse(); // newest first
-      if (!versions.length) throw new Error("empty");
-
-      // grouped dropdown: 1.21.x, 1.20.x, …
-      sel.innerHTML = "";
-      const groups = {};
-      versions.forEach(v => {
-        const k = v.split(".").slice(0, 2).join(".");
-        (groups[k] = groups[k] || []).push(v);
-      });
-      Object.keys(groups).sort(cv).reverse().forEach(k => {
-        const og = document.createElement("optgroup");
-        og.label = k + ".x";
-        groups[k].forEach(v => {
-          const o = document.createElement("option");
-          o.value = o.textContent = v;
-          og.appendChild(o);
-        });
-        sel.appendChild(og);
-      });
-      sel.value = versions[0]; // default = latest
-
-      // quick chips
-      const quick = $("#quickChips");
-      versions.slice(0, 5).forEach((v, i) => {
-        const c = document.createElement("button");
-        c.className = "chip";
-        c.textContent = i === 0 ? "★ LATEST " + v : v;
-        c.onclick = () => { sel.value = v; runCheck(v); };
-        quick.appendChild(c);
-      });
-      quick.hidden = false;
-
-      btn.disabled = false;
-      setStatus("live", versions.length + " VERSIONS");
-    } catch (e) {
-      setStatus("dead", "API OFFLINE");
-      sel.innerHTML = "<option>Couldn't reach api.papermc.io</option>";
-      showError("Could not reach the PaperMC API. Check your internet connection (or an ad-blocker / firewall rule) and reload.");
-    }
-  }
-
-  /* check build -------------------------------------------- */
-  async function runCheck(v) {
-    if (busy || !v) return;
-    busy = true;
-    hideError();
-    $("#result").hidden = true;
-    btn.disabled = true;
-    label.innerHTML = 'CHECKING <span class="px-loader"><i></i><i></i><i></i></span>';
-
-    try {
-      const r = await fetch(`${API}/versions/${v}`);
-      if (!r.ok) throw new Error("version");
-      const data = await r.json();
-      const builds = (data.builds || []).slice().sort((a, b) => b - a);
-      if (!builds.length) throw new Error("nobuilds");
-      const latest = builds[0];
-
-      let time = null, changes = 0;
-      try {
-        const d = await fetch(`${API}/versions/${v}/builds/${latest}`);
-        if (d.ok) {
-          const det = (await d.json()).builds?.[0];
-          time = det?.time || null;
-          changes = det?.changes?.length || 0;
+                versionSelect.innerHTML = '<option value="">-- Choose a version --</option>';
+                versions.forEach(version => {
+                    const option = document.createElement('option');
+                    option.value = version;
+                    option.textContent = `Paper ${version}`;
+                    versionSelect.appendChild(option);
+                });
+            } catch (err) {
+                console.error('Failed to load versions:', err);
+                versionSelect.innerHTML = '<option value="">Error loading versions</option>';
+            }
         }
-      } catch (_) { /* detail is optional */ }
 
-      render(v, builds, latest, time, changes);
-    } catch (e) {
-      showError(e.message === "nobuilds"
-        ? `No Paper builds exist for Minecraft <u>${v}</u>. Try a newer version.`
-        : `Failed to fetch build data for <u>${v}</u>. The API may be rate-limiting — try again in a few seconds.`);
-    } finally {
-      busy = false;
-      btn.disabled = false;
-      label.textContent = "CHECK BUILD";
-    }
-  }
+        // Get latest build info and download URL for a version
+        async function getLatestBuild(version) {
+            try {
+                const res = await fetch(`${PAPER_API_BASE}/versions/${version}/builds`);
+                const data = await res.json();
+                const builds = data.builds;
+                if (!builds || builds.length === 0) {
+                    throw new Error(`No builds found for version ${version}`);
+                }
 
-  /* render -------------------------------------------------- */
-  function render(v, builds, latest, time, changes) {
-    $("#rVersion").textContent = v;
-    $("#rBuild").textContent = "#" + latest;
-    $("#rJava").textContent = javaFor(v);
-    $("#rDate").textContent = time
-      ? new Date(time).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })
-      : "—";
-    $("#rTotal").textContent = builds.length + " BUILDS" + (changes ? " · " + changes + " COMMITS" : "");
+                // Latest build is the last one in the list
+                const latestBuild = builds[builds.length - 1];
+                const buildNumber = latestBuild.build;
+                const downloadName = latestBuild.downloads.application.name;
 
-    const dl = $("#rDownload");
-    dl.href = jarURL(v, latest);
-    dl.textContent = "⬇ DOWNLOAD paper-" + v + "-" + latest + ".jar";
+                const downloadUrl = `${PAPER_API_BASE}/versions/${version}/builds/${buildNumber}/downloads/${downloadName}`;
 
-    $("#rPage").href = "https://papermc.io/downloads/paper/" + v;
-    $("#rCopy").dataset.url = jarURL(v, latest);
-    $("#rCopy").textContent = "COPY LINK";
+                return {
+                    build: buildNumber,
+                    downloadUrl,
+                    fileName: downloadName
+                };
+            } catch (err) {
+                console.error('Failed to fetch build info:', err);
+                throw err;
+            }
+        }
 
-    $("#bVersion").textContent = "v" + v;
-    const CAP = 240;
-    $("#bNote").textContent = builds.length > CAP
-      ? ` · showing latest ${CAP} of ${builds.length}`
-      : "";
+        // Handle "Check Build" click
+        checkBtn.addEventListener('click', async () => {
+            const selectedVersion = versionSelect.value;
+            if (!selectedVersion) {
+                alert('Please select a Paper version first.');
+                return;
+            }
 
-    const grid = $("#buildsGrid");
-    grid.innerHTML = "";
-    builds.slice(0, CAP).forEach(b => {
-      const a = document.createElement("a");
-      a.className = "build-chip" + (b === latest ? " latest" : "");
-      a.href = jarURL(v, b);
-      a.download = "";
-      a.textContent = "#" + b + (b === latest ? " ★" : "");
-      grid.appendChild(a);
-    });
+            checkBtn.disabled = true;
+            checkBtn.textContent = 'Checking...';
 
-    const res = $("#result");
-    res.hidden = false;
-    res.querySelectorAll(".reveal").forEach(el => {
-      el.style.animation = "none"; void el.offsetWidth; el.style.animation = "";
-        });    res.scrollIntoView({ behavior: "smooth", block: "nearest" });  }  
+            try {
+                const buildInfo = await getLatestBuild(selectedVersion);
+                downloadLink.href = buildInfo.downloadUrl;
+                downloadLink.textContent = `Download ${buildInfo.fileName} (Build ${buildInfo.build})`;
+                resultDiv.classList.remove('hidden');
+            } catch (err) {
+                alert('Failed to fetch build info. Check console for details.');
+                console.error(err);
+            } finally {
+                checkBtn.disabled = false;
+                checkBtn.textContent = 'Check Build';
+            }
+        });
 
-/* events -------------------------------------------------- */  
-btn.addEventListener("click", () => runCheck(sel.value));  
-sel.addEventListener("keydown", e => { if (e.key === "Enter") runCheck(sel.value); });  
-$("#rCopy").addEventListener("click", async function () {    
-  try {      
-    await navigator.clipboard.writeText(this.dataset.url);      
-    this.textContent = "✓ COPIED!";      
-    setTimeout(() => (this.textContent = "COPY LINK"), 1300);    
-  } catch (_) { this.textContent = "PRESS CTRL+C"; }  
-});  
-
-/* floating pixel particles -------------------------------- */  
-(function particles() {    
-  const host = $("#pixels");    
-  const colors = [" #67b64c", " #8b5a2b", " #e0a92e", " #9fb2c8", " #e9eff4"];    
-  for (let i = 0; i < 18; i++) {      
-    const s = document.createElement("span");      
-    const size = 5 + Math.random() * 8;      
-    s.style.cssText =        
-      `left:${Math.random() * 100}%;width:${size}px;height:${size}px;` +        
-      `background:${colors[i % colors.length]};opacity:${0.14 + Math.random() * 0.22};` +        
-      `animation-duration:${13 + Math.random() * 17}s;animation-delay:-${Math.random() * 25}s;`;      
-    host.appendChild(s);    
-  }  
-})();  
-
-loadVersions();
-})();
-</script>
+        // Initialize
+        loadVersions();
+    </script>
 </body>
 </html>
