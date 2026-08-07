@@ -11,34 +11,27 @@
   <header class="header">
     <h1 class="title">Paper Build Checker</h1>
     <p class="tagline">Every Minecraft version · official PaperMC download links</p>
-    <p id="apiStatus" class="api-status">Connecting…</p>
+    <p class="api-status ok">Saved data · no API needed</p>
   </header>
 
   <main class="main">
 
     <section class="panel">
       <h2 class="panel-title">▸ Select Minecraft version</h2>
-      <select id="versionSelect" class="select" disabled>
-        <option value="">Loading versions…</option>
-      </select>
-      <button id="checkBtn" class="btn" disabled>Check Build</button>
+      <select id="versionSelect" class="select"></select>
+      <button id="checkBtn" class="btn">Check Build</button>
       <p class="note">
-        Links point straight to <strong>api.papermc.io</strong> — the official
-        Paper download service. No mirrors, no redirects.
+        Direct links use the official pattern
+        <strong>api.papermc.io/…/downloads/paper-VERSION-BUILD.jar</strong>.
+        Saved builds are a snapshot — if you ever want the very newest build,
+        use the <strong>Official page</strong> button.
       </p>
     </section>
 
-    <div id="error" class="error" hidden>
-      <p class="error-title">✖ Error</p>
-      <p id="errorMsg"></p>
-      <p id="errDetail" class="error-detail"></p>
-      <button id="retryBtn" class="btn btn-small">Retry</button>
-    </div>
-
     <section id="result" class="result" hidden>
       <h2 id="resultVersion">Minecraft —</h2>
-      <p id="latestBuild">Latest Paper build —</p>
-      <p id="buildCount">— builds</p>
+      <p id="latestBuild">Saved Paper build —</p>
+      <p id="buildCount"></p>
       <div class="actions">
         <a id="downloadLink" class="btn" href="#" target="_blank" rel="noopener">Download .jar</a>
         <button id="copyBtn" class="btn">Copy Link</button>
@@ -47,17 +40,12 @@
       </div>
     </section>
 
-    <section class="builds">
-      <h2 id="buildsTitle" hidden>All builds —</h2>
-      <ul id="buildList" class="build-list"></ul>
-    </section>
-
   </main>
 
   <footer class="footer">
     <p>
-      Data served live from <a href="https://api.papermc.io">api.papermc.io</a> ·
-      Downloads page: <a href="https://papermc.io/downloads">papermc.io/downloads</a>
+      Jars hosted by <a href="https://api.papermc.io">api.papermc.io</a> ·
+      Browse all builds at <a href="https://papermc.io/downloads">papermc.io/downloads</a>
     </p>
     <p>Fan-made tool — not affiliated with Mojang Studios or the PaperMC team.</p>
   </footer>
@@ -66,148 +54,58 @@
 (function () {
   "use strict";
 
-  var API = "https://api.papermc.io/v2/projects/paper";
-
-  /* Saved list used ONLY if the API can't be reached */
-  var FALLBACK_VERSIONS = ["1.21.8","1.21.7","1.21.6","1.21.5","1.21.4","1.21.3",
-    "1.21.2","1.21.1","1.21","1.20.6","1.20.5","1.20.4","1.20.3","1.20.2","1.20.1",
-    "1.20","1.19.4","1.19.3","1.19.2","1.19.1","1.19","1.18.2","1.18.1","1.18",
-    "1.17.1","1.17","1.16.5","1.16.4","1.16.3","1.16.2","1.16.1","1.15.2","1.14.4",
-    "1.13.2","1.12.2","1.11.2","1.10.2","1.9.4","1.8.8"];
+  /* [version, saved build number] — snapshot Aug 2026, no API used */
+  var CATALOG = [
+    ["1.21.8", null], ["1.21.7", null], ["1.21.6", null], ["1.21.5", null],
+    ["1.21.4", 222], ["1.21.3", 84], ["1.21.2", null], ["1.21.1", 131], ["1.21", null],
+    ["1.20.6", null], ["1.20.5", null], ["1.20.4", 497], ["1.20.3", null],
+    ["1.20.2", null], ["1.20.1", 196], ["1.20", null],
+    ["1.19.4", 550], ["1.19.3", null], ["1.19.2", 307], ["1.19.1", null], ["1.19", null],
+    ["1.18.2", 318], ["1.18.1", 216], ["1.18", null],
+    ["1.17.1", 411], ["1.17", null],
+    ["1.16.5", 794], ["1.16.4", 416], ["1.16.3", 253], ["1.16.2", null], ["1.16.1", null],
+    ["1.15.2", 393], ["1.14.4", null], ["1.13.2", null],
+    ["1.12.2", 1620], ["1.11.2", 1104], ["1.10.2", 916], ["1.9.4", 775], ["1.8.8", 593]
+  ];
 
   var versionSelect = document.getElementById("versionSelect");
   var checkBtn      = document.getElementById("checkBtn");
-  var retryBtn      = document.getElementById("retryBtn");
-  var apiStatus     = document.getElementById("apiStatus");
-  var errorBox      = document.getElementById("error");
-  var errorMsg      = document.getElementById("errorMsg");
-  var errDetail     = document.getElementById("errDetail");
   var result        = document.getElementById("result");
   var resultVersion = document.getElementById("resultVersion");
   var latestBuild   = document.getElementById("latestBuild");
   var buildCount    = document.getElementById("buildCount");
   var downloadLink  = document.getElementById("downloadLink");
   var copyBtn       = document.getElementById("copyBtn");
-  var officialPage  = document.getElementById("officialPage");
-  var buildsTitle   = document.getElementById("buildsTitle");
-  var buildList     = document.getElementById("buildList");
 
-  var lastError = "";
+  CATALOG.forEach(function (item) {
+    versionSelect.add(new Option(item[0], item[0]));
+  });
 
-  function setStatus(text, state) {
-    apiStatus.textContent = text;
-    apiStatus.className = "api-status" + (state ? " " + state : "");
-  }
-  function showError(msg, detail) {
-    errorMsg.textContent = msg;
-    errDetail.textContent = detail ? "(" + detail + ")" : "";
-    errorBox.hidden = false;
-  }
-  function hideError() { errorBox.hidden = true; }
-
-  /* ---- network: direct API, then 2 backup proxies, 9s timeout ---- */
-  var MIRRORS = [
-    function (u) { return u; },
-    function (u) { return "https://api.allorigins.win/raw?url=" + encodeURIComponent(u); },
-    function (u) { return "https://corsproxy.io/?url=" + encodeURIComponent(u); }
-  ];
-
-  function timedFetch(url) {
-    if ("AbortController" in window) {
-      var ctrl = new AbortController();
-      var t = setTimeout(function () { ctrl.abort(); }, 9000);
-      return fetch(url, { signal: ctrl.signal, headers: { accept: "application/json" } })
-        .finally(function () { clearTimeout(t); });
+  function check() {
+    var v = versionSelect.value;
+    var entry = null;
+    for (var i = 0; i < CATALOG.length; i++) {
+      if (CATALOG[i][0] === v) { entry = CATALOG[i]; break; }
     }
-    return fetch(url, { headers: { accept: "application/json" } });
-  }
 
-  function tryFetch(url, i) {
-    if (i >= MIRRORS.length) return Promise.reject(new Error(lastError || "no network"));
-    return timedFetch(MIRRORS[i](url))
-      .then(function (res) {
-        if (!res.ok) { lastError = "HTTP " + res.status; throw new Error(lastError); }
-        return res.json();
-      })
-      .catch(function (e) {
-        lastError = (e && e.message) ? e.message : String(e);
-        return tryFetch(url, i + 1);
-      });
-  }
-  function getJSON(url) { lastError = ""; return tryFetch(url, 0); }
+    result.hidden = false;
+    resultVersion.textContent = "Minecraft " + v;
 
-  function downloadUrl(version, build) {
-    var name = (build.downloads && build.downloads.application)
-      ? build.downloads.application.name
-      : "paper-" + version + "-" + build.build + ".jar";
-    return API + "/versions/" + version + "/builds/" + build.build + "/downloads/" + name;
-  }
-
-  function fillSelect(list) {
-    versionSelect.innerHTML = "";
-    list.forEach(function (v) { versionSelect.add(new Option(v, v)); });
-    versionSelect.disabled = false;
-    checkBtn.disabled = false;
-  }
-
-  function loadVersions() {
-    setStatus("Connecting…", "");
-    hideError();
-    versionSelect.disabled = true;
-    checkBtn.disabled = true;
-    versionSelect.innerHTML = '<option value="">Loading versions…</option>';
-
-    getJSON(API).then(function (data) {
-      fillSelect((data.versions || []).slice().reverse());
-      setStatus("API online", "ok");
-    }).catch(function () {
-      fillSelect(FALLBACK_VERSIONS);
-      setStatus("Offline mode", "offline");
-      showError("Could not reach the PaperMC API — loaded the saved version list instead. Internet is needed to fetch builds. Press Retry after fixing your connection.", lastError);
-    });
-  }
-
-  function checkBuild() {
-    var version = versionSelect.value;
-    if (!version) return;
-
-    hideError();
-    checkBtn.disabled = true;
-    checkBtn.textContent = "Checking…";
-
-    getJSON(API + "/versions/" + encodeURIComponent(version) + "/builds")
-      .then(function (data) {
-        var builds = data.builds || [];
-        if (!builds.length) throw new Error("no builds");
-
-        var latest = builds[builds.length - 1];
-        result.hidden = false;
-        resultVersion.textContent = "Minecraft " + version;
-        latestBuild.textContent  = "Latest Paper build — #" + latest.build;
-        buildCount.textContent   = builds.length + " builds";
-        downloadLink.href = downloadUrl(version, latest);
-
-        buildsTitle.hidden = false;
-        buildsTitle.textContent = "All builds — " + version;
-        buildList.innerHTML = "";
-        builds.slice().reverse().forEach(function (b) {
-          var li = document.createElement("li");
-          var a  = document.createElement("a");
-          a.href = downloadUrl(version, b);
-          a.target = "_blank";
-          a.rel = "noopener";
-          a.textContent = "#" + b.build;
-          li.appendChild(a);
-          buildList.appendChild(li);
-        });
-      })
-      .catch(function () {
-        showError("Could not load builds for " + version + ". You need a working internet connection.", lastError);
-      })
-      .finally(function () {
-        checkBtn.disabled = false;
-        checkBtn.textContent = "Check Build";
-      });
+    if (entry && entry[1]) {
+      var url = "https://api.papermc.io/v2/projects/paper/versions/" + v +
+                "/builds/" + entry[1] + "/downloads/paper-" + v + "-" + entry[1] + ".jar";
+      latestBuild.textContent = "Saved Paper build — #" + entry[1];
+      buildCount.textContent  = "Snapshot build — newer ones may exist on the official page.";
+      downloadLink.href = url;
+      downloadLink.hidden = false;
+      copyBtn.hidden = false;
+    } else {
+      latestBuild.textContent = "No saved build stored for " + v;
+      buildCount.textContent  = "Use the Official page button to grab its newest build.";
+      downloadLink.href = "https://papermc.io/downloads/paper";
+      downloadLink.hidden = false;
+      copyBtn.hidden = true;
+    }
   }
 
   copyBtn.addEventListener("click", function () {
@@ -229,10 +127,7 @@
     }
   });
 
-  checkBtn.addEventListener("click", checkBuild);
-  retryBtn.addEventListener("click", loadVersions);
-
-  loadVersions();
+  checkBtn.addEventListener("click", check);
 })();
 </script>
 </body>
