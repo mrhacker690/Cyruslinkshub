@@ -49,6 +49,8 @@
         <h3 id="playerName">-</h3>
         <p><strong>Skin Type</strong></p>
         <h3 id="skinType">-</h3>
+        <p><strong>Texture Size</strong></p>
+        <h3 id="textureSize">-</h3>
         <p><strong>Skin URL</strong></p>
         <h3 id="skinUrlText">No skin loaded</h3>
     </div>
@@ -72,10 +74,8 @@ var currentSkinUrl = null;
 var currentUsername = null;
 var isDragging = false;
 var previousMouse = { x: 0, y: 0 };
-var rotationX = 0;
-var rotationY = 0;
-var targetRotationX = 0;
-var targetRotationY = 0;
+var rotationX = 0, rotationY = 0;
+var targetRotationX = 0, targetRotationY = 0;
 var cameraDistance = 40;
 
 /* ===========================================================
@@ -98,16 +98,13 @@ function initThreeJS() {
     renderer.setPixelRatio(window.devicePixelRatio);
     container.appendChild(renderer.domElement);
 
-    var ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
-    scene.add(ambientLight);
-
-    var dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
-    dirLight.position.set(5, 10, 7);
-    scene.add(dirLight);
-
-    var backLight = new THREE.DirectionalLight(0xffffff, 0.3);
-    backLight.position.set(-5, -5, -7);
-    scene.add(backLight);
+    scene.add(new THREE.AmbientLight(0xffffff, 0.7));
+    var dir = new THREE.DirectionalLight(0xffffff, 0.8);
+    dir.position.set(5, 10, 7);
+    scene.add(dir);
+    var back = new THREE.DirectionalLight(0xffffff, 0.3);
+    back.position.set(-5, -5, -7);
+    scene.add(back);
 
     var grid = new THREE.GridHelper(50, 50, 0x4ade80, 0x333333);
     grid.position.y = -16;
@@ -126,231 +123,249 @@ function initThreeJS() {
         camera.updateProjectionMatrix();
         renderer.setSize(w, height);
     });
-
-    console.log('Three.js initialized');
 }
 
 /* ===========================================================
-   ANIMATION LOOP
+   ANIMATION
 =========================================================== */
 function animate() {
     requestAnimationFrame(animate);
-
     rotationX += (targetRotationX - rotationX) * 0.1;
     rotationY += (targetRotationY - rotationY) * 0.1;
-
     if (playerGroup && !isDragging) {
         targetRotationY += 0.005;
     }
-
     if (playerGroup) {
         playerGroup.rotation.y = rotationY;
         playerGroup.rotation.x = rotationX;
     }
-
     renderer.render(scene, camera);
 }
 
 /* ===========================================================
-   MOUSE / TOUCH CONTROLS
+   CONTROLS
 =========================================================== */
-function setupControls(container) {
-    container.addEventListener('mousedown', function(e) {
+function setupControls(el) {
+    el.addEventListener('mousedown', function(e) {
         isDragging = true;
         previousMouse = { x: e.clientX, y: e.clientY };
     });
-
     window.addEventListener('mousemove', function(e) {
         if (!isDragging) return;
-        var dx = e.clientX - previousMouse.x;
-        var dy = e.clientY - previousMouse.y;
-        targetRotationY += dx * 0.01;
-        targetRotationX += dy * 0.01;
+        targetRotationY += (e.clientX - previousMouse.x) * 0.01;
+        targetRotationX += (e.clientY - previousMouse.y) * 0.01;
         targetRotationX = Math.max(-1, Math.min(1, targetRotationX));
         previousMouse = { x: e.clientX, y: e.clientY };
     });
-
-    window.addEventListener('mouseup', function() {
-        isDragging = false;
-    });
-
-    container.addEventListener('wheel', function(e) {
+    window.addEventListener('mouseup', function() { isDragging = false; });
+    el.addEventListener('wheel', function(e) {
         e.preventDefault();
-        cameraDistance += e.deltaY * 0.05;
-        cameraDistance = Math.max(15, Math.min(80, cameraDistance));
+        cameraDistance = Math.max(15, Math.min(80, cameraDistance + e.deltaY * 0.05));
         camera.position.z = cameraDistance;
     });
-
-    container.addEventListener('touchstart', function(e) {
+    el.addEventListener('touchstart', function(e) {
         if (e.touches.length === 1) {
             isDragging = true;
             previousMouse = { x: e.touches[0].clientX, y: e.touches[0].clientY };
         }
     });
-
-    container.addEventListener('touchmove', function(e) {
+    el.addEventListener('touchmove', function(e) {
         if (!isDragging || e.touches.length !== 1) return;
         e.preventDefault();
-        var dx = e.touches[0].clientX - previousMouse.x;
-        var dy = e.touches[0].clientY - previousMouse.y;
-        targetRotationY += dx * 0.01;
-        targetRotationX += dy * 0.01;
+        targetRotationY += (e.touches[0].clientX - previousMouse.x) * 0.01;
+        targetRotationX += (e.touches[0].clientY - previousMouse.y) * 0.01;
         targetRotationX = Math.max(-1, Math.min(1, targetRotationX));
         previousMouse = { x: e.touches[0].clientX, y: e.touches[0].clientY };
     });
-
-    container.addEventListener('touchend', function() {
-        isDragging = false;
-    });
+    el.addEventListener('touchend', function() { isDragging = false; });
 }
 
 /* ===========================================================
-   CREATE MINECRAFT BODY PART WITH UV MAPPING
+   CREATE BOX WITH MINECRAFT UV MAPPING (FIXED - NO GAPS)
 =========================================================== */
-function createTexturedBox(w, h, d, uvX, uvY, texture, scale) {
-    var group = new THREE.Group();
-    var mat = new THREE.MeshLambertMaterial({ map: texture, transparent: true, side: THREE.DoubleSide });
-    var tw = 64, th = 64;
+function createBox(w, h, d, uvX, uvY, texture, scale, isOverlay, mirrorU) {
+    var geo = new THREE.BoxGeometry(w * scale, h * scale, d * scale);
+    var uvAttr = geo.attributes.uv;
+    var uvArr = uvAttr.array;
 
-    function makeFace(fw, fh, x1, y1, x2, y2) {
-        var geo = new THREE.PlaneGeometry(fw * scale, fh * scale);
-        var uv = geo.attributes.uv;
-        var u1 = x1 / tw, v1 = 1 - y2 / th;
-        var u2 = x2 / tw, v2 = 1 - y1 / th;
-        uv.setXY(0, u1, v2);
-        uv.setXY(1, u2, v2);
-        uv.setXY(2, u1, v1);
-        uv.setXY(3, u2, v1);
-        uv.needsUpdate = true;
-        return new THREE.Mesh(geo, mat);
+    var tw = texture.image.width;
+    var th = texture.image.height;
+
+    // Minecraft box UV layout
+    var faces = [
+        { x: uvX,             y: uvY + d, fw: d, fh: h },  // right
+        { x: uvX + d + w,     y: uvY + d, fw: d, fh: h },  // left
+        { x: uvX + d,         y: uvY,     fw: w, fh: d },  // top
+        { x: uvX + d + w,     y: uvY,     fw: w, fh: d },  // bottom
+        { x: uvX + d,         y: uvY + d, fw: w, fh: h },  // front
+        { x: uvX + d + w + d, y: uvY + d, fw: w, fh: h }   // back
+    ];
+
+    for (var i = 0; i < 6; i++) {
+        var f = faces[i];
+        var u1 = f.x / tw;
+        var v1 = 1 - (f.y + f.fh) / th;
+        var u2 = (f.x + f.fw) / tw;
+        var v2 = 1 - f.y / th;
+
+        if (mirrorU) {
+            var tempU1 = u1;
+            u1 = u2;
+            u2 = tempU1;
+        }
+
+        var o = i * 8;
+        uvArr[o]     = u1; uvArr[o + 1] = v1;
+        uvArr[o + 2] = u2; uvArr[o + 3] = v1;
+        uvArr[o + 4] = u1; uvArr[o + 5] = v2;
+        uvArr[o + 6] = u2; uvArr[o + 7] = v2;
     }
 
-    var front = makeFace(w, h, uvX + d, uvY + d, uvX + d + w, uvY + d + h);
-    front.position.z = (d / 2) * scale;
-    group.add(front);
+    uvAttr.needsUpdate = true;
 
-    var back = makeFace(w, h, uvX + d + w + d, uvY + d, uvX + d + w + d + w, uvY + d + h);
-    back.position.z = -(d / 2) * scale;
-    back.rotation.y = Math.PI;
-    group.add(back);
+    var mat = new THREE.MeshLambertMaterial({
+        map: texture,
+        transparent: true,
+        side: THREE.FrontSide
+    });
 
-    var right = makeFace(d, h, uvX, uvY + d, uvX + d, uvY + d + h);
-    right.position.x = (w / 2) * scale;
-    right.rotation.y = Math.PI / 2;
-    group.add(right);
+    if (isOverlay) {
+        mat.polygonOffset = true;
+        mat.polygonOffsetFactor = -1;
+        mat.polygonOffsetUnits = -1;
+    }
 
-    var left = makeFace(d, h, uvX + d + w, uvY + d, uvX + d + w + d, uvY + d + h);
-    left.position.x = -(w / 2) * scale;
-    left.rotation.y = -Math.PI / 2;
-    group.add(left);
-
-    var top = makeFace(w, d, uvX + d, uvY, uvX + d + w, uvY + d);
-    top.position.y = (h / 2) * scale;
-    top.rotation.x = -Math.PI / 2;
-    group.add(top);
-
-    var bottom = makeFace(w, d, uvX + d + w, uvY, uvX + d + w + w, uvY + d);
-    bottom.position.y = -(h / 2) * scale;
-    bottom.rotation.x = Math.PI / 2;
-    group.add(bottom);
-
-    return group;
+    return new THREE.Mesh(geo, mat);
 }
 
 /* ===========================================================
-   BUILD MINECRAFT CHARACTER
+   BUILD PLAYER MODEL
 =========================================================== */
-function buildPlayer(texture, slim) {
+function buildPlayer(texture, isOldSkin) {
     while (playerGroup.children.length > 0) {
         playerGroup.remove(playerGroup.children[0]);
     }
 
     var s = 1;
-    var armW = slim ? 3 : 4;
+    var armW = 4;
+    var texH = texture.image.height;
+    var hasOverlays = texH >= 64;
 
-    var head = createTexturedBox(8, 8, 8, 0, 0, texture, s);
+    // HEAD
+    var head = createBox(8, 8, 8, 0, 0, texture, s, false, false);
     head.position.set(0, 10 * s, 0);
     playerGroup.add(head);
 
-    var hat = createTexturedBox(8, 8, 8, 32, 0, texture, s * 1.05);
-    hat.position.set(0, 10 * s, 0);
-    playerGroup.add(hat);
+    if (hasOverlays) {
+        var hat = createBox(8, 8, 8, 32, 0, texture, s * 1.1, true, false);
+        hat.position.set(0, 10 * s, 0);
+        playerGroup.add(hat);
+    }
 
-    var body = createTexturedBox(8, 12, 4, 16, 16, texture, s);
+    // BODY
+    var body = createBox(8, 12, 4, 16, 16, texture, s, false, false);
     body.position.set(0, 0, 0);
     playerGroup.add(body);
 
-    var jacket = createTexturedBox(8, 12, 4, 16, 32, texture, s * 1.05);
-    jacket.position.set(0, 0, 0);
-    playerGroup.add(jacket);
+    if (hasOverlays) {
+        var jacket = createBox(8, 12, 4, 16, 32, texture, s * 1.1, true, false);
+        jacket.position.set(0, 0, 0);
+        playerGroup.add(jacket);
+    }
 
-    var rightArm = createTexturedBox(armW, 12, 4, 40, 16, texture, s);
-    rightArm.position.set(-(4 + armW / 2) * s, 0, 0);
-    playerGroup.add(rightArm);
+    // RIGHT ARM
+    var rArm = createBox(armW, 12, 4, 40, 16, texture, s, false, false);
+    rArm.position.set(-(4 + armW / 2) * s, 0, 0);
+    playerGroup.add(rArm);
 
-    var rightSleeve = createTexturedBox(armW, 12, 4, 40, 32, texture, s * 1.05);
-    rightSleeve.position.set(-(4 + armW / 2) * s, 0, 0);
-    playerGroup.add(rightSleeve);
+    if (hasOverlays) {
+        var rSleeve = createBox(armW, 12, 4, 40, 32, texture, s * 1.1, true, false);
+        rSleeve.position.set(-(4 + armW / 2) * s, 0, 0);
+        playerGroup.add(rSleeve);
+    }
 
-    var leftArm = createTexturedBox(armW, 12, 4, 32, 48, texture, s);
-    leftArm.position.set((4 + armW / 2) * s, 0, 0);
-    playerGroup.add(leftArm);
+    // LEFT ARM
+    if (isOldSkin) {
+        var lArm = createBox(armW, 12, 4, 40, 16, texture, s, false, true);
+        lArm.position.set((4 + armW / 2) * s, 0, 0);
+        playerGroup.add(lArm);
+    } else {
+        var lArm = createBox(armW, 12, 4, 32, 48, texture, s, false, false);
+        lArm.position.set((4 + armW / 2) * s, 0, 0);
+        playerGroup.add(lArm);
 
-    var leftSleeve = createTexturedBox(armW, 12, 4, 48, 48, texture, s * 1.05);
-    leftSleeve.position.set((4 + armW / 2) * s, 0, 0);
-    playerGroup.add(leftSleeve);
+        if (hasOverlays) {
+            var lSleeve = createBox(armW, 12, 4, 48, 48, texture, s * 1.1, true, false);
+            lSleeve.position.set((4 + armW / 2) * s, 0, 0);
+            playerGroup.add(lSleeve);
+        }
+    }
 
-    var rightLeg = createTexturedBox(4, 12, 4, 0, 16, texture, s);
-    rightLeg.position.set(-2 * s, -12 * s, 0);
-    playerGroup.add(rightLeg);
+    // RIGHT LEG
+    var rLeg = createBox(4, 12, 4, 0, 16, texture, s, false, false);
+    rLeg.position.set(-2 * s, -12 * s, 0);
+    playerGroup.add(rLeg);
 
-    var rightPants = createTexturedBox(4, 12, 4, 0, 32, texture, s * 1.05);
-    rightPants.position.set(-2 * s, -12 * s, 0);
-    playerGroup.add(rightPants);
+    if (hasOverlays) {
+        var rPants = createBox(4, 12, 4, 0, 32, texture, s * 1.1, true, false);
+        rPants.position.set(-2 * s, -12 * s, 0);
+        playerGroup.add(rPants);
+    }
 
-    var leftLeg = createTexturedBox(4, 12, 4, 16, 48, texture, s);
-    leftLeg.position.set(2 * s, -12 * s, 0);
-    playerGroup.add(leftLeg);
+    // LEFT LEG
+    if (isOldSkin) {
+        var lLeg = createBox(4, 12, 4, 0, 16, texture, s, false, true);
+        lLeg.position.set(2 * s, -12 * s, 0);
+        playerGroup.add(lLeg);
+    } else {
+        var lLeg = createBox(4, 12, 4, 16, 48, texture, s, false, false);
+        lLeg.position.set(2 * s, -12 * s, 0);
+        playerGroup.add(lLeg);
 
-    var leftPants = createTexturedBox(4, 12, 4, 0, 48, texture, s * 1.05);
-    leftPants.position.set(2 * s, -12 * s, 0);
-    playerGroup.add(leftPants);
-
-    console.log('Player model built');
+        if (hasOverlays) {
+            var lPants = createBox(4, 12, 4, 0, 48, texture, s * 1.1, true, false);
+            lPants.position.set(2 * s, -12 * s, 0);
+            playerGroup.add(lPants);
+        }
+    }
 }
 
 /* ===========================================================
    LOAD SKIN TEXTURE
 =========================================================== */
-function loadSkinTexture(url, slim) {
+function loadSkinTexture(url) {
     var loader = new THREE.TextureLoader();
     loader.crossOrigin = 'anonymous';
 
-    loader.load(url,
-        function(texture) {
-            texture.magFilter = THREE.NearestFilter;
-            texture.minFilter = THREE.NearestFilter;
-            buildPlayer(texture, slim);
-        },
-        undefined,
-        function(err) {
-            console.error('Texture load error:', err);
-            showError('Failed to load skin texture.');
-        }
-    );
+    loader.load(url, function(texture) {
+        texture.magFilter = THREE.NearestFilter;
+        texture.minFilter = THREE.NearestFilter;
+
+        var texH = texture.image.height;
+        var texW = texture.image.width;
+        var isOld = texH === 32;
+
+        buildPlayer(texture, isOld);
+
+        document.getElementById('textureSize').textContent = texW + 'x' + texH;
+        document.getElementById('skinType').textContent = isOld ? 'Classic (Old Format)' : 'Modern (64x64+)';
+
+    }, undefined, function(err) {
+        showError('Failed to load skin texture.');
+        console.error('Texture error:', err);
+    });
 }
 
 /* ===========================================================
    LOAD DEFAULT SKIN
 =========================================================== */
 function loadDefaultSkin() {
-    var defaultUrl = 'https://minotar.net/skin/MHF_Steve';
-    currentSkinUrl = defaultUrl;
+    var url = 'https://minotar.net/skin/MHF_Steve';
+    currentSkinUrl = url;
     currentUsername = 'Steve';
-    loadSkinTexture(defaultUrl, false);
+    loadSkinTexture(url);
     document.getElementById('playerName').textContent = 'Steve (Default)';
-    document.getElementById('skinType').textContent = 'Classic';
-    document.getElementById('skinUrlText').textContent = defaultUrl;
+    document.getElementById('skinUrlText').textContent = url;
     document.getElementById('downloadBtn').disabled = false;
     document.getElementById('copyUrlBtn').disabled = false;
     document.getElementById('openUrlBtn').disabled = false;
@@ -361,25 +376,20 @@ function loadDefaultSkin() {
 =========================================================== */
 function loadSkin() {
     var username = document.getElementById('usernameInput').value.trim();
-    if (!username) {
-        showError('Please enter a username');
-        return;
-    }
+    if (!username) { showError('Please enter a username'); return; }
 
     showLoading(true);
     hideError();
     hideSuccess();
 
     var skinUrl = 'https://minotar.net/skin/' + username;
-
     var testImg = new Image();
     testImg.crossOrigin = 'anonymous';
 
     testImg.onload = function() {
         currentSkinUrl = skinUrl;
         currentUsername = username;
-
-        loadSkinTexture(skinUrl, false);
+        loadSkinTexture(skinUrl);
 
         document.getElementById('playerName').textContent = username;
         document.getElementById('skinUrlText').textContent = skinUrl;
@@ -387,10 +397,8 @@ function loadSkin() {
         document.getElementById('copyUrlBtn').disabled = false;
         document.getElementById('openUrlBtn').disabled = false;
 
-        detectSkinType(skinUrl);
         showSuccess('Skin loaded for ' + username + '!');
         showLoading(false);
-        console.log('Skin loaded:', skinUrl);
     };
 
     testImg.onerror = function() {
@@ -399,31 +407,6 @@ function loadSkin() {
     };
 
     testImg.src = skinUrl;
-}
-
-/* ===========================================================
-   DETECT SKIN TYPE
-=========================================================== */
-function detectSkinType(url) {
-    var img = new Image();
-    img.crossOrigin = 'anonymous';
-    img.onload = function() {
-        var c = document.createElement('canvas');
-        c.width = img.width;
-        c.height = img.height;
-        var ctx = c.getContext('2d');
-        ctx.drawImage(img, 0, 0);
-        try {
-            var px = ctx.getImageData(54, 20, 1, 1).data;
-            document.getElementById('skinType').textContent = (px[3] === 0) ? 'Classic (Steve)' : 'Slim (Alex)';
-        } catch(e) {
-            document.getElementById('skinType').textContent = 'Classic (Steve)';
-        }
-    };
-    img.onerror = function() {
-        document.getElementById('skinType').textContent = 'Unknown';
-    };
-    img.src = url;
 }
 
 /* ===========================================================
@@ -500,20 +483,14 @@ function showError(msg) {
     document.getElementById('errorMsg').style.display = 'block';
     document.getElementById('successMsg').style.display = 'none';
 }
-function hideError() {
-    document.getElementById('errorMsg').style.display = 'none';
-}
+function hideError() { document.getElementById('errorMsg').style.display = 'none'; }
 function showSuccess(msg) {
     document.getElementById('successMsg').textContent = msg;
     document.getElementById('successMsg').style.display = 'block';
     document.getElementById('errorMsg').style.display = 'none';
 }
-function hideSuccess() {
-    document.getElementById('successMsg').style.display = 'none';
-}
-function showLoading(show) {
-    document.getElementById('loadingMsg').style.display = show ? 'block' : 'none';
-}
+function hideSuccess() { document.getElementById('successMsg').style.display = 'none'; }
+function showLoading(show) { document.getElementById('loadingMsg').style.display = show ? 'block' : 'none'; }
 
 /* ===========================================================
    START
@@ -524,7 +501,7 @@ window.addEventListener('load', function() {
     showLoading(false);
 
     if (typeof THREE === 'undefined') {
-        showError('Three.js failed to load. Check internet.');
+        showError('Three.js failed to load. Check internet connection.');
         return;
     }
 
