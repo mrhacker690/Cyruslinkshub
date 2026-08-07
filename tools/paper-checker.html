@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Paper Build Checker — All Minecraft Versions</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <header class="header">
+    <h1 class="title">Paper Build Checker</h1>
+    <p class="tagline">Every Minecraft version · official PaperMC download links</p>
+    <p id="apiStatus" class="api-status">Connecting…</p>
+  </header>
+
+  <main class="main">
+
+    <section class="panel">
+      <h2 class="panel-title">▸ Select Minecraft version</h2>
+      <select id="versionSelect" class="select" disabled>
+        <option value="">Loading versions…</option>
+      </select>
+      <button id="checkBtn" class="btn" disabled>Check Build</button>
+      <p class="note">
+        Links point straight to <strong>api.papermc.io</strong> — the official
+        Paper download service. No mirrors, no redirects.
+      </p>
+    </section>
+
+    <div id="error" class="error" hidden>
+      <p class="error-title">✖ Error</p>
+      <p id="errorMsg"></p>
+      <button id="retryBtn" class="btn btn-small">Retry</button>
+    </div>
+
+    <section id="result" class="result" hidden>
+      <h2 id="resultVersion">Minecraft —</h2>
+      <p id="latestBuild">Latest Paper build —</p>
+      <p id="buildCount">— builds</p>
+      <div class="actions">
+        <a id="downloadLink" class="btn" href="#" target="_blank" rel="noopener"> Download .jar</a>
+        <button id="copyBtn" class="btn">Copy Link</button>
+        <a id="officialPage" class="link" href="https://papermc.io/downloads/paper"
+           target="_blank" rel="noopener">Official page ↗</a>
+      </div>
+    </section>
+
+    <section class="builds">
+      <h2 id="buildsTitle" hidden>All builds —</h2>
+      <ul id="buildList" class="build-list"></ul>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <p>
+      Data served live from <a href="https://api.papermc.io">api.papermc.io</a> ·
+      Downloads page: <a href="https://papermc.io/downloads">papermc.io/downloads</a>
+    </p>
+    <p>Fan-made tool — not affiliated with Mojang Studios or the PaperMC team.</p>
+  </footer>
+
+<script>
+(function () {
+  "use strict";
+
+  var API = "https://api.papermc.io/v2/projects/paper";
+
+  var versionSelect = document.getElementById("versionSelect");
+  var checkBtn      = document.getElementById("checkBtn");
+  var retryBtn      = document.getElementById("retryBtn");
+  var apiStatus     = document.getElementById("apiStatus");
+  var errorBox      = document.getElementById("error");
+  var errorMsg      = document.getElementById("errorMsg");
+  var result        = document.getElementById("result");
+  var resultVersion = document.getElementById("resultVersion");
+  var latestBuild   = document.getElementById("latestBuild");
+  var buildCount    = document.getElementById("buildCount");
+  var downloadLink  = document.getElementById("downloadLink");
+  var copyBtn       = document.getElementById("copyBtn");
+  var officialPage  = document.getElementById("officialPage");
+  var buildsTitle   = document.getElementById("buildsTitle");
+  var buildList     = document.getElementById("buildList");
+
+  function setStatus(text, state) {
+    apiStatus.textContent = text;
+    apiStatus.className = "api-status" + (state ? " " + state : "");
+  }
+  function showError(msg) { errorMsg.textContent = msg; errorBox.hidden = false; }
+  function hideError()    { errorBox.hidden = true; }
+
+  function downloadUrl(version, build) {
+    var name = (build.downloads && build.downloads.application)
+      ? build.downloads.application.name
+      : "paper-" + version + "-" + build.build + ".jar";
+    return API + "/versions/" + version + "/builds/" + build.build + "/downloads/" + name;
+  }
+
+  function loadVersions() {
+    setStatus("Connecting…", "");
+    hideError();
+    versionSelect.disabled = true;
+    checkBtn.disabled = true;
+    versionSelect.innerHTML = '<option value="">Loading versions…</option>';
+
+    fetch(API, { headers: { accept: "application/json" } })
+      .then(function (res) {
+        if (!res.ok) throw new Error("API returned " + res.status);
+        return res.json();
+      })
+      .then(function (data) {
+        var versions = (data.versions || []).slice().reverse(); // newest first
+        versionSelect.innerHTML = "";
+        versions.forEach(function (v) { versionSelect.add(new Option(v, v)); });
+        versionSelect.disabled = false;
+        checkBtn.disabled = false;
+        setStatus("API online", "ok");
+      })
+      .catch(function () {
+        versionSelect.innerHTML = '<option value="">Couldn’t reach api.papermc.io</option>';
+        setStatus("API offline", "offline");
+        showError("Could not reach the PaperMC API. Check your internet connection (or an ad-blocker / firewall rule) and press Retry.");
+      });
+  }
+
+  function checkBuild() {
+    var version = versionSelect.value;
+    if (!version) return;
+
+    hideError();
+    checkBtn.disabled = true;
+    checkBtn.textContent = "Checking…";
+
+    fetch(API + "/versions/" + encodeURIComponent(version) + "/builds")
+      .then(function (res) {
+        if (!res.ok) throw new Error("API returned " + res.status);
+        return res.json();
+      })
+      .then(function (data) {
+        var builds = data.builds || [];
+        if (!builds.length) throw new Error("No builds");
+
+        var latest = builds[builds.length - 1];
+
+        result.hidden = false;
+        resultVersion.textContent = "Minecraft " + version;
+        latestBuild.textContent  = "Latest Paper build — #" + latest.build;
+        buildCount.textContent   = builds.length + " builds";
+        downloadLink.href = downloadUrl(version, latest);
+
+        buildsTitle.hidden = false;
+        buildsTitle.textContent = "All builds — " + version;
+        buildList.innerHTML = "";
+        builds.slice().reverse().forEach(function (b) {
+          var li = document.createElement("li");
+          var a  = document.createElement("a");
+          a.href = downloadUrl(version, b);
+          a.target = "_blank";
+          a.rel = "noopener";
+          a.textContent = "#" + b.build;
+          li.appendChild(a);
+          buildList.appendChild(li);
+        });
+      })
+      .catch(function () {
+        showError("Could not load builds for " + version + ". Try again in a moment.");
+      })
+      .finally(function () {
+        checkBtn.disabled = false;
+        checkBtn.textContent = "Check Build";
+      });
+  }
+
+  copyBtn.addEventListener("click", function () {
+    var url = downloadLink.href;
+    function done() {
+      copyBtn.textContent = "Copied!";
+      setTimeout(function () { copyBtn.textContent = "Copy Link"; }, 1200);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(url).then(done);
+    } else {
+      var ta = document.createElement("textarea");
+      ta.value = url;
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand("copy"); } catch (e) {}
+      ta.remove();
+      done();
+    }
+  });
+
+  checkBtn.addEventListener("click", checkBuild);
+  retryBtn.addEventListener("click", loadVersions);
+
+  loadVersions();
+})();
+</script>
+</body>
+</html>
