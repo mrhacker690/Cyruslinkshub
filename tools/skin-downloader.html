@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minecraft Skin Viewer & Downloader</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #1e3c72 100%);
+            color: #fff;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: grid;
+            gap: 20px;
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        .header {
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .header h1 i {
+            color: #4ade80;
+        }
+
+        .header p {
+            opacity: 0.8;
+        }
+
+        .search-section {
+            display: grid;
+            gap: 15px;
+        }
+
+        .search-section label {
+            font-weight: 600;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            min-width: 200px;
+            padding: 12px 16px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        input[type="text"]::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        input[type="text"]:focus {
+            border-color: #4ade80;
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        button {
+            padding: 12px 20px;
+            border-radius: 10px;
+            border: none;
+            background: linear-gradient(135deg, #4ade80, #22c55e);
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(74, 222, 128, 0.4);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        button.secondary {
+            background: linear-gradient(135deg, #60a5fa, #3b82f6);
+        }
+
+        button.secondary:hover {
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+        }
+
+        .viewer-section {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .viewer-section {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        #viewer3d {
+            width: 100%;
+            height: 500px;
+            border-radius: 12px;
+            background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+            cursor: grab;
+        }
+
+        #viewer3d:active {
+            cursor: grabbing;
+        }
+
+        .skin-info {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .skin-preview-2d {
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .skin-preview-2d img {
+            max-width: 100%;
+            image-rendering: pixelated;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+        }
+
+        .info-box {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            font-size: 0.9rem;
+            word-break: break-all;
+        }
+
+        .info-box strong {
+            display: block;
+            color: #4ade80;
+            margin-bottom: 5px;
+        }
+
+        .url-box a {
+            color: #60a5fa;
+            text-decoration: none;
+            word-break: break-all;
+            font-size: 0.85rem;
+            display: block;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+
+        .url-box a:hover {
+            text-decoration: underline;
+        }
+
+        .url-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .url-actions button {
+            flex: 1;
+            padding: 6px 12px;
+            font-size: 0.8rem;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .actions button {
+            justify-content: center;
+        }
+
+        .footer {
+            text-align: center;
+            opacity: 0.8;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255, 255, 255, 0.2);
+            border-top-color: #4ade80;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .error {
+            color: #f87171;
+            padding: 10px;
+            background: rgba(248, 113, 113, 0.1);
+            border-radius: 8px;
+            display: none;
+        }
+
+        .error.active {
+            display: block;
+        }
+
+        .controls-hint {
+            text-align: center;
+            font-size: 0.85rem;
+            opacity: 0.6;
+            margin-top: 10px;
+        }
+
+        .tab-switch {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .tab-switch button {
+            flex: 1;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .tab-switch button.active {
+            background: linear-gradient(135deg, #4ade80, #22c55e);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <div class="glass header">
+        <h1>
+            <i class="fa-solid fa-user-astronaut"></i>
+            Minecraft Skin Viewer & Downloader
+        </h1>
+        <p>View skins in 3D and download them instantly</p>
+    </div>
+
+    <div class="glass search-section">
+        <div class="tab-switch">
+            <button id="tabUsername" class="active" onclick="switchTab('username')">
+                <i class="fa-solid fa-user"></i> Username
+            </button>
+            <button id="tabUrl" onclick="switchTab('url')">
+                <i class="fa-solid fa-link"></i> Direct URL
+            </button>
+        </div>
+
+        <div id="usernameTab">
+            <label>Search by Minecraft Username</label>
+            <div class="input-group">
+                <input type="text" id="usernameInput" placeholder="Enter username (e.g., Notch, Steve)">
+                <button id="loadUsernameBtn" onclick="loadByUsername()">
+                    <i class="fa-solid fa-magnifying-glass"></i> Load Skin
+                </button>
+            </div>
+        </div>
+
+        <div id="urlTab" style="display:none;">
+            <label>Direct Skin URL (PNG)</label>
+            <div class="input-group">
+                <input type="text" id="urlInput" placeholder="https://textures.minecraft.net/texture/...">
+                <button id="loadUrlBtn" onclick="loadByUrl()">
+                    <i class="fa-solid fa-magnifying-glass"></i> Load Skin
+                </button>
+            </div>
+        </div>
+
+        <div class="error" id="errorMsg"></div>
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Fetching skin...</p>
+        </div>
+    </div>
+
+    <div class="glass viewer-section">
+        <div>
+            <div id="viewer3d"></div>
+            <p class="controls-hint">
+                <i class="fa-solid fa-hand-pointer"></i>
+                Drag to rotate • Scroll to zoom • Right-click to pan
+            </p>
+        </div>
+
+        <div class="skin-info">
+            <div class="skin-preview-2d">
+                <h3 style="margin-bottom: 10px;">2D Preview</h3>
+                <img id="skin2d" src="" alt="Skin 2D" style="display:none;">
+                <p id="noSkin2d">No skin loaded</p>
+            </div>
+
+            <div class="info-box">
+                <strong>Player Name</strong>
+                <span id="playerName">-</span>
+            </div>
+
+            <div class="info-box">
+                <strong>Skin Type</strong>
+                <span id="skinType">-</span>
+            </div>
+
+            <div class="info-box">
+                <strong>Texture Size</strong>
+                <span id="textureSize">-</span>
+            </div>
+
+            <div class="info-box url-box">
+                <strong>Skin URL</strong>
+                <a id="skinUrlDisplay" href="#" target="_blank" onclick="event.preventDefault(); copySkinUrl();">
+                    No skin loaded
+                </a>
+                <div class="url-actions">
+                    <button onclick="copySkinUrl()">
+                        <i class="fa-solid fa-copy"></i> Copy
+                    </button>
+                    <button onclick="openSkinUrl()">
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i> Open
+                    </button>
+                </div>
+            </div>
+
+            <div class="actions">
+                <button id="downloadBtn" onclick="downloadSkin()" disabled>
+                    <i class="fa-solid fa-download"></i> Download
+                </button>
+                <button id="copyUrlBtn" class="secondary" onclick="copySkinUrl()" disabled>
+                    <i class="fa-solid fa-copy"></i> Copy URL
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="glass footer">
+        <p>
+            Minecraft Skin Viewer & Downloader
+            <br><br>
+            Uses Mojang API & Three.js for 3D rendering
+        </p>
+    </div>
+
+</div>
+
+<script>
+/* ===========================================================
+   THREE.JS SETUP
+=========================================================== */
+let scene, camera, renderer, playerGroup;
+let currentSkinUrl = null;
+let currentSkinModel = 'classic';
+
+function initThreeJS() {
+    const container = document.getElementById('viewer3d');
+    const width = container.clientWidth;
+    const height = container.clientHeight;
+
+    scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x0f172a);
+
+    camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+    camera.position.set(0, 0, 30);
+
+    renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(width, height);
+    renderer.setPixelRatio(window.devicePixelRatio);
+    container.appendChild(renderer.domElement);
+
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+    scene.add(ambientLight);
+
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    directionalLight.position.set(5, 10, 7);
+    scene.add(directionalLight);
+
+    const backLight = new THREE.DirectionalLight(0xffffff, 0.4);
+    backLight.position.set(-5, -5, -7);
+    scene.add(backLight);
+
+    const gridHelper = new THREE.GridHelper(40, 40, 0x4ade80, 0x1e293b);
+    gridHelper.position.y = -12;
+    scene.add(gridHelper);
+
+    playerGroup = new THREE.Group();
+    scene.add(playerGroup);
+
+    setupOrbitControls(container);
+    window.addEventListener('resize', onWindowResize);
+    animate();
+}
+
+function onWindowResize() {
+    const container = document.getElementById('viewer3d');
+    const width = container.clientWidth;
+    const height = container.clientHeight;
+    camera.aspect = width / height;
+    camera.updateProjectionMatrix();
+    renderer.setSize(width, height);
+}
+
+function animate() {
+    requestAnimationFrame(animate);
+    if (playerGroup) {
+        playerGroup.rotation.y += 0.005;
+    }
+    renderer.render(scene, camera);
+}
+
+/* ===========================================================
+   SIMPLE ORBIT CONTROLS
+=========================================================== */
+function setupOrbitControls(container) {
+    let isDragging = false;
+    let isPanning = false;
+    let previousMousePosition = { x: 0, y: 0 };
+    let distance = 30;
+    let theta = 0;
+    let phi = Math.PI / 2;
+
+    function updateCamera() {
+        camera.position.x = distance * Math.sin(phi) * Math.sin(theta);
+        camera.position.y = distance * Math.cos(phi);
+        camera.position.z = distance * Math.sin(phi) * Math.cos(theta);
+        camera.lookAt(0, 0, 0);
+    }
+
+    container.addEventListener('mousedown', (e) => {
+        if (e.button === 2) isPanning = true;
+        else isDragging = true;
+        previousMousePosition = { x: e.clientX, y: e.clientY };
+    });
+
+    container.addEventListener('mousemove', (e) => {
+        const deltaX = e.clientX - previousMousePosition.x;
+        const deltaY = e.clientY - previousMousePosition.y;
+
+        if (isDragging) {
+            theta -= deltaX * 0.01;
+            phi -= deltaY * 0.01;
+            phi = Math.max(0.1, Math.min(Math.PI - 0.1, phi));
+            updateCamera();
+        } else if (isPanning) {
+            camera.position.y += deltaY * 0.05;
+        }
+
+        previousMousePosition = { x: e.clientX, y: e.clientY };
+    });
+
+    container.addEventListener('mouseup', () => {
+        isDragging = false;
+        isPanning = false;
+    });
+
+    container.addEventListener('mouseleave', () => {
+        isDragging = false;
+        isPanning = false;
+    });
+
+    container.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        distance += e.deltaY * 0.05;
+        distance = Math.max(10, Math.min(60, distance));
+        updateCamera();
+    });
+
+    container.addEventListener('contextmenu', (e) => e.preventDefault());
+}
+
+/* ===========================================================
+   MINECRAFT SKIN MODEL BUILDER
+=========================================================== */
+function createMinecraftModel(texture, model = 'classic') {
+    while (playerGroup.children.length > 0) {
+        playerGroup.remove(playerGroup.children[0]);
+    }
+
+    const armWidth = model === 'slim' ? 3 : 4;
+
+    function createPart(w, h, d, uv, position) {
+        const geometry = new THREE.BoxGeometry(w, h, d);
+        adjustUVs(geometry, uv, w, h, d);
+        const material = new THREE.MeshLambertMaterial({ map: texture, transparent: true });
+        const mesh = new THREE.Mesh(geometry, material);
+        mesh.position.copy(position);
+        return mesh;
+    }
+
+    const uvs = {
+        head:        { x: 0,  y: 0,  w: 32, h: 16 },
+        headOverlay: { x: 32, y: 0,  w: 32, h: 16 },
+        body:        { x: 16, y: 16, w: 24, h: 16 },
+        bodyOverlay: { x: 16, y: 32, w: 24, h: 16 },
+        rightArm:    { x: 40, y: 16, w: 16, h: 16 },
+        rightArmOverlay: { x: 40, y: 32, w: 16, h: 16 },
+        leftArm:     { x: 32, y: 48, w: 16, h: 16 },
+        leftArmOverlay: { x: 48, y: 48, w: 16, h: 16 },
+        rightLeg:    { x: 0,  y: 16, w: 16, h: 16 },
+        rightLegOverlay: { x: 0, y: 32, w: 16, h: 16 },
+        leftLeg:     { x: 16, y: 48, w: 16, h: 16 },
+        leftLegOverlay: { x: 0, y: 48, w: 16, h: 16 }
+    };
+
+    playerGroup.add(createPart(8, 8, 8, uvs.head, new THREE.Vector3(0, 10, 0)));
+    playerGroup.add(createPart(8, 8, 8, uvs.headOverlay, new THREE.Vector3(0, 10, 0)));
+
+    playerGroup.add(createPart(8, 12, 4, uvs.body, new THREE.Vector3(0, 0, 0)));
+    playerGroup.add(createPart(8, 12, 4, uvs.bodyOverlay, new THREE.Vector3(0, 0, 0)));
+
+    playerGroup.add(createPart(armWidth, 12, 4, uvs.rightArm, new THREE.Vector3(-4 - armWidth/2, 0, 0)));
+    playerGroup.add(createPart(armWidth, 12, 4, uvs.rightArmOverlay, new THREE.Vector3(-4 - armWidth/2, 0, 0)));
+
+    playerGroup.add(createPart(armWidth, 12, 4, uvs.leftArm, new THREE.Vector3(4 + armWidth/2, 0, 0)));
+    playerGroup.add(createPart(armWidth, 12, 4, uvs.leftArmOverlay, new THREE.Vector3(4 + armWidth/2, 0, 0)));
+
+    playerGroup.add(createPart(4, 12, 4, uvs.rightLeg, new THREE.Vector3(-2, -12, 0)));
+    playerGroup.add(createPart(4, 12, 4, uvs.rightLegOverlay, new THREE.Vector3(-2, -12, 0)));
+
+    playerGroup.add(createPart(4, 12, 4, uvs.leftLeg, new THREE.Vector3(2, -12, 0)));
+    playerGroup.add(createPart(4, 12, 4, uvs.leftLegOverlay, new THREE.Vector3(2, -12, 0)));
+}
+
+function adjustUVs(geometry, uv, w, h, d) {
+    const faceUVMap = [
+        { u1: uv.x + d + w,     v1: uv.y + d,     u2: uv.x + d + w + d, v2: uv.y + d + h },
+        { u1: uv.x + d,         v1: uv.y + d,     u2: uv.x + d + w,     v2: uv.y + d + h },
+        { u1: uv.x + d + w,     v1: uv.y,         u2: uv.x + d + w + d, v2: uv.y + d },
+        { u1: uv.x + d + w + d, v1: uv.y,         u2: uv.x + d + w + d + w, v2: uv.y + d },
+        { u1: uv.x + d + w,     v1: uv.y + d,     u2: uv.x + d + w + w, v2: uv.y + d + h },
+        { u1: uv.x,             v1: uv.y + d,     u2: uv.x + d,         v2: uv.y + d + h }
+    ];
+
+    if (w === 3) {
+        faceUVMap[0] = { u1: uv.x + d + w,     v1: uv.y + d,     u2: uv.x + d + w + d, v2: uv.y + d + h };
+        faceUVMap[1] = { u1: uv.x + d,         v1: uv.y + d,     u2: uv.x + d + w,     v2: uv.y + d + h };
+        faceUVMap[2] = { u1: uv.x + d + w,     v1: uv.y,         u2: uv.x + d + w + d, v2: uv.y + d };
+        faceUVMap[3] = { u1: uv.x + d + w + d, v1: uv.y,         u2: uv.x + d + w + d + w, v2: uv.y + d };
+        faceUVMap[4] = { u1: uv.x + d + w,     v1: uv.y + d,     u2: uv.x + d + w + w, v2: uv.y + d + h };
+        faceUVMap[5] = { u1: uv.x,             v1: uv.y + d,     u2: uv.x + d,         v2: uv.y + d + h };
+    }
+
+    const uvAttribute = geometry.attributes.uv;
+    const uvArray = uvAttribute.array;
+
+    for (let i = 0; i < 6; i++) {
+        const face = faceUVMap[i];
+        const u1 = face.u1 / 64;
+        const v1 = 1 - face.v1 / 64;
+        const u2 = face.u2 / 64;
+        const v2 = 1 - face.v2 / 64;
+
+        const idx = i * 8;
+        uvArray[idx]     = u1; uvArray[idx + 1] = v1;
+        uvArray[idx + 2] = u1; uvArray[idx + 3] = v2;
+        uvArray[idx + 4] = u2; uvArray[idx + 5] = v1;
+        uvArray[idx + 6] = u2; uvArray[idx + 7] = v2;
+    }
+
+    uvAttribute.needsUpdate = true;
+}
+
+/* ===========================================================
+   API & LOADING
+=========================================================== */
+async function loadByUsername() {
+    const username = document.getElementById('usernameInput').value.trim();
+    if (!username) {
+        showError('Please enter a username');
+        return;
+    }
+
+    showLoading(true);
+    hideError();
+
+    try {
+        const uuidResponse = await fetch(`https://api.mojang.com/users/profiles/minecraft/${username}`);
+        if (!uuidResponse.ok) {
+            throw new Error('Player not found');
+        }
+        const uuidData = await uuidResponse.json();
+       
