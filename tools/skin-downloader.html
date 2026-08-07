@@ -641,4 +641,218 @@ async function loadByUsername() {
             throw new Error('Player not found');
         }
         const uuidData = await uuidResponse.json();
-       
+const uuid = uuidData.id;
+
+const profileResponse = await fetch(`https://sessionserver.mojang.com/session/minecraft/profile/${uuid}`);
+if (!profileResponse.ok) {
+    throw new Error('Could not fetch profile');
+}
+
+const profileData = await profileResponse.json();
+const textureProperty = profileData.properties.find(p => p.name === 'textures');
+
+if (!textureProperty) {
+    throw new Error('No texture data found');
+}
+
+const decoded = JSON.parse(atob(textureProperty.value));
+const skinData = decoded.textures.SKIN;
+
+if (!skinData) {
+    loadSkinFromUrl(
+        'https://textures.minecraft.net/texture/1a4af71855adb57e2ef04988f5e49ad7fbe50586e50de22f66ead7d96de013b',
+        username,
+        'classic'
+    );
+    return;
+}
+
+const model = skinData.metadata?.model === 'slim' ? 'slim' : 'classic';
+loadSkinFromUrl(skinData.url, username, model);
+
+} catch (error) {
+    showError(error.message);
+    showLoading(false);
+}
+
+async function loadByUrl() {
+    const url = document.getElementById('urlInput').value.trim();
+
+    if (!url) {
+        showError('Please enter a URL');
+        return;
+    }
+
+    if (!url.startsWith('http')) {
+        showError('Invalid URL');
+        return;
+    }
+
+    showLoading(true);
+    hideError();
+
+    loadSkinFromUrl(url, 'Custom Skin', 'classic');
+}
+
+function loadSkinFromUrl(url, playerName, model) {
+    const textureLoader = new THREE.TextureLoader();
+    textureLoader.crossOrigin = 'anonymous';
+
+    textureLoader.load(
+        url,
+        (texture) => {
+            texture.magFilter = THREE.NearestFilter;
+            texture.minFilter = THREE.NearestFilter;
+
+            currentSkinUrl = url;
+            currentSkinModel = model;
+
+            createMinecraftModel(texture, model);
+
+            document.getElementById('playerName').textContent = playerName;
+            document.getElementById('skinType').textContent =
+                model === 'slim' ? 'Slim (Alex)' : 'Classic (Steve)';
+
+            const img = texture.image;
+            document.getElementById('textureSize').textContent =
+                `${img.width}x${img.height}`;
+
+            const skin2d = document.getElementById('skin2d');
+            skin2d.src = url;
+            skin2d.style.display = 'block';
+
+            document.getElementById('noSkin2d').style.display = 'none';
+
+            const urlDisplay = document.getElementById('skinUrlDisplay');
+            urlDisplay.textContent = url;
+            urlDisplay.href = url;
+
+            document.getElementById('downloadBtn').disabled = false;
+            document.getElementById('copyUrlBtn').disabled = false;
+
+            showLoading(false);
+        },
+        undefined,
+        (error) => {
+            showError('Failed to load skin texture. CORS issue or invalid URL.');
+            showLoading(false);
+        }
+    );
+}
+
+/* ===========================================================
+   DOWNLOAD, COPY & OPEN URL
+=========================================================== */
+
+async function downloadSkin() {
+    if (!currentSkinUrl) return;
+
+    try {
+        const response = await fetch(currentSkinUrl);
+        const blob = await response.blob();
+
+        const url = window.URL.createObjectURL(blob);
+
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'minecraft_skin.png';
+
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+
+        window.URL.revokeObjectURL(url);
+    } catch (error) {
+        window.open(currentSkinUrl, '_blank');
+    }
+}
+
+function copySkinUrl() {
+    if (!currentSkinUrl) {
+        showError('No skin URL to copy');
+        return;
+    }
+
+    navigator.clipboard.writeText(currentSkinUrl).then(() => {
+        const btn = document.getElementById('copyUrlBtn');
+        const originalText = btn.innerHTML;
+
+        btn.innerHTML = '<i class="fa-solid fa-check"></i> Copied!';
+
+        setTimeout(() => {
+            btn.innerHTML = originalText;
+        }, 2000);
+    }).catch(() => {
+        showError('Failed to copy URL');
+    });
+}
+
+function openSkinUrl() {
+    if (!currentSkinUrl) {
+        showError('No skin URL to open');
+        return;
+    }
+
+    window.open(currentSkinUrl, '_blank');
+}
+
+/* ===========================================================
+   UI HELPERS
+=========================================================== */
+
+function switchTab(tab) {
+    document.getElementById('usernameTab').style.display =
+        tab === 'username' ? 'block' : 'none';
+
+    document.getElementById('urlTab').style.display =
+        tab === 'url' ? 'block' : 'none';
+
+    document.getElementById('tabUsername').classList.toggle(
+        'active',
+        tab === 'username'
+    );
+
+    document.getElementById('tabUrl').classList.toggle(
+        'active',
+        tab === 'url'
+    );
+}
+
+function showLoading(show) {
+    document.getElementById('loading').classList.toggle('active', show);
+}
+
+function showError(msg) {
+    const errorEl = document.getElementById('errorMsg');
+    errorEl.textContent = msg;
+    errorEl.classList.add('active');
+}
+
+function hideError() {
+    document.getElementById('errorMsg').classList.remove('active');
+}
+
+/* ===========================================================
+   INIT
+=========================================================== */
+
+window.addEventListener('load', () => {
+    initThreeJS();
+
+    document.getElementById('usernameInput').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') loadByUsername();
+    });
+
+    document.getElementById('urlInput').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') loadByUrl();
+    });
+
+    loadSkinFromUrl(
+        'https://textures.minecraft.net/texture/1a4af71855adb57e2ef04988f5e49ad7fbe50586e50de22f66ead7d96de013b',
+        'Steve (Default)',
+        'classic'
+    );
+});
+</script>
+</body>
+</html>
