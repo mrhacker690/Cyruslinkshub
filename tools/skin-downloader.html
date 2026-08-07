@@ -4,40 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Minecraft Skin Viewer & Downloader</title>
-
-    <!-- YOUR CSS -->
     <link rel="stylesheet" href="style.css">
-
-    <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 </head>
 <body>
 
 <div class="container">
 
-    <!-- HEADER -->
     <div class="glass header-card">
-        <h1>
-            <i class="fa-solid fa-user-astronaut"></i>
-            Minecraft Skin Viewer & Downloader
-        </h1>
+        <h1><i class="fa-solid fa-user-astronaut"></i> Minecraft Skin Viewer & Downloader</h1>
         <p>View skins in 3D and download them instantly</p>
     </div>
 
-    <!-- SEARCH -->
     <div class="glass search-card">
         <label>Minecraft Username</label>
         <input type="text" id="usernameInput" placeholder="Enter username... Example: Notch">
         <br><br>
-        <button id="loadBtn" onclick="loadSkin()">
-            <i class="fa-solid fa-magnifying-glass"></i>
-            Load Skin
-        </button>
-
+        <button onclick="loadSkin()"><i class="fa-solid fa-magnifying-glass"></i> Load Skin</button>
         <br><br>
-
         <div class="quick-names">
-            <span>Quick try:</span>
+            <span>Try:</span>
             <button onclick="quickLoad('Notch')">Notch</button>
             <button onclick="quickLoad('Technoblade')">Technoblade</button>
             <button onclick="quickLoad('Dream')">Dream</button>
@@ -45,155 +31,338 @@
         </div>
     </div>
 
-    <!-- STATUS -->
     <div id="errorMsg" class="error-msg"></div>
     <div id="successMsg" class="success-msg"></div>
-    <div id="loadingMsg" class="loading-msg">
-        <i class="fa-solid fa-spinner fa-spin"></i> Loading...
-    </div>
+    <div id="loadingMsg" class="loading-msg"><i class="fa-solid fa-spinner fa-spin"></i> Loading...</div>
 
-    <!-- 3D VIEWER -->
     <div class="glass viewer-card">
         <h2><i class="fa-solid fa-cube"></i> 3D Skin Preview</h2>
         <hr>
-        <canvas id="skinCanvas" width="500" height="500"></canvas>
-        <p class="controls-hint">
-            <i class="fa-solid fa-hand-pointer"></i>
-            Drag to rotate • Scroll to zoom
-        </p>
+        <div id="viewerContainer"></div>
+        <p class="controls-hint"><i class="fa-solid fa-hand-pointer"></i> Drag to rotate • Scroll to zoom</p>
     </div>
 
-    <!-- SKIN INFO -->
     <div class="glass result-card">
         <h2><i class="fa-solid fa-circle-info"></i> Skin Information</h2>
         <hr>
-
         <p><strong>Player Name</strong></p>
         <h3 id="playerName">-</h3>
-
         <p><strong>Skin Type</strong></p>
         <h3 id="skinType">-</h3>
-
         <p><strong>Skin URL</strong></p>
-        <h3 id="skinUrlDisplay">No skin loaded</h3>
-
-        <br>
-
-        <a id="skinUrlLink" href="#" target="_blank" style="display:none;">
-            <button>
-                <i class="fa-solid fa-arrow-up-right-from-square"></i>
-                Open Skin URL
-            </button>
-        </a>
+        <h3 id="skinUrlText">No skin loaded</h3>
     </div>
 
-    <!-- ACTIONS -->
     <div class="glass actions-card">
-        <button id="downloadBtn" onclick="downloadSkin()" disabled>
-            <i class="fa-solid fa-download"></i>
-            Download Skin
-        </button>
-
-        <button id="copyUrlBtn" onclick="copySkinUrl()" disabled>
-            <i class="fa-solid fa-copy"></i>
-            Copy Skin URL
-        </button>
+        <button id="downloadBtn" onclick="downloadSkin()" disabled><i class="fa-solid fa-download"></i> Download Skin</button>
+        <button id="copyUrlBtn" onclick="copySkinUrl()" disabled><i class="fa-solid fa-copy"></i> Copy URL</button>
+        <button id="openUrlBtn" onclick="openSkinUrl()" disabled><i class="fa-solid fa-arrow-up-right-from-square"></i> Open URL</button>
     </div>
 
-    <!-- FOOTER -->
     <div class="glass footer-card">
-        <p>
-            Minecraft Skin Viewer & Downloader
-            <br><br>
-            Powered by Minotar.net & SkinView3D
-            <br><br>
-            No API Key Required
-        </p>
+        <p>Minecraft Skin Viewer & Downloader<br><br>Powered by Three.js & Minotar.net</p>
     </div>
 
 </div>
 
-<!-- SkinView3D Library -->
-<script src="https://cdn.jsdelivr.net/npm/skinview3d@3.0.1/bundles/skinview3d.min.js"
-        onerror="loadFallback()"></script>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
-/* ===========================================================
-   FALLBACK CDN
-=========================================================== */
-function loadFallback() {
-    console.log('Primary CDN failed, trying fallback...');
-    var s = document.createElement('script');
-    s.src = 'https://unpkg.com/skinview3d@3.0.1/bundles/skinview3d.min.js';
-    s.onload = function() {
-        console.log('Fallback loaded');
-        initViewer();
-    };
-    s.onerror = function() {
-        showError('3D library failed to load. Check internet connection.');
-    };
-    document.head.appendChild(s);
-}
-
-/* ===========================================================
-   GLOBALS
-=========================================================== */
-var skinViewer = null;
+var scene, camera, renderer, playerGroup;
 var currentSkinUrl = null;
 var currentUsername = null;
-var viewerReady = false;
+var isDragging = false;
+var previousMouse = { x: 0, y: 0 };
+var rotationX = 0;
+var rotationY = 0;
+var targetRotationX = 0;
+var targetRotationY = 0;
+var cameraDistance = 40;
 
 /* ===========================================================
-   INIT 3D VIEWER
+   INIT THREE.JS
 =========================================================== */
-function initViewer() {
-    if (typeof skinview3d === 'undefined') {
-        showError('3D library not loaded. Refresh the page.');
-        return;
-    }
+function initThreeJS() {
+    var container = document.getElementById('viewerContainer');
+    var width = container.clientWidth || 500;
+    var height = 500;
 
-    var canvas = document.getElementById('skinCanvas');
+    scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x1a1a2e);
 
-    try {
-        skinViewer = new skinview3d.SkinViewer({
-            canvas: canvas,
-            width: 500,
-            height: 500,
-            skin: 'https://minotar.net/skin/MHF_Steve'
-        });
+    camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+    camera.position.set(0, 5, cameraDistance);
+    camera.lookAt(0, 0, 0);
 
-        skinViewer.controls.enableRotate = true;
-        skinViewer.controls.enableZoom = true;
-        skinViewer.controls.enablePan = false;
+    renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(width, height);
+    renderer.setPixelRatio(window.devicePixelRatio);
+    container.appendChild(renderer.domElement);
 
-        skinViewer.autoRotate = true;
-        skinViewer.autoRotateSpeed = 2;
+    var ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+    scene.add(ambientLight);
 
-        skinViewer.animations = new skinview3d.CompositeAnimation();
-        skinViewer.animations.add(skinview3d.WalkingAnimation);
+    var dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    dirLight.position.set(5, 10, 7);
+    scene.add(dirLight);
 
-        viewerReady = true;
-        console.log('3D Viewer initialized');
+    var backLight = new THREE.DirectionalLight(0xffffff, 0.3);
+    backLight.position.set(-5, -5, -7);
+    scene.add(backLight);
 
-    } catch (e) {
-        console.error('Init error:', e);
-        showError('Failed to start 3D viewer: ' + e.message);
-    }
+    var grid = new THREE.GridHelper(50, 50, 0x4ade80, 0x333333);
+    grid.position.y = -16;
+    scene.add(grid);
+
+    playerGroup = new THREE.Group();
+    scene.add(playerGroup);
+
+    setupControls(container);
+    loadDefaultSkin();
+    animate();
+
+    window.addEventListener('resize', function() {
+        var w = container.clientWidth || 500;
+        camera.aspect = w / height;
+        camera.updateProjectionMatrix();
+        renderer.setSize(w, height);
+    });
+
+    console.log('Three.js initialized');
 }
 
 /* ===========================================================
-   LOAD SKIN
+   ANIMATION LOOP
+=========================================================== */
+function animate() {
+    requestAnimationFrame(animate);
+
+    rotationX += (targetRotationX - rotationX) * 0.1;
+    rotationY += (targetRotationY - rotationY) * 0.1;
+
+    if (playerGroup && !isDragging) {
+        targetRotationY += 0.005;
+    }
+
+    if (playerGroup) {
+        playerGroup.rotation.y = rotationY;
+        playerGroup.rotation.x = rotationX;
+    }
+
+    renderer.render(scene, camera);
+}
+
+/* ===========================================================
+   MOUSE / TOUCH CONTROLS
+=========================================================== */
+function setupControls(container) {
+    container.addEventListener('mousedown', function(e) {
+        isDragging = true;
+        previousMouse = { x: e.clientX, y: e.clientY };
+    });
+
+    window.addEventListener('mousemove', function(e) {
+        if (!isDragging) return;
+        var dx = e.clientX - previousMouse.x;
+        var dy = e.clientY - previousMouse.y;
+        targetRotationY += dx * 0.01;
+        targetRotationX += dy * 0.01;
+        targetRotationX = Math.max(-1, Math.min(1, targetRotationX));
+        previousMouse = { x: e.clientX, y: e.clientY };
+    });
+
+    window.addEventListener('mouseup', function() {
+        isDragging = false;
+    });
+
+    container.addEventListener('wheel', function(e) {
+        e.preventDefault();
+        cameraDistance += e.deltaY * 0.05;
+        cameraDistance = Math.max(15, Math.min(80, cameraDistance));
+        camera.position.z = cameraDistance;
+    });
+
+    container.addEventListener('touchstart', function(e) {
+        if (e.touches.length === 1) {
+            isDragging = true;
+            previousMouse = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        }
+    });
+
+    container.addEventListener('touchmove', function(e) {
+        if (!isDragging || e.touches.length !== 1) return;
+        e.preventDefault();
+        var dx = e.touches[0].clientX - previousMouse.x;
+        var dy = e.touches[0].clientY - previousMouse.y;
+        targetRotationY += dx * 0.01;
+        targetRotationX += dy * 0.01;
+        targetRotationX = Math.max(-1, Math.min(1, targetRotationX));
+        previousMouse = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    });
+
+    container.addEventListener('touchend', function() {
+        isDragging = false;
+    });
+}
+
+/* ===========================================================
+   CREATE MINECRAFT BODY PART WITH UV MAPPING
+=========================================================== */
+function createTexturedBox(w, h, d, uvX, uvY, texture, scale) {
+    var group = new THREE.Group();
+    var mat = new THREE.MeshLambertMaterial({ map: texture, transparent: true, side: THREE.DoubleSide });
+    var tw = 64, th = 64;
+
+    function makeFace(fw, fh, x1, y1, x2, y2) {
+        var geo = new THREE.PlaneGeometry(fw * scale, fh * scale);
+        var uv = geo.attributes.uv;
+        var u1 = x1 / tw, v1 = 1 - y2 / th;
+        var u2 = x2 / tw, v2 = 1 - y1 / th;
+        uv.setXY(0, u1, v2);
+        uv.setXY(1, u2, v2);
+        uv.setXY(2, u1, v1);
+        uv.setXY(3, u2, v1);
+        uv.needsUpdate = true;
+        return new THREE.Mesh(geo, mat);
+    }
+
+    var front = makeFace(w, h, uvX + d, uvY + d, uvX + d + w, uvY + d + h);
+    front.position.z = (d / 2) * scale;
+    group.add(front);
+
+    var back = makeFace(w, h, uvX + d + w + d, uvY + d, uvX + d + w + d + w, uvY + d + h);
+    back.position.z = -(d / 2) * scale;
+    back.rotation.y = Math.PI;
+    group.add(back);
+
+    var right = makeFace(d, h, uvX, uvY + d, uvX + d, uvY + d + h);
+    right.position.x = (w / 2) * scale;
+    right.rotation.y = Math.PI / 2;
+    group.add(right);
+
+    var left = makeFace(d, h, uvX + d + w, uvY + d, uvX + d + w + d, uvY + d + h);
+    left.position.x = -(w / 2) * scale;
+    left.rotation.y = -Math.PI / 2;
+    group.add(left);
+
+    var top = makeFace(w, d, uvX + d, uvY, uvX + d + w, uvY + d);
+    top.position.y = (h / 2) * scale;
+    top.rotation.x = -Math.PI / 2;
+    group.add(top);
+
+    var bottom = makeFace(w, d, uvX + d + w, uvY, uvX + d + w + w, uvY + d);
+    bottom.position.y = -(h / 2) * scale;
+    bottom.rotation.x = Math.PI / 2;
+    group.add(bottom);
+
+    return group;
+}
+
+/* ===========================================================
+   BUILD MINECRAFT CHARACTER
+=========================================================== */
+function buildPlayer(texture, slim) {
+    while (playerGroup.children.length > 0) {
+        playerGroup.remove(playerGroup.children[0]);
+    }
+
+    var s = 1;
+    var armW = slim ? 3 : 4;
+
+    var head = createTexturedBox(8, 8, 8, 0, 0, texture, s);
+    head.position.set(0, 10 * s, 0);
+    playerGroup.add(head);
+
+    var hat = createTexturedBox(8, 8, 8, 32, 0, texture, s * 1.05);
+    hat.position.set(0, 10 * s, 0);
+    playerGroup.add(hat);
+
+    var body = createTexturedBox(8, 12, 4, 16, 16, texture, s);
+    body.position.set(0, 0, 0);
+    playerGroup.add(body);
+
+    var jacket = createTexturedBox(8, 12, 4, 16, 32, texture, s * 1.05);
+    jacket.position.set(0, 0, 0);
+    playerGroup.add(jacket);
+
+    var rightArm = createTexturedBox(armW, 12, 4, 40, 16, texture, s);
+    rightArm.position.set(-(4 + armW / 2) * s, 0, 0);
+    playerGroup.add(rightArm);
+
+    var rightSleeve = createTexturedBox(armW, 12, 4, 40, 32, texture, s * 1.05);
+    rightSleeve.position.set(-(4 + armW / 2) * s, 0, 0);
+    playerGroup.add(rightSleeve);
+
+    var leftArm = createTexturedBox(armW, 12, 4, 32, 48, texture, s);
+    leftArm.position.set((4 + armW / 2) * s, 0, 0);
+    playerGroup.add(leftArm);
+
+    var leftSleeve = createTexturedBox(armW, 12, 4, 48, 48, texture, s * 1.05);
+    leftSleeve.position.set((4 + armW / 2) * s, 0, 0);
+    playerGroup.add(leftSleeve);
+
+    var rightLeg = createTexturedBox(4, 12, 4, 0, 16, texture, s);
+    rightLeg.position.set(-2 * s, -12 * s, 0);
+    playerGroup.add(rightLeg);
+
+    var rightPants = createTexturedBox(4, 12, 4, 0, 32, texture, s * 1.05);
+    rightPants.position.set(-2 * s, -12 * s, 0);
+    playerGroup.add(rightPants);
+
+    var leftLeg = createTexturedBox(4, 12, 4, 16, 48, texture, s);
+    leftLeg.position.set(2 * s, -12 * s, 0);
+    playerGroup.add(leftLeg);
+
+    var leftPants = createTexturedBox(4, 12, 4, 0, 48, texture, s * 1.05);
+    leftPants.position.set(2 * s, -12 * s, 0);
+    playerGroup.add(leftPants);
+
+    console.log('Player model built');
+}
+
+/* ===========================================================
+   LOAD SKIN TEXTURE
+=========================================================== */
+function loadSkinTexture(url, slim) {
+    var loader = new THREE.TextureLoader();
+    loader.crossOrigin = 'anonymous';
+
+    loader.load(url,
+        function(texture) {
+            texture.magFilter = THREE.NearestFilter;
+            texture.minFilter = THREE.NearestFilter;
+            buildPlayer(texture, slim);
+        },
+        undefined,
+        function(err) {
+            console.error('Texture load error:', err);
+            showError('Failed to load skin texture.');
+        }
+    );
+}
+
+/* ===========================================================
+   LOAD DEFAULT SKIN
+=========================================================== */
+function loadDefaultSkin() {
+    var defaultUrl = 'https://minotar.net/skin/MHF_Steve';
+    currentSkinUrl = defaultUrl;
+    currentUsername = 'Steve';
+    loadSkinTexture(defaultUrl, false);
+    document.getElementById('playerName').textContent = 'Steve (Default)';
+    document.getElementById('skinType').textContent = 'Classic';
+    document.getElementById('skinUrlText').textContent = defaultUrl;
+    document.getElementById('downloadBtn').disabled = false;
+    document.getElementById('copyUrlBtn').disabled = false;
+    document.getElementById('openUrlBtn').disabled = false;
+}
+
+/* ===========================================================
+   LOAD SKIN BY USERNAME
 =========================================================== */
 function loadSkin() {
     var username = document.getElementById('usernameInput').value.trim();
-
     if (!username) {
         showError('Please enter a username');
-        return;
-    }
-
-    if (!viewerReady) {
-        showError('3D viewer still loading. Please wait...');
         return;
     }
 
@@ -210,31 +379,22 @@ function loadSkin() {
         currentSkinUrl = skinUrl;
         currentUsername = username;
 
-        // Update 3D model
-        skinViewer.loadSkin(skinUrl, 'default');
+        loadSkinTexture(skinUrl, false);
 
-        // Update UI
         document.getElementById('playerName').textContent = username;
-        document.getElementById('skinUrlDisplay').textContent = skinUrl;
-
-        var urlLink = document.getElementById('skinUrlLink');
-        urlLink.href = skinUrl;
-        urlLink.style.display = 'inline-block';
-
-        // Enable buttons
+        document.getElementById('skinUrlText').textContent = skinUrl;
         document.getElementById('downloadBtn').disabled = false;
         document.getElementById('copyUrlBtn').disabled = false;
+        document.getElementById('openUrlBtn').disabled = false;
 
-        // Detect type
         detectSkinType(skinUrl);
-
         showSuccess('Skin loaded for ' + username + '!');
         showLoading(false);
         console.log('Skin loaded:', skinUrl);
     };
 
     testImg.onerror = function() {
-        showError('Player "' + username + '" not found or has no skin.');
+        showError('Player "' + username + '" not found.');
         showLoading(false);
     };
 
@@ -247,38 +407,30 @@ function loadSkin() {
 function detectSkinType(url) {
     var img = new Image();
     img.crossOrigin = 'anonymous';
-
     img.onload = function() {
         var c = document.createElement('canvas');
         c.width = img.width;
         c.height = img.height;
         var ctx = c.getContext('2d');
         ctx.drawImage(img, 0, 0);
-
         try {
-            var pixel = ctx.getImageData(54, 20, 1, 1).data;
-            if (pixel[3] === 0) {
-                document.getElementById('skinType').textContent = 'Classic (Steve)';
-            } else {
-                document.getElementById('skinType').textContent = 'Slim (Alex)';
-            }
+            var px = ctx.getImageData(54, 20, 1, 1).data;
+            document.getElementById('skinType').textContent = (px[3] === 0) ? 'Classic (Steve)' : 'Slim (Alex)';
         } catch(e) {
             document.getElementById('skinType').textContent = 'Classic (Steve)';
         }
     };
-
     img.onerror = function() {
         document.getElementById('skinType').textContent = 'Unknown';
     };
-
     img.src = url;
 }
 
 /* ===========================================================
    QUICK LOAD
 =========================================================== */
-function quickLoad(username) {
-    document.getElementById('usernameInput').value = username;
+function quickLoad(name) {
+    document.getElementById('usernameInput').value = name;
     loadSkin();
 }
 
@@ -286,31 +438,26 @@ function quickLoad(username) {
    DOWNLOAD SKIN
 =========================================================== */
 function downloadSkin() {
-    if (!currentSkinUrl) {
-        showError('No skin loaded');
-        return;
-    }
-
+    if (!currentSkinUrl) return;
     showLoading(true);
 
     fetch(currentSkinUrl)
-        .then(function(res) { return res.blob(); })
+        .then(function(r) { return r.blob(); })
         .then(function(blob) {
-            var url = window.URL.createObjectURL(blob);
+            var url = URL.createObjectURL(blob);
             var a = document.createElement('a');
             a.href = url;
-            a.download = (currentUsername || 'minecraft') + '_skin.png';
+            a.download = (currentUsername || 'skin') + '.png';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
-            window.URL.revokeObjectURL(url);
-            showSuccess('Skin downloaded!');
+            URL.revokeObjectURL(url);
+            showSuccess('Downloaded!');
             showLoading(false);
         })
-        .catch(function(err) {
-            console.error('Download error:', err);
+        .catch(function() {
             window.open(currentSkinUrl, '_blank');
-            showSuccess('Opened in new tab. Right-click → Save As to download.');
+            showSuccess('Opened in new tab. Right-click → Save As.');
             showLoading(false);
         });
 }
@@ -319,82 +466,69 @@ function downloadSkin() {
    COPY URL
 =========================================================== */
 function copySkinUrl() {
-    if (!currentSkinUrl) {
-        showError('No skin URL');
-        return;
-    }
-
+    if (!currentSkinUrl) return;
     if (navigator.clipboard) {
-        navigator.clipboard.writeText(currentSkinUrl)
-            .then(function() {
-                showSuccess('URL copied!');
-                setTimeout(hideSuccess, 2000);
-            })
-            .catch(function() { fallbackCopy(); });
+        navigator.clipboard.writeText(currentSkinUrl).then(function() {
+            showSuccess('URL copied!');
+            setTimeout(hideSuccess, 2000);
+        });
     } else {
-        fallbackCopy();
+        var ta = document.createElement('textarea');
+        ta.value = currentSkinUrl;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        showSuccess('URL copied!');
+        setTimeout(hideSuccess, 2000);
     }
 }
 
-function fallbackCopy() {
-    var ta = document.createElement('textarea');
-    ta.value = currentSkinUrl;
-    ta.style.position = 'fixed';
-    ta.style.left = '-9999px';
-    document.body.appendChild(ta);
-    ta.select();
-    try {
-        document.execCommand('copy');
-        showSuccess('URL copied!');
-        setTimeout(hideSuccess, 2000);
-    } catch(e) {
-        showError('Copy failed');
-    }
-    document.body.removeChild(ta);
+/* ===========================================================
+   OPEN URL
+=========================================================== */
+function openSkinUrl() {
+    if (!currentSkinUrl) return;
+    window.open(currentSkinUrl, '_blank');
 }
 
 /* ===========================================================
    UI HELPERS
 =========================================================== */
 function showError(msg) {
-    var el = document.getElementById('errorMsg');
-    el.textContent = msg;
-    el.style.display = 'block';
+    document.getElementById('errorMsg').textContent = msg;
+    document.getElementById('errorMsg').style.display = 'block';
     document.getElementById('successMsg').style.display = 'none';
 }
-
 function hideError() {
     document.getElementById('errorMsg').style.display = 'none';
 }
-
 function showSuccess(msg) {
-    var el = document.getElementById('successMsg');
-    el.textContent = msg;
-    el.style.display = 'block';
+    document.getElementById('successMsg').textContent = msg;
+    document.getElementById('successMsg').style.display = 'block';
     document.getElementById('errorMsg').style.display = 'none';
 }
-
 function hideSuccess() {
     document.getElementById('successMsg').style.display = 'none';
 }
-
 function showLoading(show) {
     document.getElementById('loadingMsg').style.display = show ? 'block' : 'none';
 }
 
 /* ===========================================================
-   INIT ON LOAD
+   START
 =========================================================== */
 window.addEventListener('load', function() {
     hideError();
     hideSuccess();
     showLoading(false);
 
-    if (typeof skinview3d !== 'undefined') {
-        initViewer();
-    } else {
-        console.log('Waiting for fallback CDN...');
+    if (typeof THREE === 'undefined') {
+        showError('Three.js failed to load. Check internet.');
+        return;
     }
+
+    initThreeJS();
 
     document.getElementById('usernameInput').addEventListener('keydown', function(e) {
         if (e.key === 'Enter') loadSkin();
