@@ -31,6 +31,7 @@
     <div id="error" class="error" hidden>
       <p class="error-title">✖ Error</p>
       <p id="errorMsg"></p>
+      <p id="errDetail" class="error-detail"></p>
       <button id="retryBtn" class="btn btn-small">Retry</button>
     </div>
 
@@ -39,7 +40,7 @@
       <p id="latestBuild">Latest Paper build —</p>
       <p id="buildCount">— builds</p>
       <div class="actions">
-        <a id="downloadLink" class="btn" href="#" target="_blank" rel="noopener"> Download .jar</a>
+        <a id="downloadLink" class="btn" href="#" target="_blank" rel="noopener">Download .jar</a>
         <button id="copyBtn" class="btn">Copy Link</button>
         <a id="officialPage" class="link" href="https://papermc.io/downloads/paper"
            target="_blank" rel="noopener">Official page ↗</a>
@@ -67,12 +68,20 @@
 
   var API = "https://api.papermc.io/v2/projects/paper";
 
+  /* Saved list used ONLY if the API can't be reached */
+  var FALLBACK_VERSIONS = ["1.21.8","1.21.7","1.21.6","1.21.5","1.21.4","1.21.3",
+    "1.21.2","1.21.1","1.21","1.20.6","1.20.5","1.20.4","1.20.3","1.20.2","1.20.1",
+    "1.20","1.19.4","1.19.3","1.19.2","1.19.1","1.19","1.18.2","1.18.1","1.18",
+    "1.17.1","1.17","1.16.5","1.16.4","1.16.3","1.16.2","1.16.1","1.15.2","1.14.4",
+    "1.13.2","1.12.2","1.11.2","1.10.2","1.9.4","1.8.8"];
+
   var versionSelect = document.getElementById("versionSelect");
   var checkBtn      = document.getElementById("checkBtn");
   var retryBtn      = document.getElementById("retryBtn");
   var apiStatus     = document.getElementById("apiStatus");
   var errorBox      = document.getElementById("error");
   var errorMsg      = document.getElementById("errorMsg");
+  var errDetail     = document.getElementById("errDetail");
   var result        = document.getElementById("result");
   var resultVersion = document.getElementById("resultVersion");
   var latestBuild   = document.getElementById("latestBuild");
@@ -83,18 +92,62 @@
   var buildsTitle   = document.getElementById("buildsTitle");
   var buildList     = document.getElementById("buildList");
 
+  var lastError = "";
+
   function setStatus(text, state) {
     apiStatus.textContent = text;
     apiStatus.className = "api-status" + (state ? " " + state : "");
   }
-  function showError(msg) { errorMsg.textContent = msg; errorBox.hidden = false; }
-  function hideError()    { errorBox.hidden = true; }
+  function showError(msg, detail) {
+    errorMsg.textContent = msg;
+    errDetail.textContent = detail ? "(" + detail + ")" : "";
+    errorBox.hidden = false;
+  }
+  function hideError() { errorBox.hidden = true; }
+
+  /* ---- network: direct API, then 2 backup proxies, 9s timeout ---- */
+  var MIRRORS = [
+    function (u) { return u; },
+    function (u) { return "https://api.allorigins.win/raw?url=" + encodeURIComponent(u); },
+    function (u) { return "https://corsproxy.io/?url=" + encodeURIComponent(u); }
+  ];
+
+  function timedFetch(url) {
+    if ("AbortController" in window) {
+      var ctrl = new AbortController();
+      var t = setTimeout(function () { ctrl.abort(); }, 9000);
+      return fetch(url, { signal: ctrl.signal, headers: { accept: "application/json" } })
+        .finally(function () { clearTimeout(t); });
+    }
+    return fetch(url, { headers: { accept: "application/json" } });
+  }
+
+  function tryFetch(url, i) {
+    if (i >= MIRRORS.length) return Promise.reject(new Error(lastError || "no network"));
+    return timedFetch(MIRRORS[i](url))
+      .then(function (res) {
+        if (!res.ok) { lastError = "HTTP " + res.status; throw new Error(lastError); }
+        return res.json();
+      })
+      .catch(function (e) {
+        lastError = (e && e.message) ? e.message : String(e);
+        return tryFetch(url, i + 1);
+      });
+  }
+  function getJSON(url) { lastError = ""; return tryFetch(url, 0); }
 
   function downloadUrl(version, build) {
     var name = (build.downloads && build.downloads.application)
       ? build.downloads.application.name
       : "paper-" + version + "-" + build.build + ".jar";
     return API + "/versions/" + version + "/builds/" + build.build + "/downloads/" + name;
+  }
+
+  function fillSelect(list) {
+    versionSelect.innerHTML = "";
+    list.forEach(function (v) { versionSelect.add(new Option(v, v)); });
+    versionSelect.disabled = false;
+    checkBtn.disabled = false;
   }
 
   function loadVersions() {
@@ -104,24 +157,14 @@
     checkBtn.disabled = true;
     versionSelect.innerHTML = '<option value="">Loading versions…</option>';
 
-    fetch(API, { headers: { accept: "application/json" } })
-      .then(function (res) {
-        if (!res.ok) throw new Error("API returned " + res.status);
-        return res.json();
-      })
-      .then(function (data) {
-        var versions = (data.versions || []).slice().reverse(); // newest first
-        versionSelect.innerHTML = "";
-        versions.forEach(function (v) { versionSelect.add(new Option(v, v)); });
-        versionSelect.disabled = false;
-        checkBtn.disabled = false;
-        setStatus("API online", "ok");
-      })
-      .catch(function () {
-        versionSelect.innerHTML = '<option value="">Couldn’t reach api.papermc.io</option>';
-        setStatus("API offline", "offline");
-        showError("Could not reach the PaperMC API. Check your internet connection (or an ad-blocker / firewall rule) and press Retry.");
-      });
+    getJSON(API).then(function (data) {
+      fillSelect((data.versions || []).slice().reverse());
+      setStatus("API online", "ok");
+    }).catch(function () {
+      fillSelect(FALLBACK_VERSIONS);
+      setStatus("Offline mode", "offline");
+      showError("Could not reach the PaperMC API — loaded the saved version list instead. Internet is needed to fetch builds. Press Retry after fixing your connection.", lastError);
+    });
   }
 
   function checkBuild() {
@@ -132,17 +175,12 @@
     checkBtn.disabled = true;
     checkBtn.textContent = "Checking…";
 
-    fetch(API + "/versions/" + encodeURIComponent(version) + "/builds")
-      .then(function (res) {
-        if (!res.ok) throw new Error("API returned " + res.status);
-        return res.json();
-      })
+    getJSON(API + "/versions/" + encodeURIComponent(version) + "/builds")
       .then(function (data) {
         var builds = data.builds || [];
-        if (!builds.length) throw new Error("No builds");
+        if (!builds.length) throw new Error("no builds");
 
         var latest = builds[builds.length - 1];
-
         result.hidden = false;
         resultVersion.textContent = "Minecraft " + version;
         latestBuild.textContent  = "Latest Paper build — #" + latest.build;
@@ -164,7 +202,7 @@
         });
       })
       .catch(function () {
-        showError("Could not load builds for " + version + ". Try again in a moment.");
+        showError("Could not load builds for " + version + ". You need a working internet connection.", lastError);
       })
       .finally(function () {
         checkBtn.disabled = false;
@@ -198,4 +236,4 @@
 })();
 </script>
 </body>
-</html>
+  </html>
