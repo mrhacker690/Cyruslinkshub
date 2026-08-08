@@ -456,4 +456,153 @@ function buildTemplates() {
     TEMPLATES[currentTab].forEach(function(t, i) {
         var o = document.createElement('option');
         o.value = i;
-        
+        o.textContent = t[0];
+sel.appendChild(o);
+});
+}
+
+function applyTemplate() {
+    var idx = parseInt(
+        document.getElementById('templateSelect').value,
+        10
+    );
+
+    var t = TEMPLATES[currentTab][idx];
+
+    if (currentTab === 'motd') {
+        document.getElementById('motd1').value = t[1][0];
+        document.getElementById('motd2').value = t[1][1];
+
+    } else if (currentTab === 'sign') {
+        for (var i = 0; i < 4; i++) {
+            document.getElementById(
+                'sign' + (i + 1)
+            ).value = t[1][i];
+        }
+
+    } else {
+        document.getElementById('chatMsg').value = t[1];
+    }
+
+    updateAll();
+
+    showSuccess('Template applied!');
+    setTimeout(hideSuccess, 1500);
+}
+
+function clearAll() {
+    var ids =
+        currentTab === 'motd'
+            ? ['motd1', 'motd2']
+            : currentTab === 'sign'
+                ? ['sign1', 'sign2', 'sign3', 'sign4']
+                : ['chatSender', 'chatMsg'];
+
+    ids.forEach(function(id) {
+        document.getElementById(id).value = '';
+    });
+
+    updateAll();
+}
+
+/* ===========================================================
+   COPY
+=========================================================== */
+
+function copyText(key) {
+    var text = outputs[key];
+
+    if (!text) return;
+
+    if (navigator.clipboard) {
+        navigator.clipboard
+            .writeText(text)
+            .then(function() {
+                showSuccess('Copied to clipboard!');
+                setTimeout(hideSuccess, 1500);
+            });
+
+    } else {
+        var ta =
+            document.createElement('textarea');
+
+        ta.value = text;
+
+        document.body.appendChild(ta);
+
+        ta.select();
+
+        document.execCommand('copy');
+
+        document.body.removeChild(ta);
+
+        showSuccess('Copied to clipboard!');
+        setTimeout(hideSuccess, 1500);
+    }
+}
+
+/* ===========================================================
+   UI HELPERS + START
+=========================================================== */
+
+function showSuccess(m) {
+    document.getElementById(
+        'successMsg'
+    ).textContent = m;
+
+    document.getElementById(
+        'successMsg'
+    ).style.display = 'block';
+
+    document.getElementById(
+        'errorMsg'
+    ).style.display = 'none';
+}
+
+function hideSuccess() {
+    document.getElementById(
+        'successMsg'
+    ).style.display = 'none';
+}
+
+function showError(m) {
+    document.getElementById(
+        'errorMsg'
+    ).textContent = m;
+
+    document.getElementById(
+        'errorMsg'
+    ).style.display = 'block';
+
+    document.getElementById(
+        'successMsg'
+    ).style.display = 'none';
+}
+
+window.addEventListener(
+    'load',
+    function() {
+        buildToolbar();
+        buildTemplates();
+
+        var inputs =
+            document.querySelectorAll(
+                'input[type="text"]'
+            );
+
+        for (var i = 0; i < inputs.length; i++) {
+            inputs[i].addEventListener(
+                'focus',
+                function() {
+                    activeInput = this;
+                }
+            );
+        }
+
+        updateAll();
+    }
+);
+
+</script>
+</body>
+</html>
