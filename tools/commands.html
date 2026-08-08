@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ultimate Minecraft Command Suite</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+</head>
+<body>
+
+<div class="container">
+
+<div class="glass header-card">
+<h1><i class="fa-solid fa-terminal"></i> Ultimate Command Suite</h1>
+<p>MCStacker-style • Java + Bedrock • OP presets • Recursive entities</p>
+</div>
+
+<div id="errorMsg" class="error-msg"></div>
+<div id="successMsg" class="success-msg"></div>
+
+<!-- EDITION -->
+<div class="glass search-card">
+<h2><i class="fa-solid fa-gamepad"></i> Edition</h2>
+<div class="mobile-buttons">
+<button onclick="setEdition('java')" id="edJava" style="opacity:1">☕ Java</button>
+<button onclick="setEdition('bedrock')" id="edBedrock" style="opacity:0.5">📱 Bedrock</button>
+</div>
+</div>
+
+<!-- MODULE SELECTOR -->
+<div class="glass search-card">
+<h2><i class="fa-solid fa-cubes"></i> Generator</h2>
+<div class="mobile-buttons">
+<button onclick="switchMod('give')"><i class="fa-solid fa-gift"></i> /give</button>
+<button onclick="switchMod('summon')"><i class="fa-solid fa-dragon"></i> /summon</button>
+<button onclick="switchMod('setblock')"><i class="fa-solid fa-cube"></i> /setblock</button>
+<button onclick="switchMod('fill')"><i class="fa-solid fa-border-all"></i> /fill</button>
+<button onclick="switchMod('item')"><i class="fa-solid fa-box"></i> /item</button>
+<button onclick="switchMod('data')"><i class="fa-solid fa-database"></i> /data</button>
+<button onclick="switchMod('execute')"><i class="fa-solid fa-code-branch"></i> /execute</button>
+<button onclick="switchMod('spawner')"><i class="fa-solid fa-bug"></i> Spawner</button>
+<button onclick="switchMod('tellraw')"><i class="fa-solid fa-comment"></i> /tellraw</button>
+<button onclick="switchMod('title')"><i class="fa-solid fa-heading"></i> /title</button>
+<button onclick="switchMod('particle')"><i class="fa-solid fa-wind"></i> /particle</button>
+<button onclick="switchMod('effect')"><i class="fa-solid fa-flask"></i> /effect</button>
+<button onclick="switchMod('bossbar')"><i class="fa-solid fa-heart"></i> /bossbar</button>
+<button onclick="switchMod('playsound')"><i class="fa-solid fa-volume-high"></i> /playsound</button>
+<button onclick="switchMod('attribute')"><i class="fa-solid fa-gauge-high"></i> /attribute</button>
+<button onclick="switchMod('op')"><i class="fa-solid fa-skull-crossbones"></i> OP/Hack</button>
+</div>
+</div>
+
+<!-- /give -->
+<div id="modGive" class="glass result-card">
+<h2><i class="fa-solid fa-gift"></i> /give Generator</h2>
+<hr>
+<label>Item</label>
+<select id="giveItem" onchange="buildGive()"></select>
+<label>Amount</label>
+<input type="number" id="giveCount" value="1" min="1" max="64" oninput="buildGive()">
+<label>Custom Name (§ codes)</label>
+<input type="text" id="giveName" placeholder="§6§lGod Sword" oninput="buildGive()">
+<label>Lore (3 lines)</label>
+<input type="text" id="giveLore1" placeholder="§7Line 1" oninput="buildGive()">
+<input type="text" id="giveLore2" placeholder="§7Line 2" oninput="buildGive()">
+<input type="text" id="giveLore3" placeholder="§7Line 3" oninput="buildGive()">
+<label>Enchantments</label>
+<div id="enchantBox"></div>
+<label>Attributes</label>
+<div class="quick-names">
+<label>Health: <input type="number" id="attrHealth" value="20" oninput="buildGive()"></label>
+<label>Damage: <input type="number" id="attrDamage" value="1" oninput="buildGive()"></label>
+<label>Speed: <input type="number" id="attrSpeed" value="0.1" step="0.01" oninput="buildGive()"></label>
+</div>
+<label>Special</label>
+<div class="quick-names">
+<label><input type="checkbox" id="giveUnbreak" onchange="buildGive()"> Unbreakable</label>
+<label><input type="checkbox" id="giveHide" onchange="buildGive()"> Hide Flags</label>
+</div>
+<label>Container (recursive)</label>
+<select id="giveContainer" onchange="buildGive()">
+<option value="">None</option>
+<option value="chest">Chest</option>
+<option value="shulker_box">Shulker Box</option>
+</select>
+<input type="text" id="giveContItem" placeholder="diamond" oninput="buildGive()">
+<input type="number" id="giveContCount" value="64" oninput="buildGive()">
+<h3>Generated Command</h3>
+<div class="info-box" id="giveOutput">/give @p diamond_sword</div>
+<button onclick="copyOutput('give')"><i class="fa-solid fa-copy"></i> Copy</button>
+</div>
+
+<!-- /summon -->
+<div id="modSummon" class="glass result-card" style="display:none">
+<h2><i class="fa-solid fa-dragon"></i> /summon Generator</h2>
+<hr>
+<label>Entity</label>
+<select id="summonEntity" onchange="buildSummon()"></select>
+<label>Custom Name</label>
+<input type="text" id="summonName" placeholder="§c§lBoss" oninput="buildSummon()">
+<label><input type="checkbox" id="summonNameVis" checked onchange="buildSummon()"> Show Name</label>
+<label>Health</label>
+<input type="number" id="summonHealth" value="20" oninput="buildSummon()">
+<label>Speed</label>
+<input type="number" id="summonSpeed" value="0.25" step="0.05" oninput="buildSummon()">
+<label>Equipment</label>
+<div class="quick-names">
+<label>Main: <select id="summonMain" onchange="buildSummon()"><option value="">None</option><option value="diamond_sword">Diamond Sword</option><option value="netherite_sword">Netherite</option><option value="bow">Bow</option><option value="trident">Trident</option></select></label>
+<label>Helmet: <select id="summonHelm" onchange="buildSummon()"><option value="">None</option><option value="diamond_helmet">Diamond</option><option value="netherite_helmet">Netherite</option></select></label>
+</div>
+<label>Flags</label>
+<div class="quick-names">
+<label><input type="checkbox" id="summonNoAI" onchange="buildSummon()"> No AI</label>
+<label><input type="checkbox" id="summonSilent" onchange="buildSummon()"> Silent</label>
+<label><input type="checkbox" id="summonInvul" onchange="buildSummon()"> Invulnerable</label>
+<label><input type="checkbox" id="summonGlow" onchange="buildSummon()"> Glowing</label>
+<label><input type="checkbox" id="summonNoGrav" onchange="buildSummon()"> No Gravity</label>
+</div>
+<label>Passenger (recursive stacking)</label>
+<select id="summonPass" onchange="buildSummon()">
+<option value="">None</option><option value="zombie">Zombie</option><option value="skeleton">Skeleton</option>
+<option value="creeper">Creeper</option><option value="chicken">Chicken</option><option value="pig">Pig</option>
+<option value="boat">Boat</option><option value="minecart">Minecart</option>
+</select>
+<h3>Generated Command</h3>
+<div class="info-box" id="summonOutput">/summon zombie</div>
+<button onclick="copyOutput('summon')"><i class="fa-solid fa-copy"></i> Copy</button>
+</div>
+
+<!-- /setblock -->
+<div id="modSetblock" class="glass result-card" style="display:none">
+<h2><i class="fa-solid fa-cube"></i> /setblock</h2>
+<hr>
+<label>Block</label>
+<select id="setblockBlock" onchange="buildSetblock()"></select>
+<label>Position</label>
+<input type="text" id="setblockPos" value="~ ~ ~" oninput="buildSetblock()">
+<label>Mode</label>
+<select id="setblockMode" onchange="buildSetblock()">
+<option value="replace">Replace</option><option value="destroy">Destroy</option><option value="keep">Keep</option>
+</select>
+<label>NBT Data</label>
+<textarea id="setblockNBT" rows="2" oninput="buildSetblock()"></textarea>
+<h3>Generated Command</h3>
+<div class="info-box" id="setblockOutput">/setblock ~ ~ ~ stone</div>
+<button onclick="copyOutput('setblock')"><i class="fa-solid fa-copy"></i> Copy</button>
+</div>
+
+<!-- /fill -->
+<div id="modFill" class="glass result-card" style="display:none">
+<h2><i class="fa-solid fa-border-all"></i> /fill</h2>
+<hr>
+<label>From</label><input type="text" id="fillFrom" value="~ ~ ~" oninput="buildFill()">
+<label>To</label><input type="text" id="fillTo" value="~10 ~10 ~10" oninput="buildFill()">
+<label>Block</label><select id="fillBlock" onchange="buildFill()"></select>
+<label>Mode</label>
+<select id="fillMode" onchange="buildFill()">
+<option value="replace">Replace</option><option value="destroy">Destroy</option>
+<option value="keep">Keep</option><option value="hollow">Hollow</option><option value="outline">Outline</option>
+</select>
+<h3>Generated Command</h3>
+<div class="info-box" id="fillOutput">/fill ~ ~ ~ ~10 ~10 ~10 stone</div>
+<button onclick="copyOutput('fill')"><i class="fa-solid fa-copy"></i> Copy</button>
+</div>
+
+<!-- /item -->
+<div id="modItem" class="glass result-card" style="display:none">
+<h2><i class="fa-solid fa-box"></i> /item Replace</h2>
+<hr>
+<label>Target</label>
+<select id="itemTarget" onchange="buildItem()">
+<option value="entity">Entity</option><option value="block">Block</option>
+</select>
+<label>Selector/Position</label><input type="text" id="itemSel" value="@p" oninput="buildItem()">
+<label>Slot</label><input type="text" id="itemSlot" value="hotbar.0" oninput="buildItem()">
+<label>Item</label><select id="itemReplace" onchange="buildItem()"></select>
+<label>Count</label><input type="number" id="itemCount" value="1" oninput="buildItem()">
+<h3>Generated Command</h3>
+<div class="info-box" id="itemOutput">/item replace entity @p hotbar.0 with diamond</div>
+<button onclick="copyOutput('item')"><i class="fa-solid fa-copy"></i> Copy</button>
+</div>
+
+<!-- /data -->
+<div id="modData" class="glass result-card" style="display:none">
+<h2><i class="fa-solid fa-database"></i> /data NBT</h2>
+<hr>
+<label>Action</label>
+<select id="dataAction" onchange="buildData()">
+<option value="get">Get</option><option value="merge">Merge</option><option value="remove">Remove</option>
+</select>
+<label>Target</label>
+<select id="dataTarget" onchange="buildData()">
+<option value="entity">Entity</option><option value="block">Block</option><option value="storage">Storage</option>
+</select>
+<label>Selector/Position</label><input type="text" id="dataSel" value="@p" oninput="buildData()">
+<label>NBT Path</label><input type="text" id="dataPath" oninput="buildData()">
+<label>NBT Data (merge)</label><textarea id="dataNBT" rows="2" oninput="buildData()"></textarea>
+<h3>Generated Command</h3>
+<div class="info-box" id="dataOutput">/data get entity @p</div>
+<button onclick="copyOutput('data')"><i class="fa-solid fa-copy"></i> Copy</button>
+</div>
+
+<!-- /execute -->
+<div id="modExecute" class="glass result-card" style="display:none">
+<h2><i class="fa-solid fa-code-branch"></i> /execute Chains</h2>
+<hr>
+<label>As</label>
+<select id="execAs" onchange="buildExecute()">
+<option value="@a">@a All</option><option value="@p">@p Nearest</option>
+<option value="@r">@r Random</option><option value="@e">@e Entities</option><option value="@s">@s Self</option>
+</select>
+<label>At</label>
+<select id="execAt" onchange="buildExecute()">
+<option value="@s">@s</option><option value="@p">@p</option><option value="~ ~ ~">Coords</option>
+</select>
+<label>Condition</label>
+<select id="execCond" onchange="buildExecute()">
+<option value="">None</option><option value="if">If</option><option value="unless">Unless</option>
+</select>
+<input type="text" id="execCondVal" placeholder="entity @a[tag=vip]" oninput="buildExecute()">
+<label>Command</label><input type="text" id="execCmd" value="say Hello!" oninput="buildExecute()">
+<h3>Generated Command</h3>
+<div class="info-box" id="executeOutput">/execute as @a at @s run say Hello!</div>
+<button onclick="copyOutput('execute')"><i class="fa-solid fa-copy"></i> Copy</button>
+</div>
+
+<!-- Spawner -->
+<div id="modSpawner" class="glass result-card" style="display:none">
+<h2><i class="fa-solid fa-bug"></i> Mob Spawner</h2>
+<hr>
+<label>Entity</label><select id="spawnerEnt" onchange="buildSpawner()"></select>
+<label>Delay (ticks)</label><input type="number" id="spawnerDelay" value="20" oninput="buildSpawner()">
+<label>Count</label><input type="number" id="spawnerCount" value="4" oninput="buildSpawner()">
+<label>Range</label><input type="number" id="spawnerRange" value="4" oninput="buildSpawner()">
+<label>Max Nearby</label><input type="number" id="spawnerMax" value="6" oninput="buildSpawner()">
+<label>Player Range</label><input type="number" id="spawnerPRange" value="16" oninput="buildSpawner()">
+<h3>Generated Command</h3>
+<div class="info-box" id="spawnerOutput">/setblock ~ ~ ~ spawner</div>
+<button onclick="copyOutput('spawner')"><i class="fa-solid fa-copy"></i> Copy</button>
+</div>
+
+<!-- /tellraw -->
+<div id="modTellraw" class="glass result-card" style="display:none">
+<h2><i class="fa-solid fa-comment"></i> /tellraw JSON</h2>
+<hr>
+<label>Text</label><input type="text" id="tellrawText" placeholder="Hello!" oninput="buildTellraw()">
+<label>Color</label>
+<select id="tellrawColor" onchange="buildTellraw()">
+<option value="">Default</option><option value="red">Red</option><option value="gold">Gold</option>
+<option value="green">Green</option><option value="aqua">Aqua</option><option value="yellow">Yellow</option>
+<option value="light_purple">Light Purple</option><option value="white">White</option>
+<option value="blue">Blue</option><option value="dark_red">Dark Red</option>
+</select>
+<label>Format</label>
+<div class="quick-names">
+<label><input type="checkbox" id="tellrawBold" onchange="buildTellraw()"> Bold</label>
+<label><input type="checkbox" id="tellrawItalic" onchange="buildTellraw()"> Italic</label>
+<label><input type="checkbox" id="tellrawUnder" onchange="buildTellraw()"> Underline</label>
+<label><input type="checkbox" id="tellrawStrike" onchange="buildTellraw()"> Strike</label>
+<label><input type="checkbox" id="tellrawObf" onchange="buildTellraw()"> Obfuscated</label>
+</div>
+<label>Hover</label><input type="text" id="tellrawHover" oninput="buildTellraw()">
+<label>Click Action</label>
+<select id="tellrawClick" onchange="buildTellraw()">
+<option value="">None</option><option value="open_url">Open URL</option>
+<option value="run_command">Run Command</option><option value="suggest_command">Suggest</option>
+</select>
+<input type="text" id="tellrawClickVal" oninput="buildTellraw()">
+<h3>Generated Command</h3>
+<div class="info-box" id="tellrawOutput">/tellraw @a {"text":"Hello!"}</div>
+<button onclick="copyOutput('tellraw')"><i class="fa-solid fa-copy"></i> Copy</button>
+</div>
+
+<!-- /title -->
+<div id="modTitle" class="glass result-card" style="display:none">
+<h2><i class="fa-solid fa-heading"></i> /title</h2>
+<hr>
+<label>Title</label><input type="text" id="titleMain" placeholder="WELCOME" oninput="buildTitle()">
+<label>Subtitle</label><input type="text" id="titleSub" oninput="buildTitle()">
+<label>Color</label>
+<select id="titleColor" onchange="buildTitle()">
+<option value="white">White</option><option value="gold">Gold</option><option value="red">Red</option>
+<option value="green">Green</option><option value="blue">Blue</option><option value="aqua">Aqua</option>
+</select>
+<label>Fade In</label><input type="number" id="titleFadeIn" value="10" oninput="buildTitle()">
+<label>Stay</label><input type="number" id="titleStay" value="70" oninput="buildTitle()">
+<label>Fade Out</label><input type="number" id="titleFadeOut" value="20" oninput="buildTitle()">
+<h3>Generated Commands</h3>
+<div class="info-box" id="titleOutput">/title @a times 10 70 20</div>
+<button onclick="copyOutput('title')"><i class="fa-solid fa-copy"></i> Copy</button>
+</div>
+
+<!-- /particle -->
+<div id="modParticle" class="glass result-card" style="display:none">
+<h2><i class="fa-solid fa-wind"></i> /particle</h2>
+<hr>
+<label>Particle</label><select id="particleType" onchange="buildParticle()"></select>
+<label>Position</label><input type="text" id="particlePos" value="~ ~ ~" oninput="buildParticle()">
+<label>Delta</label><input type="text" id="particleDelta" value="0 0 0" oninput="buildParticle()">
+<label>Speed</label><input type="number" id="particleSpeed" value="0" step="0.1" oninput="buildParticle()">
+<label>Count</label><input type="number" id="particleCount" value="10" oninput="buildParticle()">
+<label>Force</label>
+<select id="particleForce" onchange="buildParticle()">
+<option value="normal">Normal</option><option value="force">Force</option>
+</select>
+<h3>Generated Command</h3>
+<div class="info-box" id="particleOutput">/particle flame ~ ~ ~ 0 0 0 0 10</div>
+<button onclick="copyOutput('particle')"><i class="fa-solid fa-copy"></i> Copy</button>
+</div>
+
+<!-- /effect -->
+<div id="modEffect" class="glass result-card" style="display:none">
+<h2><i class="fa-solid fa-flask"></i> /effect</h2>
+<hr>
+<label>Effect</label><select id="effectType" onchange="buildEffect()"></select>
+<label>Duration (sec)</label><input type="number" id="effectDur" value="30" oninput="buildEffect()">
+<label>Amplifier</label><input type="number" id="effectAmp" value="0" oninput="buildEffect()">
+<label>Hide Particles</label>
+<select id="effectHide" onchange="buildEffect()">
+<option value="false">Show</option><option value="true">Hide</option>
+</select>
+<h3>Generated Command</h3>
+<div class="info-box" id="effectOutput">/effect give @p speed 30 0 false</div>
+<button onclick="copyOutput('effect')"><i class="fa-solid fa-copy"></i> Copy</button>
+</div>
+
+<!-- /bossbar -->
+<div id="modBossbar" class="glass result-card" style="display:none">
+<h2><i class="fa-solid fa-heart"></i> /bossbar</h2>
+<hr>
+<label>ID</label><input type="text" id="bbId" placeholder="custom:bar" oninput="buildBossbar()">
+<label>Name</label><input type="text" id="bbName" placeholder="Boss" oninput="buildBossbar()">
+<label>Color</label>
+<select id="bbColor" onchange="buildBossbar()">
+<option value="pink">Pink</option><option value="blue">Blue</option><option value="red">Red</option>
+<option value="green">Green</option><option value="yellow">Yellow</option><option value="purple">Purple</option>
+<option value="white">White</option>
+</select>
+<label>Style</label>
+<select id="bbStyle" onchange="buildBossbar()">
+<option value="progress">Progress</option><option value="notched_6">Notched 6</option>
+<option value="notched_10">Notched 10</option><option value="notched_12">Notched 12</option>
+<option value="notched_20">Notched 20</option>
+</select>
+<label>Max</label><input type="number" id="bbMax" value="100" oninput="buildBossbar()">
+<label>Value</label><input type="number" id="bbVal" value="50" oninput="buildBossbar()">
+<h3>Generated Commands</h3>
+<div class="info-box" id="bossbarOutput">/bossbar add custom:bar</div>
+<button onclick="copyOutput('bossbar')"><i class="fa-solid fa-copy"></i> Copy</button>
+</div>
+
+<!-- /playsound -->
+<div id="modPlaysound" class="glass result-card" style="display:none">
+<h2><i class="fa-solid fa-volume-high"></i> /playsound</h2>
+<hr>
+<label>Sound</label><select id="soundType" onchange="buildPlaysound()"></select>
+<label>Source</label>
+<select id="soundSource" onchange="buildPlaysound()">
+<option value="master">Master</option><option value="music">Music</option>
+<option value="record">Record</option><option value="weather">Weather</option>
+<option value="block">Block</option><option value="hostile">Hostile</option>
+<option value="neutral">Neutral</option><option value="player">Player</option>
+<option value="ambient">Ambient</option><option value="voice">Voice</option>
+</select>
+<label>Volume</label><input type="number" id="soundVol" value="1" step="0.1" oninput="buildPlaysound()">
+<label>Pitch</label><input type="number" id="soundPitch" value="1" step="0.1" oninput="buildPlaysound()">
+<h3>Generated Command</h3>
+<div class="info-box" id="playsoundOutput">/playsound entity.ender_dragon.growl master @a</div>
+<button onclick="copyOutput('playsound')"><i class="fa-solid fa-copy"></i> Copy</button>
+</div>
+
+<!-- /attribute -->
+<div id="modAttribute" class="glass result-card" style="display:none">
+<h2><i class="fa-solid fa-gauge-high"></i> /attribute</h2>
+<hr>
+<label>Attribute</label>
+<select id="attrType" onchange="buildAttribute()">
+<option value="generic.max_health">Max Health</option>
+<option value="generic.movement_speed">Movement Speed</option>
+<option value="generic.attack_damage">Attack Damage</option>
