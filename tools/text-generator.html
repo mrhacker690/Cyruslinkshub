@@ -444,4 +444,599 @@ function buildAll() {
 
         var prev = document.getElementById('previewBox');
         prev.innerHTML = '';
-        
+        if (prefix) {
+    prev.appendChild(makePlain(prefix));
+}
+
+for (i = 0; i < converted.length; i++) {
+    var sp = document.createElement('span');
+
+    sp.style.color = charColor[i];
+    sp.style.textShadow = '2px 2px rgba(0,0,0,0.7)';
+
+    if (chk('fmtBold')) {
+        sp.style.fontWeight = 'bold';
+    }
+
+    if (chk('fmtItalic')) {
+        sp.style.fontStyle = 'italic';
+    }
+
+    var dec = [];
+
+    if (chk('fmtUnder')) {
+        dec.push('underline');
+    }
+
+    if (chk('fmtStrike')) {
+        dec.push('line-through');
+    }
+
+    sp.style.textDecoration =
+        dec.join(' ') || 'none';
+
+    if (chk('fmtObf')) {
+        sp.setAttribute('data-obf', '1');
+        sp.textContent = '#';
+    } else {
+        sp.textContent = converted.charAt(i);
+    }
+
+    prev.appendChild(sp);
+}
+
+if (suffix) {
+    prev.appendChild(makePlain(suffix));
+}
+
+var fAmp = ampFormats();
+var fSec = fAmp.replace(/&/g, '§');
+
+var ampHex = prefix + fAmp;
+var chat = prefix + miniFormatsOpen();
+
+var legacy = prefix + fAmp;
+var console_ = prefix + fSec;
+
+var bb = prefix;
+var jsonArr = [''];
+
+if (prefix) {
+    jsonArr.push({
+        text: prefix
+    });
+}
+
+if (chk('fmtBold')) {
+    bb += '[B]';
+}
+
+if (chk('fmtItalic')) {
+    bb += '[I]';
+}
+
+if (chk('fmtUnder')) {
+    bb += '[U]';
+}
+
+for (i = 0; i < converted.length; i++) {
+    var ch = converted.charAt(i);
+    var hx = charColor[i];
+
+    ampHex +=
+        '&#' +
+        hx.replace('#', '') +
+        ch;
+
+    chat +=
+        '<#' +
+        hx.replace('#', '') +
+        '>' +
+        ch;
+
+    legacy +=
+        hexCode(hx, '&') +
+        ch;
+
+    console_ +=
+        hexCode(hx, '§') +
+        ch;
+
+    bb +=
+        '[COLOR=' +
+        hx +
+        ']' +
+        ch +
+        '[/COLOR]';
+
+    var o = {
+        text: ch,
+        color: hx
+    };
+
+    if (chk('fmtBold')) {
+        o.bold = true;
+    }
+
+    if (chk('fmtItalic')) {
+        o.italic = true;
+    }
+
+    if (chk('fmtUnder')) {
+        o.underlined = true;
+    }
+
+    if (chk('fmtStrike')) {
+        o.strikethrough = true;
+    }
+
+    if (chk('fmtObf')) {
+        o.obfuscated = true;
+    }
+
+    jsonArr.push(o);
+}
+
+if (chk('fmtBold')) {
+    bb += '[/B]';
+}
+
+if (chk('fmtItalic')) {
+    bb += '[/I]';
+}
+
+if (chk('fmtUnder')) {
+    bb += '[/U]';
+}
+
+ampHex += suffix;
+chat += suffix;
+legacy += suffix;
+console_ += suffix;
+bb += suffix;
+
+if (suffix) {
+    jsonArr.push({
+        text: suffix
+    });
+}
+
+var mini =
+    miniFormatsOpen() +
+    '<gradient:' +
+    stops.join(':') +
+    '>' +
+    converted +
+    '</gradient>';
+
+outputs.ampHex = ampHex;
+outputs.chat = chat;
+outputs.mini = mini;
+outputs.legacy = legacy;
+outputs.console = console_;
+outputs.motd =
+    console_.replace(/§/g, '\\u00A7');
+
+outputs.json =
+    '/tellraw @a ' +
+    JSON.stringify(jsonArr);
+
+outputs.bb = bb;
+
+document.getElementById('outAmpHex').textContent =
+    ampHex;
+
+document.getElementById('outChat').textContent =
+    chat;
+
+document.getElementById('outMini').textContent =
+    mini;
+
+document.getElementById('outLegacy').textContent =
+    legacy;
+
+document.getElementById('outConsole').textContent =
+    console_;
+
+document.getElementById('outMotd').textContent =
+    outputs.motd;
+
+document.getElementById('outJson').textContent =
+    outputs.json;
+
+document.getElementById('outBb').textContent =
+    bb;
+
+} catch (e) {
+    showError('Build error: ' + e.message);
+}
+
+}
+
+function makePlain(t) {
+    var s = document.createElement('span');
+
+    s.textContent = t;
+    s.style.color = '#aaa';
+    s.style.textShadow =
+        '2px 2px rgba(0,0,0,0.7)';
+
+    return s;
+}
+
+function scramble(n) {
+    var chars = '!<>-/[]{}=+*^?#';
+    var out = '';
+
+    for (var i = 0; i < n; i++) {
+        out += chars.charAt(
+            Math.floor(
+                Math.random() * chars.length
+            )
+        );
+    }
+
+    return out;
+}
+
+setInterval(function() {
+    var els =
+        document.querySelectorAll('[data-obf]');
+
+    for (var i = 0; i < els.length; i++) {
+        els[i].textContent = scramble(1);
+    }
+}, 80);
+
+function renderStops() {
+    var box =
+        document.getElementById('stopsBox');
+
+    box.innerHTML = '';
+
+    for (var i = 0; i < stops.length; i++) {
+        (function(idx) {
+            var row =
+                document.createElement('div');
+
+            row.className =
+                'mobile-color-stop';
+
+            var ci =
+                document.createElement('input');
+
+            ci.type = 'color';
+            ci.value = stops[idx];
+            ci.className =
+                'mobile-color-picker';
+
+            ci.oninput = function() {
+                stops[idx] = ci.value;
+                tx.value = ci.value;
+                buildAll();
+            };
+
+            var tx =
+                document.createElement('input');
+
+            tx.type = 'text';
+            tx.value = stops[idx];
+            tx.className =
+                'mobile-color-hex';
+
+            tx.oninput = function() {
+                var v =
+                    tx.value.replace('#', '');
+
+                if (/^[0-9a-fA-F]{6}$/.test(v)) {
+                    stops[idx] =
+                        '#' + v.toLowerCase();
+
+                    ci.value =
+                        stops[idx];
+
+                    buildAll();
+                }
+            };
+
+            var lb =
+                document.createElement('div');
+
+            lb.className =
+                'mobile-color-label';
+
+            lb.textContent =
+                'Color ' + (idx + 1);
+
+            var rm =
+                document.createElement('button');
+
+            rm.innerHTML =
+                '<i class="fa-solid fa-trash"></i>';
+
+            rm.className =
+                'mobile-color-remove';
+
+            rm.onclick = function() {
+                if (stops.length > 2) {
+                    stops.splice(idx, 1);
+                    renderStops();
+                    buildAll();
+                } else {
+                    showError(
+                        'Need at least 2 colors!'
+                    );
+                }
+            };
+
+            row.appendChild(lb);
+            row.appendChild(ci);
+            row.appendChild(tx);
+            row.appendChild(rm);
+
+            box.appendChild(row);
+        })(i);
+    }
+}
+
+function addStop() {
+    if (stops.length >= 6) {
+        showError(
+            'Max 6 colors allowed!'
+        );
+        return;
+    }
+
+    stops.push('#55ff55');
+
+    renderStops();
+    buildAll();
+}
+
+function reverseStops() {
+    stops.reverse();
+
+    renderStops();
+    buildAll();
+
+    showSuccess(
+        'Gradient reversed!'
+    );
+
+    setTimeout(
+        hideSuccess,
+        1500
+    );
+}
+
+function filterPresets() {
+    var cat =
+        document.getElementById(
+            'categorySelect'
+        ).value;
+
+    var box =
+        document.getElementById(
+            'presetButtons'
+        );
+
+    box.innerHTML = '';
+
+    for (var k in PRESETS) {
+        var preset = PRESETS[k];
+
+        if (
+            cat !== 'all' &&
+            preset.cat !== cat
+        ) {
+            continue;
+        }
+
+        var btn =
+            document.createElement('button');
+
+        btn.textContent = k;
+        btn.className = 'preset-btn';
+
+        btn.onclick = function(name) {
+            return function() {
+                stops =
+                    PRESETS[name]
+                        .colors
+                        .slice();
+
+                renderStops();
+                buildAll();
+
+                showSuccess(
+                    'Applied ' + name
+                );
+
+                setTimeout(
+                    hideSuccess,
+                    1500
+                );
+            };
+        }(k);
+
+        box.appendChild(btn);
+    }
+}
+
+function buildPresets() {
+    filterPresets();
+}
+
+function buildColorCodes() {
+    var grid =
+        document.getElementById(
+            'colorCodeGrid'
+        );
+
+    grid.innerHTML = '';
+
+    for (
+        var i = 0;
+        i < MC_COLORS.length;
+        i++
+    ) {
+        var c = MC_COLORS[i];
+
+        var box =
+            document.createElement('div');
+
+        box.className =
+            'color-code-box';
+
+        box.style.backgroundColor =
+            c.hex;
+
+        box.style.color =
+            (i < 8 || i === 11)
+                ? '#fff'
+                : '#000';
+
+        box.innerHTML =
+            '<strong>' +
+            c.code +
+            '</strong><br>' +
+            c.name;
+
+        box.onclick = function(code) {
+            return function() {
+                var inp =
+                    document.getElementById(
+                        'textInput'
+                    );
+
+                inp.value =
+                    inp.value + code;
+
+                buildAll();
+
+                showSuccess(
+                    'Added ' +
+                    code +
+                    ' to text'
+                );
+
+                setTimeout(
+                    hideSuccess,
+                    1500
+                );
+            };
+        }(c.code);
+
+        grid.appendChild(box);
+    }
+}
+
+function copyText(key) {
+    var text = outputs[key];
+
+    if (!text) return;
+
+    if (
+        navigator.clipboard &&
+        navigator.clipboard.writeText
+    ) {
+        navigator.clipboard
+            .writeText(text)
+            .then(function() {
+                showSuccess(
+                    'Copied to clipboard!'
+                );
+
+                setTimeout(
+                    hideSuccess,
+                    1500
+                );
+            })
+            .catch(function() {
+                fallbackCopy(text);
+            });
+    } else {
+        fallbackCopy(text);
+    }
+}
+
+function fallbackCopy(text) {
+    var ta =
+        document.createElement('textarea');
+
+    ta.value = text;
+
+    ta.style.position = 'fixed';
+    ta.style.left = '-9999px';
+
+    document.body.appendChild(ta);
+
+    ta.select();
+
+    try {
+        document.execCommand('copy');
+
+        showSuccess(
+            'Copied to clipboard!'
+        );
+    } catch (e) {
+        showError(
+            'Copy failed. Please copy manually.'
+        );
+    }
+
+    document.body.removeChild(ta);
+
+    setTimeout(
+        hideSuccess,
+        1500
+    );
+}
+
+function showError(m) {
+    document.getElementById(
+        'errorMsg'
+    ).textContent = m;
+
+    document.getElementById(
+        'errorMsg'
+    ).style.display = 'block';
+
+    document.getElementById(
+        'successMsg'
+    ).style.display = 'none';
+}
+
+function showSuccess(m) {
+    document.getElementById(
+        'successMsg'
+    ).textContent = m;
+
+    document.getElementById(
+        'successMsg'
+    ).style.display = 'block';
+
+    document.getElementById(
+        'errorMsg'
+    ).style.display = 'none';
+}
+
+function hideSuccess() {
+    document.getElementById(
+        'successMsg'
+    ).style.display = 'none';
+}
+
+window.addEventListener(
+    'load',
+    function() {
+        buildPresets();
+        buildColorCodes();
+        renderStops();
+        buildAll();
+    }
+);
+
+</script>
+</body>
+</html>
