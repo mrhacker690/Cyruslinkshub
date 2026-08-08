@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Minecraft RGB Gradient Creator</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
@@ -12,22 +12,107 @@
 <div class="container">
 
     <div class="glass header-card">
-        <h1><i class="fa-solid fa-rainbow"></i> Minecraft RGB Gradient Creator</h1>
-        <p>Gradient text for chat, command blocks, signs, books, MOTD & nicknames</p>
+        <h1><i class="fa-solid fa-rainbow"></i> RGB Gradient Creator</h1>
+        <p>Create beautiful gradient text for Minecraft servers</p>
     </div>
 
     <div id="errorMsg" class="error-msg"></div>
     <div id="successMsg" class="success-msg"></div>
 
-    <!-- ============ TEXT + STYLE ============ -->
-    <div class="glass search-card">
-        <h2><i class="fa-solid fa-keyboard"></i> Text & Style</h2>
+    <!-- ============ QUICK GUIDE ============ -->
+    <div class="glass guide-card">
+        <h2><i class="fa-solid fa-book"></i> Quick Guide</h2>
         <hr>
-        <label>Input Text</label>
-        <input type="text" id="textInput" oninput="buildAll()" placeholder="Type here to generate a gradient!" value="My Awesome Server">
+        <details>
+            <summary>📖 How to use this tool</summary>
+            <div class="info-box">
+                <strong>1.</strong> Type your text in the input box<br>
+                <strong>2.</strong> Pick gradient colors (2-6 colors)<br>
+                <strong>3.</strong> Add formatting (bold, italic, etc.)<br>
+                <strong>4.</strong> Choose font style<br>
+                <strong>5.</strong> Copy the format you need!
+            </div>
+        </details>
+        <details>
+            <summary>🎨 Which format should I use?</summary>
+            <div class="info-box">
+                <strong>&#rrggbb:</strong> Most plugins (LuckPerms, TAB, etc.)<br>
+                <strong>&lt;#rrggbb&gt;:</strong> Chat plugins, MiniMessage<br>
+                <strong>&x legacy:</strong> Essentials, PlaceholderAPI<br>
+                <strong>§x console:</strong> Signs, books, command blocks<br>
+                <strong>/tellraw JSON:</strong> Vanilla commands (1.16+)<br>
+                <strong>[COLOR]:</strong> Forums, Discord BBCode
+            </div>
+        </details>
+        <details>
+            <summary>🔧 Advanced tips</summary>
+            <div class="info-box">
+                <strong>•</strong> Use "Trim colors from spaces" for cleaner gradients<br>
+                <strong>•</strong> Prefix/Suffix adds text before/after (like rank tags)<br>
+                <strong>•</strong> Magic (&k) creates animated scrambled text<br>
+                <strong>•</strong> Reverse button flips gradient direction<br>
+                <strong>•</strong> Font styles work with all color formats
+            </div>
+        </details>
+    </div>
 
-        <label>Font Style</label>
-        <select id="fontSelect" onchange="buildAll()">
+    <!-- ============ TEXT INPUT ============ -->
+    <div class="glass search-card">
+        <h2><i class="fa-solid fa-keyboard"></i> Your Text</h2>
+        <hr>
+        <input type="text" id="textInput" oninput="buildAll()" placeholder="Type here..." value="My Server">
+        <div class="char-count">Characters: <span id="charCount">0</span></div>
+        <br>
+        <label>Prefix (before text):</label>
+        <input type="text" id="prefixInput" oninput="buildAll()" placeholder="[OWNER] ">
+        <label>Suffix (after text):</label>
+        <input type="text" id="suffixInput" oninput="buildAll()" placeholder=" &7»">
+    </div>
+
+    <!-- ============ GRADIENT COLORS ============ -->
+    <div class="glass search-card">
+        <h2><i class="fa-solid fa-palette"></i> Gradient Colors</h2>
+        <hr>
+        <div id="stopsBox" class="mobile-color-stops"></div>
+        <br>
+        <div class="mobile-buttons">
+            <button onclick="addStop()" class="full-width"><i class="fa-solid fa-plus"></i> Add Color</button>
+            <button onclick="reverseStops()" class="full-width"><i class="fa-solid fa-right-left"></i> Reverse</button>
+        </div>
+        <br>
+        <label>Quick Presets (30+ themes):</label>
+        <div class="preset-categories">
+            <select id="categorySelect" onchange="filterPresets()" class="mobile-select">
+                <option value="all">All Presets</option>
+                <option value="classic">🎨 Classic</option>
+                <option value="nature">🌿 Nature</option>
+                <option value="fire">🔥 Fire & Lava</option>
+                <option value="ice">❄️ Ice & Water</option>
+                <option value="cyber">⚡ Cyber & Neon</option>
+                <option value="pastel">🌸 Pastel & Cute</option>
+                <option value="dark">🌑 Dark & Moody</option>
+                <option value="seasonal">🎄 Seasonal</option>
+                <option value="gaming">🎮 Gaming</option>
+            </select>
+        </div>
+        <br>
+        <div class="mobile-buttons" id="presetButtons"></div>
+    </div>
+
+    <!-- ============ FORMATTING ============ -->
+    <div class="glass search-card">
+        <h2><i class="fa-solid fa-text-height"></i> Text Formatting</h2>
+        <hr>
+        <div class="mobile-format-grid">
+            <label class="format-check"><input type="checkbox" id="fmtBold" onchange="buildAll()"> <strong>B</strong></label>
+            <label class="format-check"><input type="checkbox" id="fmtItalic" onchange="buildAll()"> <em>I</em></label>
+            <label class="format-check"><input type="checkbox" id="fmtUnder" onchange="buildAll()"> <u>U</u></label>
+            <label class="format-check"><input type="checkbox" id="fmtStrike" onchange="buildAll()"> <s>S</s></label>
+            <label class="format-check"><input type="checkbox" id="fmtObf" onchange="buildAll()"> <span style="letter-spacing:2px;">▒▒</span></label>
+        </div>
+        <br>
+        <label>Font Style:</label>
+        <select id="fontSelect" onchange="buildAll()" class="mobile-select">
             <option value="default">Default Font</option>
             <option value="smallcaps">Small Caps</option>
             <option value="circled">Circled</option>
@@ -36,103 +121,128 @@
             <option value="upsidedown">Upside Down</option>
         </select>
         <br><br>
-
-        <div class="quick-names">
-            <label><input type="checkbox" id="fmtBold" onchange="buildAll()"> Bold &l</label>
-            <label><input type="checkbox" id="fmtItalic" onchange="buildAll()"> Italic &o</label>
-            <label><input type="checkbox" id="fmtUnder" onchange="buildAll()"> Underline &n</label>
-            <label><input type="checkbox" id="fmtStrike" onchange="buildAll()"> Strike &m</label>
-            <label><input type="checkbox" id="fmtObf" onchange="buildAll()"> Magic &k</label>
-        </div>
-        <br>
-        <label>Prefix</label>
-        <input type="text" id="prefixInput" oninput="buildAll()" placeholder="e.g. [&lOWNER&r] ">
-        <label>Suffix</label>
-        <input type="text" id="suffixInput" oninput="buildAll()" placeholder="e.g.  &7»">
-        <br><br>
         <label><input type="checkbox" id="trimSpaces" onchange="buildAll()" checked> Trim colors from spaces</label>
     </div>
 
-    <!-- ============ COLORS ============ -->
-    <div class="glass search-card">
-        <h2><i class="fa-solid fa-palette"></i> Gradient Colors</h2>
-        <hr>
-        <div id="stopsBox"></div>
-        <br>
-        <div class="quick-names">
-            <button onclick="addStop()"><i class="fa-solid fa-plus"></i> Add Color</button>
-            <button onclick="reverseStops()"><i class="fa-solid fa-right-left"></i> Reverse</button>
-        </div>
-        <br>
-        <label>Presets</label>
-        <select id="presetSelect"></select>
-        <button onclick="applyPreset()"><i class="fa-solid fa-wand-magic-sparkles"></i> Apply Preset</button>
-    </div>
-
-    <!-- ============ PREVIEW ============ -->
+    <!-- ============ LIVE PREVIEW ============ -->
     <div class="glass result-card">
         <h2><i class="fa-solid fa-eye"></i> Live Preview</h2>
         <hr>
-        <div id="previewBox" style="background:rgba(0,0,0,0.75);border:2px solid #333;padding:14px;font-family:monospace;font-size:18px;color:#fff;word-break:break-all;"></div>
+        <div id="previewBox" class="mobile-preview"></div>
     </div>
 
     <!-- ============ OUTPUTS ============ -->
     <div class="glass result-card">
-        <h2><i class="fa-solid fa-code"></i> Generated Codes (copy & paste)</h2>
+        <h2><i class="fa-solid fa-code"></i> Copy These Codes</h2>
         <hr>
 
-        <p><strong>&#rrggbb — Plugins / Nicknames</strong></p>
-        <div class="info-box" id="outAmpHex">-</div>
-        <button onclick="copyText('ampHex')"><i class="fa-solid fa-copy"></i> Copy</button>
+        <div class="output-section">
+            <div class="output-label">🎯 Plugin Format (&#rrggbb)</div>
+            <div class="output-desc">
+                <strong>Use for:</strong> LuckPerms, TAB, CMI nicknames, most modern plugins<br>
+                <strong>Works in:</strong> Chat, tablist, nametags, item lore
+            </div>
+            <div class="info-box" id="outAmpHex"></div>
+            <button onclick="copyText('ampHex')" class="copy-btn"><i class="fa-solid fa-copy"></i> Copy</button>
+        </div>
 
-        <p><strong>&lt;#rrggbb&gt; — Chat / MiniMessage per-char</strong></p>
-        <div class="info-box" id="outChat">-</div>
-        <button onclick="copyText('chat')"><i class="fa-solid fa-copy"></i> Copy</button>
+        <div class="output-section">
+            <div class="output-label">💬 Chat Format (&lt;#rrggbb&gt;)</div>
+            <div class="output-desc">
+                <strong>Use for:</strong> Chat plugins (ChatManager, DeluxeChat), MiniMessage<br>
+                <strong>Works in:</strong> Chat messages, MOTD, some plugins
+            </div>
+            <div class="info-box" id="outChat"></div>
+            <button onclick="copyText('chat')" class="copy-btn"><i class="fa-solid fa-copy"></i> Copy</button>
+        </div>
 
-        <p><strong>MiniMessage Gradient Tag (Paper/Velocity)</strong></p>
-        <div class="info-box" id="outMini">-</div>
-        <button onclick="copyText('mini')"><i class="fa-solid fa-copy"></i> Copy</button>
+        <div class="output-section">
+            <div class="output-label">✨ MiniMessage Gradient Tag</div>
+            <div class="output-desc">
+                <strong>Use for:</strong> Paper servers, Velocity, MiniMessage plugin<br>
+                <strong>Works in:</strong> Chat, signs, books (if plugin supports it)<br>
+                <strong>Note:</strong> Shortest format, easiest to read
+            </div>
+            <div class="info-box" id="outMini"></div>
+            <button onclick="copyText('mini')" class="copy-btn"><i class="fa-solid fa-copy"></i> Copy</button>
+        </div>
 
-        <p><strong>&x Legacy — Essentials / placeholders</strong></p>
-        <div class="info-box" id="outLegacy">-</div>
-        <button onclick="copyText('legacy')"><i class="fa-solid fa-copy"></i> Copy</button>
+        <div class="output-section">
+            <div class="output-label">🔧 Legacy Format (&x)</div>
+            <div class="output-desc">
+                <strong>Use for:</strong> Essentials, PlaceholderAPI, older plugins<br>
+                <strong>Works in:</strong> Chat, placeholders, some config files<br>
+                <strong>Note:</strong> Each hex digit prefixed with &
+            </div>
+            <div class="info-box" id="outLegacy"></div>
+            <button onclick="copyText('legacy')" class="copy-btn"><i class="fa-solid fa-copy"></i> Copy</button>
+        </div>
 
-        <p><strong>§x Console / Signs / Books</strong></p>
-        <div class="info-box" id="outConsole">-</div>
-        <button onclick="copyText('console')"><i class="fa-solid fa-copy"></i> Copy</button>
+        <div class="output-section">
+            <div class="output-label">📦 Console Format (§x)</div>
+            <div class="output-desc">
+                <strong>Use for:</strong> Signs, books, command blocks, armor stands<br>
+                <strong>Works in:</strong> Minecraft 1.16+ vanilla commands<br>
+                <strong>Note:</strong> Each hex digit prefixed with §
+            </div>
+            <div class="info-box" id="outConsole"></div>
+            <button onclick="copyText('console')" class="copy-btn"><i class="fa-solid fa-copy"></i> Copy</button>
+        </div>
 
-        <p><strong>MOTD format (\u00A7)</strong></p>
-        <div class="info-box" id="outMotd">-</div>
-        <button onclick="copyText('motd')"><i class="fa-solid fa-copy"></i> Copy</button>
+        <div class="output-section">
+            <div class="output-label">🌐 MOTD Format</div>
+            <div class="output-desc">
+                <strong>Use for:</strong> server.properties motd line<br>
+                <strong>Works in:</strong> Server list description (Java 1.16+)<br>
+                <strong>Note:</strong> Uses \u00A7 escape sequences
+            </div>
+            <div class="info-box" id="outMotd"></div>
+            <button onclick="copyText('motd')" class="copy-btn"><i class="fa-solid fa-copy"></i> Copy</button>
+        </div>
 
-        <p><strong>/tellraw JSON command (1.16+)</strong></p>
-        <div class="info-box" id="outJson">-</div>
-        <button onclick="copyText('json')"><i class="fa-solid fa-copy"></i> Copy</button>
+        <div class="output-section">
+            <div class="output-label">⚙️ /tellraw JSON Command</div>
+            <div class="output-desc">
+                <strong>Use for:</strong> Vanilla command blocks, functions, datapacks<br>
+                <strong>Works in:</strong> Minecraft 1.16+ without plugins<br>
+                <strong>Note:</strong> Full JSON array, paste directly into command
+            </div>
+            <div class="info-box" id="outJson"></div>
+            <button onclick="copyText('json')" class="copy-btn"><i class="fa-solid fa-copy"></i> Copy</button>
+        </div>
 
-        <p><strong>BBCode [COLOR] — Forums</strong></p>
-        <div class="info-box" id="outBb">-</div>
-        <button onclick="copyText('bb')"><i class="fa-solid fa-copy"></i> Copy</button>
+        <div class="output-section">
+            <div class="output-label">📝 BBCode Format</div>
+            <div class="output-desc">
+                <strong>Use for:</strong> Forum posts, Discord embeds, web pages<br>
+                <strong>Works in:</strong> Most forum software (phpBB, XenForo)<br>
+                <strong>Note:</strong> Standard [COLOR=#hex] tags
+            </div>
+            <div class="info-box" id="outBb"></div>
+            <button onclick="copyText('bb')" class="copy-btn"><i class="fa-solid fa-copy"></i> Copy</button>
+        </div>
+    </div>
+
+    <!-- ============ MINECRAFT COLOR CODES ============ -->
+    <div class="glass search-card">
+        <h2><i class="fa-solid fa-circle-info"></i> Minecraft Color Codes</h2>
+        <hr>
+        <div class="color-code-grid" id="colorCodeGrid"></div>
     </div>
 
     <div class="glass footer-card">
-        <p>Minecraft RGB Gradient Creator<br><br>Chat • Command Blocks • Armor Stands • Signs • Books • MOTD</p>
+        <p>RGB Gradient Creator for Minecraft<br><br>30+ Presets • All Formats • Mobile Friendly</p>
     </div>
 
 </div>
 
 <script>
-/* ===========================================================
-   ERROR CATCHER (shows any JS error on screen)
-=========================================================== */
 window.onerror = function(msg) {
-    var el = document.getElementById('errorMsg');
-    if (el) { el.textContent = 'JS Error: ' + msg; el.style.display = 'block'; }
+    document.getElementById('errorMsg').textContent = 'Error: ' + msg;
+    document.getElementById('errorMsg').style.display = 'block';
     return false;
 };
 
-/* ===========================================================
-   STATE
-=========================================================== */
 var stops = ['#ff5555', '#ffaa00'];
 var outputs = {};
 
@@ -142,27 +252,89 @@ var DIGIT = '0123456789';
 
 var FONT_MAPS = {
     smallcaps: { l: 'ᴀʙᴄᴅᴇɢʜɪᴊᴋᴍɴᴏᴘǫʀꜱᴛᴜᴠᴡxᴢ', u: 'ᴀʙᴄᴅᴇꜰɢʜɪᴊᴋʟɴᴏᴘǫʀꜱᴛᴜᴠᴡxʏᴢ', d: '0123456789' },
-    circled:   { l: 'ⓐⓑⓒⓓⓔⓕⓗⓘⓙⓛⓝⓟⓠⓡⓢⓣⓥⓧⓨⓩ', u: 'ⒶⒷⒸⒹⒺⒼⒾⓀⓂⓄⓆⓈⓊⓌⓎ', d: '①②③④⑤⑥⑦⑧⑨' },
-    squared:   { l: '🅱🅲🅳🅵🅷🅹🅻🅽🅿🆁🆂🆃🆅🆆🆇🆈🆉', u: '🅰🅲🅳🅴🅶🅸🅺🅻🅼🅽🅿🆁🆃🆄🆅🆆🆇🆈🆉', d: '0123456789' },
-    superscript:{ l: 'ᵃᵇᵈᶠʰⁱᵏˡᵐⁿᵖʳˢᵗᵘᵛʷʸ', u: 'ᴬᴮᶜᴰᴱᶠᴳᴴᴵᴶᴷᴸᴹᴺᴼᴾᵠᴿˢᵀᵁⱽᵂˣʸ', d: '⁰¹²³⁴⁵⁷⁸⁹' },
-    upsidedown:{ l: 'ɐqɔpǝɟɥᴉʞʅɯuodbɹsʇnʌʍxʎz', u: '∀qƆpƎℲƃHIſʞ˥WNOdQɹS∩ΛMXZ', d: '0ᄅㄣ9ㄥ86' }
+    circled: { l: 'ⓐⓑⓒⓓⓔⓕⓗⓘⓙⓛⓝⓟⓠⓡⓢⓣⓥⓧⓨⓩ', u: 'ⒶⒷⒸⒹⒺⒼⒾⓀⓂⓄⓆⓈⓊⓌⓎ', d: '①②③④⑤⑥⑦⑧⑨' },
+    squared: { l: '🅱🅲🅳🅵🅷🅹🅻🅽🅿🆁🆂🆃🆅🆆🆇🆈🆉', u: '🅰🅲🅳🅴🅶🅸🅺🅻🅼🅽🅿🆁🆃🆄🆅🆆🆇🆈🆉', d: '0123456789' },
+    superscript: { l: 'ᵃᵇᵈᶠʰⁱᵏˡᵐⁿᵖʳˢᵗᵘᵛʷʸ', u: 'ᴬᴮᶜᴰᴱᶠᴳᴴᴵᴶᴷᴸᴹᴺᴼᴾᵠᴿˢᵀᵁⱽᵂˣʸ', d: '⁰¹²³⁴⁵⁷⁸⁹' },
+    upsidedown: { l: 'ɐqɔpǝɟɥᴉʞʅɯuodbɹsʇnʌʍxʎz', u: '∀qƆpƎℲƃHIſʞ˥WNOdQɹS∩ΛMXZ', d: '0ᄅㄣ9ㄥ86' }
 };
 
 var PRESETS = {
-    'Sunset': ['#ff5555', '#ffaa00'],
-    'Fire': ['#ffff55', '#ff5555', '#aa0000'],
-    'Ocean': ['#55ffff', '#0000aa'],
-    'Gold': ['#ffff55', '#ffaa00'],
-    'Emerald': ['#55ff55', '#00aa00'],
-    'Purple Haze': ['#ff55ff', '#5555ff'],
-    'Ice': ['#ffffff', '#55ffff'],
-    'Candy': ['#ff55ff', '#ffff55'],
-    'Rainbow': ['#ff5555', '#ffaa00', '#ffff55', '#55ff55', '#55ffff', '#ff55ff']
+    // Classic (6)
+    '🌈 Rainbow': { cat: 'classic', colors: ['#ff5555', '#ffaa00', '#ffff55', '#55ff55', '#55ffff', '#ff55ff'] },
+    '⭐ Gold': { cat: 'classic', colors: ['#ffff55', '#ffaa00'] },
+    '💎 Diamond': { cat: 'classic', colors: ['#55ffff', '#ffffff'] },
+    '💚 Emerald': { cat: 'classic', colors: ['#55ff55', '#00aa00'] },
+    '💜 Purple': { cat: 'classic', colors: ['#ff55ff', '#5555ff'] },
+    '❤️ Red': { cat: 'classic', colors: ['#ff5555', '#aa0000'] },
+    
+    // Nature (4)
+    '🌅 Sunset': { cat: 'nature', colors: ['#ff5555', '#ffaa00', '#ff55ff'] },
+    '🌊 Ocean': { cat: 'nature', colors: ['#55ffff', '#0000aa'] },
+    '🌿 Forest': { cat: 'nature', colors: ['#55ff55', '#00aa00', '#005500'] },
+    '🏜️ Desert': { cat: 'nature', colors: ['#ffaa00', '#aa5500', '#550000'] },
+    
+    // Fire & Lava (4)
+    '🔥 Fire': { cat: 'fire', colors: ['#ffff55', '#ff5555', '#aa0000'] },
+    '🌋 Lava': { cat: 'fire', colors: ['#ffaa00', '#ff5555', '#550000'] },
+    '🔥 Ember': { cat: 'fire', colors: ['#ff5555', '#aa0000', '#550000'] },
+    '☀️ Sun': { cat: 'fire', colors: ['#ffffff', '#ffff55', '#ffaa00'] },
+    
+    // Ice & Water (4)
+    '❄️ Ice': { cat: 'ice', colors: ['#ffffff', '#55ffff'] },
+    '🧊 Glacier': { cat: 'ice', colors: ['#55ffff', '#0000aa', '#000055'] },
+    '💧 Water': { cat: 'ice', colors: ['#5555ff', '#0000aa'] },
+    '🌊 Deep Sea': { cat: 'ice', colors: ['#0000aa', '#000055', '#000000'] },
+    
+    // Cyber & Neon (4)
+    '⚡ Electric': { cat: 'cyber', colors: ['#55ffff', '#ff55ff'] },
+    '🌆 Cyberpunk': { cat: 'cyber', colors: ['#ff55ff', '#5555ff', '#00ffff'] },
+    '💜 Vaporwave': { cat: 'cyber', colors: ['#ff55ff', '#5555ff', '#55ffff'] },
+    '🟢 Matrix': { cat: 'cyber', colors: ['#00ff00', '#00aa00', '#005500'] },
+    
+    // Pastel & Cute (4)
+    '🌸 Sakura': { cat: 'pastel', colors: ['#ffaaaa', '#ffffff'] },
+    '🍬 Candy': { cat: 'pastel', colors: ['#ff55ff', '#ffff55'] },
+    '🍭 Bubblegum': { cat: 'pastel', colors: ['#ff55ff', '#55ffff'] },
+    '🌈 Pastel Rainbow': { cat: 'pastel', colors: ['#ffaaaa', '#ffffaa', '#aaffaa', '#aaffff', '#aaaaff', '#ffaaff'] },
+    
+    // Dark & Moody (4)
+    '🌑 Midnight': { cat: 'dark', colors: ['#5555ff', '#000055', '#000000'] },
+    '🩸 Blood': { cat: 'dark', colors: ['#aa0000', '#550000', '#000000'] },
+    '☠️ Toxic': { cat: 'dark', colors: ['#55ff55', '#00aa00', '#005500'] },
+    '🖤 Shadow': { cat: 'dark', colors: ['#555555', '#000000'] },
+    
+    // Seasonal (4)
+    '🎄 Christmas': { cat: 'seasonal', colors: ['#55ff55', '#ffffff', '#ff5555'] },
+    '🎃 Halloween': { cat: 'seasonal', colors: ['#ffaa00', '#aa5500', '#000000'] },
+    '❤️ Valentine': { cat: 'seasonal', colors: ['#ff5555', '#ff55ff', '#ffffff'] },
+    '☃️ Winter': { cat: 'seasonal', colors: ['#ffffff', '#55ffff', '#5555ff'] },
+    
+    // Gaming (4)
+    '🎮 Gamer': { cat: 'gaming', colors: ['#00ff00', '#00aa00'] },
+    '⚔️ PvP': { cat: 'gaming', colors: ['#ff5555', '#aa0000', '#550000'] },
+    '👑 VIP': { cat: 'gaming', colors: ['#ffff55', '#ffaa00', '#aa5500'] },
+    '💀 Hardcore': { cat: 'gaming', colors: ['#aa0000', '#550000', '#000000'] }
 };
 
-/* ===========================================================
-   COLOR MATH
-=========================================================== */
+var MC_COLORS = [
+    { code: '&0', name: 'Black', hex: '#000000' },
+    { code: '&1', name: 'Dark Blue', hex: '#0000AA' },
+    { code: '&2', name: 'Dark Green', hex: '#00AA00' },
+    { code: '&3', name: 'Dark Aqua', hex: '#00AAAA' },
+    { code: '&4', name: 'Dark Red', hex: '#AA0000' },
+    { code: '&5', name: 'Dark Purple', hex: '#AA00AA' },
+    { code: '&6', name: 'Gold', hex: '#FFAA00' },
+    { code: '&7', name: 'Gray', hex: '#AAAAAA' },
+    { code: '&8', name: 'Dark Gray', hex: '#555555' },
+    { code: '&9', name: 'Blue', hex: '#5555FF' },
+    { code: '&a', name: 'Green', hex: '#55FF55' },
+    { code: '&b', name: 'Aqua', hex: '#55FFFF' },
+    { code: '&c', name: 'Red', hex: '#FF5555' },
+    { code: '&d', name: 'Light Purple', hex: '#FF55FF' },
+    { code: '&e', name: 'Yellow', hex: '#FFFF55' },
+    { code: '&f', name: 'White', hex: '#FFFFFF' }
+];
+
 function hexToRgb(h) {
     h = String(h).replace('#', '');
     if (h.length === 3) h = h.charAt(0)+h.charAt(0)+h.charAt(1)+h.charAt(1)+h.charAt(2)+h.charAt(2);
@@ -170,10 +342,12 @@ function hexToRgb(h) {
     if (isNaN(n)) return [255, 255, 255];
     return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
 }
+
 function rgbToHex(r, g, b) {
     function p(x) { x = Math.round(x).toString(16); return x.length < 2 ? '0' + x : x; }
     return '#' + p(r) + p(g) + p(b);
 }
+
 function lerp(a, b, t) { return a + (b - a) * t; }
 
 function charColors(count) {
@@ -191,9 +365,6 @@ function charColors(count) {
     return out;
 }
 
-/* ===========================================================
-   FONT CONVERTER
-=========================================================== */
 function convertFont(str, key) {
     if (key === 'default' || !FONT_MAPS[key]) return str;
     var m = FONT_MAPS[key];
@@ -214,9 +385,6 @@ function convertFont(str, key) {
     return out;
 }
 
-/* ===========================================================
-   FORMAT HELPERS
-=========================================================== */
 function chk(id) { return document.getElementById(id).checked; }
 
 function ampFormats() {
@@ -228,6 +396,7 @@ function ampFormats() {
     if (chk('fmtObf')) s += '&k';
     return s;
 }
+
 function miniFormatsOpen() {
     var s = '';
     if (chk('fmtBold')) s += '<bold>';
@@ -237,6 +406,7 @@ function miniFormatsOpen() {
     if (chk('fmtObf')) s += '<obfuscated>';
     return s;
 }
+
 function hexCode(hex, sym) {
     var h = hex.replace('#', '');
     var out = sym + 'x';
@@ -244,9 +414,6 @@ function hexCode(hex, sym) {
     return out;
 }
 
-/* ===========================================================
-   MAIN BUILD
-=========================================================== */
 function buildAll() {
     try {
         var raw = document.getElementById('textInput').value;
@@ -254,6 +421,8 @@ function buildAll() {
         var prefix = document.getElementById('prefixInput').value;
         var suffix = document.getElementById('suffixInput').value;
         var trim = document.getElementById('trimSpaces').checked;
+
+        document.getElementById('charCount').textContent = converted.length;
 
         var i, total = 0;
         for (i = 0; i < converted.length; i++) {
@@ -273,245 +442,6 @@ function buildAll() {
             }
         }
 
-        /* ---- preview ---- */
         var prev = document.getElementById('previewBox');
         prev.innerHTML = '';
-        if (prefix) prev.appendChild(makePlain(prefix));
-        for (i = 0; i < converted.length; i++) {
-            var sp = document.createElement('span');
-            sp.style.color = charColor[i];
-            sp.style.textShadow = '2px 2px rgba(0,0,0,0.7)';
-            if (chk('fmtBold')) sp.style.fontWeight = 'bold';
-            if (chk('fmtItalic')) sp.style.fontStyle = 'italic';
-            var dec = [];
-            if (chk('fmtUnder')) dec.push('underline');
-            if (chk('fmtStrike')) dec.push('line-through');
-            sp.style.textDecoration = dec.join(' ') || 'none';
-            if (chk('fmtObf')) { sp.setAttribute('data-obf', '1'); sp.textContent = '#'; }
-            else sp.textContent = converted.charAt(i);
-            prev.appendChild(sp);
-        }
-        if (suffix) prev.appendChild(makePlain(suffix));
-
-        /* ---- outputs ---- */
-        var fAmp = ampFormats();
-        var fSec = fAmp.replace(/&/g, '§');
-
-        var ampHex = prefix + fAmp, chat = prefix + miniFormatsOpen();
-        var legacy = prefix + fAmp, console_ = prefix + fSec;
-        var bb = prefix, jsonArr = [''];
-        if (prefix) jsonArr.push({ text: prefix });
-
-        if (chk('fmtBold')) bb += '[B]';
-        if (chk('fmtItalic')) bb += '[I]';
-        if (chk('fmtUnder')) bb += '[U]';
-
-        for (i = 0; i < converted.length; i++) {
-            var ch = converted.charAt(i);
-            var hx = charColor[i];
-            ampHex += '&#' + hx.replace('#', '') + ch;
-            chat += '<#' + hx.replace('#', '') + '>' + ch;
-            legacy += hexCode(hx, '&') + ch;
-            console_ += hexCode(hx, '§') + ch;
-            bb += '[COLOR=' + hx + ']' + ch + '[/COLOR]';
-            var o = { text: ch, color: hx };
-            if (chk('fmtBold')) o.bold = true;
-            if (chk('fmtItalic')) o.italic = true;
-            if (chk('fmtUnder')) o.underlined = true;
-            if (chk('fmtStrike')) o.strikethrough = true;
-            if (chk('fmtObf')) o.obfuscated = true;
-            jsonArr.push(o);
-        }
-
-        if (chk('fmtBold')) bb += '[/B]';
-        if (chk('fmtItalic')) bb += '[/I]';
-        if (chk('fmtUnder')) bb += '[/U]';
-
-        ampHex += suffix; chat += suffix; legacy += suffix; console_ += suffix; bb += suffix;
-        if (suffix) jsonArr.push({ text: suffix });
-
-        var mini = miniFormatsOpen() + '<gradient:' + stops.join(':') + '>' + converted + '</gradient>';
-
-        outputs.ampHex = ampHex;
-        outputs.chat = chat;
-        outputs.mini = mini;
-        outputs.legacy = legacy;
-        outputs.console = console_;
-        outputs.motd = console_.replace(/§/g, '\\u00A7');
-        outputs.json = '/tellraw @a ' + JSON.stringify(jsonArr);
-        outputs.bb = bb;
-
-        document.getElementById('outAmpHex').textContent = ampHex;
-        document.getElementById('outChat').textContent = chat;
-        document.getElementById('outMini').textContent = mini;
-        document.getElementById('outLegacy').textContent = legacy;
-        document.getElementById('outConsole').textContent = console_;
-        document.getElementById('outMotd').textContent = outputs.motd;
-        document.getElementById('outJson').textContent = outputs.json;
-        document.getElementById('outBb').textContent = bb;
-
-    } catch (e) {
-        showError('Build error: ' + e.message);
-    }
-}
-
-function makePlain(t) {
-    var s = document.createElement('span');
-    s.textContent = t;
-    s.style.color = '#aaa';
-    s.style.textShadow = '2px 2px rgba(0,0,0,0.7)';
-    return s;
-}
-
-/* ===========================================================
-   MAGIC TEXT SCRAMBLE
-=========================================================== */
-function scramble(n) {
-    var chars = '!<>-/[]{}=+*^?#';
-    var out = '';
-    for (var i = 0; i < n; i++) out += chars.charAt(Math.floor(Math.random() * chars.length));
-    return out;
-}
-setInterval(function() {
-    var els = document.querySelectorAll('[data-obf]');
-    for (var i = 0; i < els.length; i++) els[i].textContent = scramble(1);
-}, 80);
-
-/* ===========================================================
-   COLOR STOPS UI
-=========================================================== */
-function renderStops() {
-    var box = document.getElementById('stopsBox');
-    box.innerHTML = '';
-    for (var i = 0; i < stops.length; i++) {
-        (function(idx) {
-            var row = document.createElement('div');
-            row.className = 'quick-names';
-
-            var ci = document.createElement('input');
-            ci.type = 'color';
-            ci.value = stops[idx];
-            ci.oninput = function() {
-                stops[idx] = ci.value;
-                tx.value = ci.value;
-                buildAll();
-            };
-
-            var tx = document.createElement('input');
-            tx.type = 'text';
-            tx.value = stops[idx];
-            tx.style.width = '100px';
-            tx.oninput = function() {
-                var v = tx.value.replace('#', '');
-                if (/^[0-9a-fA-F]{6}$/.test(v)) {
-                    stops[idx] = '#' + v.toLowerCase();
-                    ci.value = stops[idx];
-                    buildAll();
-                }
-            };
-
-            var lb = document.createElement('span');
-            lb.textContent = '#' + (idx + 1);
-
-            var rm = document.createElement('button');
-            rm.innerHTML = '<i class="fa-solid fa-minus"></i>';
-            rm.onclick = function() {
-                if (stops.length > 2) {
-                    stops.splice(idx, 1);
-                    renderStops();
-                    buildAll();
-                } else {
-                    showError('Minimum 2 colors needed');
-                }
-            };
-
-            row.appendChild(lb);
-            row.appendChild(ci);
-            row.appendChild(tx);
-            row.appendChild(rm);
-            box.appendChild(row);
-        })(i);
-    }
-}
-
-function addStop() {
-    if (stops.length >= 6) { showError('Max 6 colors'); return; }
-    stops.push('#55ff55');
-    renderStops();
-    buildAll();
-}
-
-function reverseStops() {
-    stops.reverse();
-    renderStops();
-    buildAll();
-}
-
-/* ===========================================================
-   PRESETS
-=========================================================== */
-function buildPresets() {
-    var sel = document.getElementById('presetSelect');
-    sel.innerHTML = '';
-    for (var k in PRESETS) {
-        var o = document.createElement('option');
-        o.value = k;
-        o.textContent = k;
-        sel.appendChild(o);
-    }
-}
-function applyPreset() {
-    var k = document.getElementById('presetSelect').value;
-    stops = PRESETS[k].slice();
-    renderStops();
-    buildAll();
-    showSuccess('Preset "' + k + '" applied!');
-    setTimeout(hideSuccess, 1500);
-}
-
-/* ===========================================================
-   COPY + UI HELPERS
-=========================================================== */
-function copyText(key) {
-    var text = outputs[key];
-    if (!text) return;
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(text).then(function() {
-            showSuccess('Copied to clipboard!');
-            setTimeout(hideSuccess, 1500);
-        });
-    } else {
-        var ta = document.createElement('textarea');
-        ta.value = text;
-        document.body.appendChild(ta);
-        ta.select();
-        try { document.execCommand('copy'); showSuccess('Copied!'); } catch (e) { showError('Copy failed'); }
-        document.body.removeChild(ta);
-        setTimeout(hideSuccess, 1500);
-    }
-}
-
-function showError(m) {
-    document.getElementById('errorMsg').textContent = m;
-    document.getElementById('errorMsg').style.display = 'block';
-    document.getElementById('successMsg').style.display = 'none';
-}
-function showSuccess(m) {
-    document.getElementById('successMsg').textContent = m;
-    document.getElementById('successMsg').style.display = 'block';
-    document.getElementById('errorMsg').style.display = 'none';
-}
-function hideSuccess() { document.getElementById('successMsg').style.display = 'none'; }
-
-/* ===========================================================
-   START
-=========================================================== */
-window.addEventListener('load', function() {
-    buildPresets();
-    renderStops();
-    buildAll();
-});
-</script>
-
-</body>
-            </html>
+        
