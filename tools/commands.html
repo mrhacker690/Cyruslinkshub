@@ -379,3 +379,1045 @@
 <option value="generic.max_health">Max Health</option>
 <option value="generic.movement_speed">Movement Speed</option>
 <option value="generic.attack_damage">Attack Damage</option>
+</option>
+<option value="generic.attack_speed">Attack Speed</option>
+<option value="generic.knockback_resistance">Knockback Resist</option>
+<option value="generic.armor">Armor</option>
+<option value="generic.armor_toughness">Armor Toughness</option>
+<option value="generic.luck">Luck</option>
+</select>
+
+<label>Value</label>
+<input
+    type="number"
+    id="attrVal"
+    value="20"
+    step="0.1"
+    oninput="buildAttribute()"
+>
+
+<h3>Generated Command</h3>
+
+<div class="info-box" id="attributeOutput">
+    /attribute @p minecraft:generic.max_health base set 20
+</div>
+
+<button onclick="copyOutput('attribute')">
+    <i class="fa-solid fa-copy"></i> Copy
+</button>
+
+</div>
+
+<!-- OP/HACK PRESETS -->
+
+<div
+    id="modOp"
+    class="glass result-card"
+    style="display:none"
+>
+    <h2>
+        <i class="fa-solid fa-skull-crossbones"></i>
+        OP / Hack Presets
+    </h2>
+
+    <p>
+        One-click overpowered commands for
+        creative/testing servers
+    </p>
+
+    <hr>
+
+    <div class="mobile-buttons">
+
+        <button onclick="loadOP('godkit')">
+            <i class="fa-solid fa-shield"></i>
+            God Kit
+        </button>
+
+        <button onclick="loadOP('maxsword')">
+            <i class="fa-solid fa-khanda"></i>
+            Max Sword
+        </button>
+
+        <button onclick="loadOP('maxarmor')">
+            <i class="fa-solid fa-vest"></i>
+            Max Armor
+        </button>
+
+        <button onclick="loadOP('fly')">
+            <i class="fa-solid fa-feather"></i>
+            Fly Mode
+        </button>
+
+        <button onclick="loadOP('speed')">
+            <i class="fa-solid fa-bolt"></i>
+            Speed Hack
+        </button>
+
+        <button onclick="loadOP('strength')">
+            <i class="fa-solid fa-dumbbell"></i>
+            Strength 255
+        </button>
+
+        <button onclick="loadOP('regen')">
+            <i class="fa-solid fa-heart"></i>
+            Infinite Regen
+        </button>
+
+        <button onclick="loadOP('invisible')">
+            <i class="fa-solid fa-ghost"></i>
+            Invisible
+        </button>
+
+        <button onclick="loadOP('onehit')">
+            <i class="fa-solid fa-hand-fist"></i>
+            One-Hit Kill
+        </button>
+
+        <button onclick="loadOP('boss')">
+            <i class="fa-solid fa-dragon"></i>
+            Boss Mob
+        </button>
+
+        <button onclick="loadOP('witherstorm')">
+            <i class="fa-solid fa-skull"></i>
+            Wither Storm
+        </button>
+
+        <button onclick="loadOP('dragonstack')">
+            <i class="fa-solid fa-fire"></i>
+            Dragon Stack
+        </button>
+
+        <button onclick="loadOP('creeperarmy')">
+            <i class="fa-solid fa-bomb"></i>
+            Creeper Army
+        </button>
+
+        <button onclick="loadOP('giant')">
+            <i class="fa-solid fa-person"></i>
+            Giant Zombie
+        </button>
+
+        <button onclick="loadOP('food')">
+            <i class="fa-solid fa-apple-whole"></i>
+            Infinite Food
+        </button>
+
+        <button onclick="loadOP('tpall')">
+            <i class="fa-solid fa-people-arrows"></i>
+            TP All Here
+        </button>
+
+        <button onclick="loadOP('killall')">
+            <i class="fa-solid fa-skull-crossbones"></i>
+            Kill All Mobs
+        </button>
+
+        <button onclick="loadOP('nuke')">
+            <i class="fa-solid fa-explosion"></i>
+            Nuke Area
+        </button>
+
+        <button onclick="loadOP('godmode')">
+            <i class="fa-solid fa-user-shield"></i>
+            God Mode
+        </button>
+
+        <button onclick="loadOP('creative')">
+            <i class="fa-solid fa-wand-sparkles"></i>
+            Creative All
+        </button>
+
+    </div>
+
+    <h3>Generated Command(s)</h3>
+
+    <div
+        class="info-box"
+        id="opOutput"
+    >
+        Select a preset above
+    </div>
+
+    <button onclick="copyOutput('op')">
+        <i class="fa-solid fa-copy"></i>
+        Copy
+    </button>
+</div>
+
+<div class="glass footer-card">
+    <p>
+        Ultimate Minecraft Command Suite
+        <br><br>
+        MCStacker-style • Java + Bedrock • OP Presets
+    </p>
+</div>
+
+</div>
+
+<script>
+
+window.onerror = function(msg) {
+    document.getElementById('errorMsg').textContent =
+        'Error: ' + msg;
+
+    document.getElementById('errorMsg').style.display =
+        'block';
+
+    return false;
+};
+
+var edition = 'java';
+var outputs = {};
+var currentMod = 'give';
+
+/* ===========================================================
+   DATA
+=========================================================== */
+
+var ITEMS = [
+    'diamond_sword',
+    'netherite_sword',
+    'iron_sword',
+    'stone_sword',
+    'wooden_sword',
+    'golden_sword',
+    'diamond_pickaxe',
+    'netherite_pickaxe',
+    'iron_pickaxe',
+    'diamond_axe',
+    'netherite_axe',
+    'diamond_shovel',
+    'netherite_shovel',
+    'bow',
+    'crossbow',
+    'trident',
+    'arrow',
+    'shield',
+    'totem_of_undying',
+    'elytra',
+    'golden_apple',
+    'enchanted_golden_apple',
+    'diamond_helmet',
+    'netherite_helmet',
+    'diamond_chestplate',
+    'netherite_chestplate',
+    'diamond_leggings',
+    'netherite_leggings',
+    'diamond_boots',
+    'netherite_boots',
+    'iron_helmet',
+    'iron_chestplate',
+    'iron_leggings',
+    'iron_boots',
+    'chainmail_helmet',
+    'chainmail_chestplate',
+    'chainmail_leggings',
+    'chainmail_boots',
+    'leather_helmet',
+    'leather_chestplate',
+    'leather_leggings',
+    'leather_boots',
+    'diamond',
+    'emerald',
+    'gold_ingot',
+    'iron_ingot',
+    'netherite_ingot',
+    'coal',
+    'redstone',
+    'lapis_lazuli',
+    'oak_log',
+    'birch_log',
+    'spruce_log',
+    'stone',
+    'cobblestone',
+    'dirt',
+    'grass_block',
+    'sand',
+    'obsidian',
+    'bedrock',
+    'tnt',
+    'glass',
+    'book',
+    'paper',
+    'stick',
+    'bone',
+    'ender_pearl',
+    'nether_star',
+    'command_block',
+    'barrier',
+    'structure_block'
+];
+
+var ENTITIES = [
+    'zombie',
+    'skeleton',
+    'creeper',
+    'spider',
+    'enderman',
+    'witch',
+    'slime',
+    'magma_cube',
+    'blaze',
+    'ghast',
+    'wither_skeleton',
+    'zombie_piglin',
+    'piglin',
+    'hoglin',
+    'zoglin',
+    'stray',
+    'husk',
+    'drowned',
+    'phantom',
+    'pillager',
+    'vindicator',
+    'evoker',
+    'ravager',
+    'vex',
+    'warden',
+    'wither',
+    'ender_dragon',
+    'elder_guardian',
+    'giant',
+    'cow',
+    'pig',
+    'sheep',
+    'chicken',
+    'horse',
+    'donkey',
+    'mule',
+    'llama',
+    'wolf',
+    'cat',
+    'ocelot',
+    'fox',
+    'rabbit',
+    'bee',
+    'panda',
+    'polar_bear',
+    'dolphin',
+    'squid',
+    'glow_squid',
+    'turtle',
+    'parrot',
+    'villager',
+    'iron_golem',
+    'snow_golem',
+    'armor_stand',
+    'boat',
+    'minecart',
+    'tnt',
+    'falling_block'
+];
+
+var BLOCKS = [
+    'stone',
+    'cobblestone',
+    'dirt',
+    'grass_block',
+    'sand',
+    'gravel',
+    'oak_planks',
+    'birch_planks',
+    'spruce_planks',
+    'oak_log',
+    'birch_log',
+    'spruce_log',
+    'diamond_block',
+    'gold_block',
+    'iron_block',
+    'emerald_block',
+    'netherite_block',
+    'chest',
+    'furnace',
+    'crafting_table',
+    'tnt',
+    'glass',
+    'obsidian',
+    'bedrock',
+    'command_block',
+    'barrier',
+    'spawner',
+    'anvil',
+    'beacon',
+    'end_stone',
+    'netherrack',
+    'glowstone',
+    'sea_lantern'
+];
+
+var ENCHANTS = [
+    'sharpness',
+    'smite',
+    'bane_of_arthropods',
+    'knockback',
+    'fire_aspect',
+    'looting',
+    'sweeping_edge',
+    'efficiency',
+    'silk_touch',
+    'unbreaking',
+    'fortune',
+    'power',
+    'punch',
+    'flame',
+    'infinity',
+    'protection',
+    'fire_protection',
+    'blast_protection',
+    'projectile_protection',
+    'thorns',
+    'feather_falling',
+    'respiration',
+    'aqua_affinity',
+    'depth_strider',
+    'frost_walker',
+    'soul_speed',
+    'swift_sneak',
+    'luck_of_the_sea',
+    'lure',
+    'mending',
+    'loyalty',
+    'riptide',
+    'channeling',
+    'multishot',
+    'piercing',
+    'quick_charge'
+];
+
+var EFFECTS = [
+    'speed',
+    'slowness',
+    'haste',
+    'mining_fatigue',
+    'strength',
+    'instant_health',
+    'instant_damage',
+    'jump_boost',
+    'nausea',
+    'regeneration',
+    'resistance',
+    'fire_resistance',
+    'water_breathing',
+    'invisibility',
+    'night_vision',
+    'hunger',
+    'weakness',
+    'poison',
+    'wither',
+    'health_boost',
+    'absorption',
+    'saturation',
+    'glowing',
+    'levitation',
+    'luck',
+    'unluck',
+    'slow_falling',
+    'blindness',
+    'conduit_power',
+    'dolphins_grace'
+];
+
+var PARTICLES = [
+    'flame',
+    'smoke',
+    'heart',
+    'angry',
+    'happy_villager',
+    'note',
+    'portal',
+    'enchant',
+    'explosion',
+    'cloud',
+    'dust',
+    'block',
+    'item',
+    'soul_fire_flame',
+    'soul',
+    'bubble',
+    'water',
+    'lava',
+    'splash',
+    'fishing',
+    'underwater',
+    'rain',
+    'dripping_water',
+    'dripping_lava',
+    'campfire_cosy_smoke',
+    'campfire_signal_smoke',
+    'witch',
+    'totem_of_undying',
+    'firework',
+    'spark',
+    'electric_spark',
+    'scrape',
+    'glow',
+    'glow_squid_ink'
+];
+
+var SOUNDS = [
+    'entity.ender_dragon.growl',
+    'entity.wither.spawn',
+    'entity.lightning_bolt.thunder',
+    'entity.experience_orb.pickup',
+    'entity.player.levelup',
+    'entity.zombie.ambient',
+    'entity.creeper.primed',
+    'entity.enderman.teleport',
+    'entity.ghast.scream',
+    'entity.warden.roar',
+    'entity.blaze.shoot',
+    'block.anvil.land',
+    'block.chest.open',
+    'block.note_block.harp',
+    'block.portal.travel',
+    'music.creative',
+    'music.game',
+    'music.menu',
+    'music.nether.basalt_deltas',
+    'music.end',
+    'ambient.cave',
+    'weather.rain',
+    'weather.thunder',
+    'entity.player.attack.critical',
+    'entity.player.death'
+];
+
+/* ===========================================================
+   EDITION
+=========================================================== */
+
+function setEdition(e) {
+    edition = e;
+
+    document.getElementById('edJava').style.opacity =
+        (e === 'java') ? '1' : '0.5';
+
+    document.getElementById('edBedrock').style.opacity =
+        (e === 'bedrock') ? '1' : '0.5';
+
+    rebuildAll();
+}
+
+/* ===========================================================
+   SWITCH MODULE
+=========================================================== */
+
+function switchMod(m) {
+    currentMod = m;
+
+    var mods = [
+        'give',
+        'summon',
+        'setblock',
+        'fill',
+        'item',
+        'data',
+        'execute',
+        'spawner',
+        'tellraw',
+        'title',
+        'particle',
+        'effect',
+        'bossbar',
+        'playsound',
+        'attribute',
+        'op'
+    ];
+
+    mods.forEach(function(g) {
+        var el =
+            document.getElementById(
+                'mod' +
+                g.charAt(0).toUpperCase() +
+                g.slice(1)
+            );
+
+        if (el) {
+            el.style.display =
+                (g === m) ? 'block' : 'none';
+        }
+    });
+}
+
+/* ===========================================================
+   POPULATE SELECTS
+=========================================================== */
+
+function populate(selId, arr) {
+    var s =
+        document.getElementById(selId);
+
+    if (!s) return;
+
+    s.innerHTML = '';
+
+    arr.forEach(function(v) {
+        var o =
+            document.createElement('option');
+
+        o.value = v;
+
+        o.textContent =
+            v
+                .replace(/_/g, ' ')
+                .replace(
+                    /\b\w/g,
+                    function(l) {
+                        return l.toUpperCase();
+                    }
+                );
+
+        s.appendChild(o);
+    });
+}
+
+function buildEnchantBox() {
+    var box =
+        document.getElementById(
+            'enchantBox'
+        );
+
+    box.innerHTML = '';
+
+    ENCHANTS.forEach(function(e) {
+        var row =
+            document.createElement('div');
+
+        row.className =
+            'quick-names';
+
+        row.style.marginBottom =
+            '6px';
+
+        row.innerHTML =
+            '<label>' +
+            '<input type="checkbox" id="en_' +
+            e +
+            '" onchange="buildGive()"> ' +
+            e.replace(/_/g, ' ') +
+            '</label>' +
+
+            '<input type="number" id="el_' +
+            e +
+            '" value="1" min="1" max="255" ' +
+            'style="width:60px" ' +
+            'oninput="buildGive()">';
+
+        box.appendChild(row);
+    });
+}
+
+/* ===========================================================
+   BUILD FUNCTIONS
+=========================================================== */
+
+function buildGive() {
+    var item =
+        document.getElementById(
+            'giveItem'
+        ).value;
+
+    var count =
+        document.getElementById(
+            'giveCount'
+        ).value;
+
+    var name =
+        document.getElementById(
+            'giveName'
+        ).value;
+
+    var lore1 =
+        document.getElementById(
+            'giveLore1'
+        ).value;
+
+    var lore2 =
+        document.getElementById(
+            'giveLore2'
+        ).value;
+
+    var lore3 =
+        document.getElementById(
+            'giveLore3'
+        ).value;
+
+    var unbreak =
+        document.getElementById(
+            'giveUnbreak'
+        ).checked;
+
+    var hide =
+        document.getElementById(
+            'giveHide'
+        ).checked;
+
+    var cont =
+        document.getElementById(
+            'giveContainer'
+        ).value;
+
+    var ci =
+        document.getElementById(
+            'giveContItem'
+        ).value;
+
+    var cc =
+        document.getElementById(
+            'giveContCount'
+        ).value;
+
+    var nbt = [];
+    var display = [];
+
+    if (name) {
+        display.push(
+            "Name:'" + name + "'"
+        );
+    }
+
+    var lore =
+        [lore1, lore2, lore3]
+            .filter(function(l) {
+                return l;
+            });
+
+    if (lore.length) {
+        display.push(
+            'Lore:[' +
+            lore
+                .map(function(l) {
+                    return '"' + l + '"';
+                })
+                .join(',') +
+            ']'
+        );
+    }
+
+    if (display.length) {
+        nbt.push(
+            'display:{' +
+            display.join(',') +
+            '}'
+        );
+    }
+
+    var ench = [];
+
+    ENCHANTS.forEach(function(e) {
+        var cb =
+            document.getElementById(
+                'en_' + e
+            );
+
+        if (cb && cb.checked) {
+            var lvl =
+                document.getElementById(
+                    'el_' + e
+                ).value;
+
+            ench.push(
+                '{id:"' +
+                e +
+                '",lvl:' +
+                lvl +
+                '}'
+            );
+        }
+    });
+
+    if (ench.length) {
+        nbt.push(
+            'Enchantments:[' +
+            ench.join(',') +
+            ']'
+        );
+    }
+
+    var attrHealth =
+        document.getElementById(
+            'attrHealth'
+        ).value;
+
+    var attrDmg =
+        document.getElementById(
+            'attrDamage'
+        ).value;
+
+    var attrSpd =
+        document.getElementById(
+            'attrSpeed'
+        ).value;
+
+    var attrs = [];
+
+    if (
+        attrHealth &&
+        attrHealth != '20'
+    ) {
+        attrs.push(
+            '{AttributeName:"generic.max_health",' +
+            'Name:"hp",' +
+            'Amount:' +
+            attrHealth +
+            ',Operation:0,' +
+            'UUID:[I;1,1,1,1]}'
+        );
+    }
+
+    if (
+        attrDmg &&
+        attrDmg != '1'
+    ) {
+        attrs.push(
+            '{AttributeName:"generic.attack_damage",' +
+            'Name:"dmg",' +
+            'Amount:' +
+            attrDmg +
+            ',Operation:0,' +
+            'UUID:[I;2,2,2,2]}'
+        );
+    }
+
+    if (
+        attrSpd &&
+        attrSpd != '0.1'
+    ) {
+        attrs.push(
+            '{AttributeName:"generic.movement_speed",' +
+            'Name:"spd",' +
+            'Amount:' +
+            attrSpd +
+            ',Operation:0,' +
+            'UUID:[I;3,3,3,3]}'
+        );
+    }
+
+    if (attrs.length) {
+        nbt.push(
+            'AttributeModifiers:[' +
+            attrs.join(',') +
+            ']'
+        );
+    }
+
+    if (unbreak) {
+        nbt.push('Unbreakable:1b');
+    }
+
+    if (hide) {
+        nbt.push('HideFlags:63');
+    }
+
+    if (cont && ci) {
+        nbt.push(
+            'BlockEntityTag:{Items:[{Slot:0b,id:"' +
+            ci +
+            '",Count:' +
+            cc +
+            'b}]}'
+        );
+    }
+
+    var cmd =
+        '/give @p ' +
+        item;
+
+    if (nbt.length) {
+        cmd +=
+            '[' +
+            nbt.join(',') +
+            ']';
+    }
+
+    cmd += ' ' + count;
+
+    outputs.give = cmd;
+
+    document.getElementById(
+        'giveOutput'
+    ).textContent = cmd;
+}
+
+function buildSummon() {
+    var ent =
+        document.getElementById(
+            'summonEntity'
+        ).value;
+
+    var name =
+        document.getElementById(
+            'summonName'
+        ).value;
+
+    var nameVis =
+        document.getElementById(
+            'summonNameVis'
+        ).checked;
+
+    var hp =
+        document.getElementById(
+            'summonHealth'
+        ).value;
+
+    var spd =
+        document.getElementById(
+            'summonSpeed'
+        ).value;
+
+    var main =
+        document.getElementById(
+            'summonMain'
+        ).value;
+
+    var helm =
+        document.getElementById(
+            'summonHelm'
+        ).value;
+
+    var noai =
+        document.getElementById(
+            'summonNoAI'
+        ).checked;
+
+    var silent =
+        document.getElementById(
+            'summonSilent'
+        ).checked;
+
+    var invul =
+        document.getElementById(
+            'summonInvul'
+        ).checked;
+
+    var glow =
+        document.getElementById(
+            'summonGlow'
+        ).checked;
+
+    var nograv =
+        document.getElementById(
+            'summonNoGrav'
+        ).checked;
+
+    var pass =
+        document.getElementById(
+            'summonPass'
+        ).value;
+
+    var nbt = [];
+
+    if (name) {
+        nbt.push(
+            "CustomName:'" +
+            name +
+            "',CustomNameVisible:" +
+            (nameVis ? '1b' : '0b')
+        );
+    }
+
+    if (hp != '20') {
+        nbt.push(
+            'Health:' +
+            hp +
+            'f'
+        );
+    }
+
+    if (spd != '0.25') {
+        nbt.push(
+            'Attributes:[{Name:"generic.movement_speed",' +
+            'Base:' +
+            spd +
+            '}]'
+        );
+    }
+
+    if (main) {
+        nbt.push(
+            'HandItems:[{id:"' +
+            main +
+            '",Count:1b}]'
+        );
+    }
+
+    if (helm) {
+        nbt.push(
+            'ArmorItems:[{},{},{},{id:"' +
+            helm +
+            '",Count:1b}]'
+        );
+    }
+
+    if (noai) {
+        nbt.push('NoAI:1b');
+    }
+
+    if (silent) {
+        nbt.push('Silent:1b');
+    }
+
+    if (invul) {
+        nbt.push('Invulnerable:1b');
+    }
+
+    if (glow) {
+        nbt.push('Glowing:1b');
+    }
+
+    if (nograv) {
+        nbt.push('NoGravity:1b');
+    }
+
+    if (pass) {
+        nbt.push(
+            'Passengers:[{id:"' +
+            pass +
+            '"}]'
+        );
+    }
+
+    var cmd =
+        '/summon ' +
+        ent;
+
+    if (nbt.length) {
+        cmd +=
+            ' ~ ~ ~ {' +
+            nbt.join(',') +
+            '}';
+    }
+
+    outputs.summon = cmd;
+
+    document.getElementById(
+        'summonOutput'
+    ).textContent = cmd;
+}
+
+function buildSetblock() {
+    var b =
+        document.getElementById(
+            'setblockBlock'
+        ).value;
+
+    var p =
+        document.getElementById(
+            'setblockPos'
+        ).value;
+
+    var m =
+        document.getElementById(
+            'setblockMode'
+        ).value;
+
+    var n =
+        document.getElementById(
+            'setblockNBT'
+        ).value;
+
+    var cmd =
+        '/setblock
+      
