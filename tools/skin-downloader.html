@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minecraft Skin Viewer & Downloader</title>
+    <title>Minecraft Skin Viewer, Editor & Downloader</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 </head>
@@ -12,8 +12,8 @@
 <div class="container">
 
     <div class="glass header-card">
-        <h1><i class="fa-solid fa-user-astronaut"></i> Minecraft Skin Viewer & Downloader</h1>
-        <p>3D viewer • Java + Bedrock export • Real-time skin editor</p>
+        <h1><i class="fa-solid fa-user-astronaut"></i> Minecraft Skin Studio</h1>
+        <p>3D viewer • 3D + 2D real-time editor • Animations • Java + Bedrock export</p>
     </div>
 
     <div class="glass search-card">
@@ -35,14 +35,32 @@
     <div id="successMsg" class="success-msg"></div>
     <div id="loadingMsg" class="loading-msg"><i class="fa-solid fa-spinner fa-spin"></i> Loading...</div>
 
+    <!-- ============ 3D VIEWER ============ -->
     <div class="glass viewer-card">
         <h2><i class="fa-solid fa-cube"></i> 3D Skin Preview</h2>
         <hr>
         <div id="viewerContainer"></div>
-        <p class="controls-hint"><i class="fa-solid fa-hand-pointer"></i> Drag to rotate • Scroll to zoom</p>
+        <p class="controls-hint"><i class="fa-solid fa-hand-pointer"></i> Drag to rotate • Scroll to zoom • Paint mode: click/drag on model</p>
+
+        <div class="viewer-tools">
+            <button onclick="setMode('rotate')" id="rotateModeBtn"><i class="fa-solid fa-rotate"></i> Rotate Mode</button>
+            <button onclick="setMode('paint')" id="paintModeBtn"><i class="fa-solid fa-paintbrush"></i> 3D Paint Mode</button>
+            <button onclick="toggleAutoRotate()" id="autoRotBtn"><i class="fa-solid fa-pause"></i> Auto-Rotate</button>
+        </div>
+
+        <div class="anim-tools">
+            <span>Animation:</span>
+            <button onclick="setAnim('idle')">Idle</button>
+            <button onclick="setAnim('walk')">Walk</button>
+            <button onclick="setAnim('wave')">Wave</button>
+            <button onclick="setAnim('sit')">Sit</button>
+            <button onclick="setAnim('dance')">Dance</button>
+        </div>
+
+        <p class="controls-hint">Hovered part: <strong id="partLabel">-</strong></p>
     </div>
 
-    <!-- ============ REAL-TIME SKIN EDITOR ============ -->
+    <!-- ============ 2D EDITOR + REFERENCE ============ -->
     <div class="glass editor-card">
         <h2><i class="fa-solid fa-paintbrush"></i> Skin Editor (Real-Time)</h2>
         <hr>
@@ -61,13 +79,20 @@
                     <option value="3">3 px</option>
                 </select>
 
-                <button onclick="setEraser(false)" id="paintBtn"><i class="fa-solid fa-paintbrush"></i> Paint</button>
-                <button onclick="setEraser(true)" id="eraseBtn"><i class="fa-solid fa-eraser"></i> Eraser</button>
+                <button onclick="setEraser(false)"><i class="fa-solid fa-paintbrush"></i> Paint</button>
+                <button onclick="setEraser(true)"><i class="fa-solid fa-eraser"></i> Eraser</button>
                 <button onclick="resetSkin()"><i class="fa-solid fa-rotate-left"></i> Reset</button>
             </div>
             <br>
             <canvas id="editorCanvas" style="touch-action:none; max-width:100%; image-rendering:pixelated;"></canvas>
-            <p class="controls-hint">Paint on the texture — the 3D model updates instantly</p>
+
+            <br>
+            <div class="info-box">
+                <strong>Part Reference (texture regions)</strong>
+                Head: 0,0 • Hat: 32,0 • Body: 16,16 • Jacket: 16,32<br>
+                Right Arm: 40,16 • Left Arm: 32,48 • R Sleeve: 40,32 • L Sleeve: 48,48<br>
+                Right Leg: 0,16 • Left Leg: 16,48 • R Pants: 0,32 • L Pants: 0,48
+            </div>
         </div>
     </div>
 
@@ -76,7 +101,7 @@
         <hr>
         <p><strong>Player Name</strong></p>
         <h3 id="playerName">-</h3>
-        <p><strong>Skin Type</strong></p>
+        <p><strong>Model</strong></p>
         <h3 id="skinType">-</h3>
         <p><strong>Texture Size</strong></p>
         <h3 id="textureSize">-</h3>
@@ -92,7 +117,7 @@
     </div>
 
     <div class="glass footer-card">
-        <p>Minecraft Skin Viewer & Downloader<br><br>Java + Bedrock supported • Three.js & Minotar.net</p>
+        <p>Minecraft Skin Studio<br><br>Java + Bedrock supported • Three.js & Minotar.net</p>
     </div>
 
 </div>
@@ -100,24 +125,18 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script>
-var scene, camera, renderer, playerGroup;
-var currentSkinUrl = null;
-var currentUsername = null;
-var threeTexture = null;
-var editCanvas = null;
-var editCtx = null;
-var originalImage = null;
-var isEraser = false;
-var painting = false;
-
-var isDragging = false;
-var previousMouse = { x: 0, y: 0 };
-var rotationX = 0, rotationY = 0;
-var targetRotationX = 0, targetRotationY = 0;
+var scene, camera, renderer, playerGroup, rig = null;
+var currentSkinUrl = null, currentUsername = null;
+var threeTexture = null, editCanvas = null, editCtx = null, originalImage = null;
+var isEraser = false, painting2d = false, painting3d = false;
+var mode = 'rotate', currentAnim = 'idle', autoRotate = true;
+var isDragging = false, previousMouse = { x: 0, y: 0 };
+var rotationX = 0, rotationY = 0, targetRotationX = 0, targetRotationY = 0;
 var cameraDistance = 40;
+var raycaster = null, pointerVec = null, hoveredMesh = null;
 
 /* ===========================================================
-   INIT THREE.JS
+   INIT
 =========================================================== */
 function initThreeJS() {
     var container = document.getElementById('viewerContainer');
@@ -137,12 +156,8 @@ function initThreeJS() {
     container.appendChild(renderer.domElement);
 
     scene.add(new THREE.AmbientLight(0xffffff, 0.7));
-    var dir = new THREE.DirectionalLight(0xffffff, 0.8);
-    dir.position.set(5, 10, 7);
-    scene.add(dir);
-    var back = new THREE.DirectionalLight(0xffffff, 0.3);
-    back.position.set(-5, -5, -7);
-    scene.add(back);
+    var d1 = new THREE.DirectionalLight(0xffffff, 0.8); d1.position.set(5, 10, 7); scene.add(d1);
+    var d2 = new THREE.DirectionalLight(0xffffff, 0.3); d2.position.set(-5, -5, -7); scene.add(d2);
 
     var grid = new THREE.GridHelper(50, 50, 0x4ade80, 0x333333);
     grid.position.y = -16;
@@ -151,7 +166,11 @@ function initThreeJS() {
     playerGroup = new THREE.Group();
     scene.add(playerGroup);
 
+    raycaster = new THREE.Raycaster();
+    pointerVec = new THREE.Vector2();
+
     setupControls(container);
+    setup3DPaint();
     loadDefaultSkin();
     animate();
 
@@ -163,29 +182,81 @@ function initThreeJS() {
     });
 }
 
+/* ===========================================================
+   ANIMATION LOOP + PROCEDURAL ANIMATIONS
+=========================================================== */
 function animate() {
     requestAnimationFrame(animate);
+    var t = performance.now() / 1000;
+
     rotationX += (targetRotationX - rotationX) * 0.1;
     rotationY += (targetRotationY - rotationY) * 0.1;
-    if (playerGroup && !isDragging) targetRotationY += 0.005;
-    if (playerGroup) {
-        playerGroup.rotation.y = rotationY;
-        playerGroup.rotation.x = rotationX;
-    }
+    if (!isDragging && autoRotate && mode === 'rotate') targetRotationY += 0.005;
+
+    playerGroup.rotation.y = rotationY;
+    playerGroup.rotation.x = rotationX;
+
+    applyAnimation(t);
     renderer.render(scene, camera);
 }
 
+function applyAnimation(t) {
+    if (!rig) return;
+    var r = rig;
+    r.head.rotation.set(0, 0, 0);
+    r.armL.rotation.set(0, 0, 0); r.armR.rotation.set(0, 0, 0);
+    r.legL.rotation.set(0, 0, 0); r.legR.rotation.set(0, 0, 0);
+    playerGroup.position.y = 0;
+    var s;
+
+    if (currentAnim === 'walk') {
+        s = Math.sin(t * 7);
+        r.armR.rotation.x = s * 0.7;  r.armL.rotation.x = -s * 0.7;
+        r.legR.rotation.x = -s * 0.8; r.legL.rotation.x = s * 0.8;
+    } else if (currentAnim === 'wave') {
+        r.armR.rotation.z = -2.6 + Math.sin(t * 8) * 0.25;
+        r.head.rotation.y = 0.3;
+    } else if (currentAnim === 'sit') {
+        r.legL.rotation.x = -1.5; r.legR.rotation.x = -1.5;
+        r.armL.rotation.x = -0.3; r.armR.rotation.x = -0.3;
+        playerGroup.position.y = 5;
+    } else if (currentAnim === 'dance') {
+        r.armR.rotation.z = -2.6 + Math.sin(t * 6) * 0.6;
+        r.armL.rotation.z = 2.6 + Math.cos(t * 6) * 0.6;
+        playerGroup.position.y = Math.abs(Math.sin(t * 6)) * 2;
+        r.head.rotation.y = Math.sin(t * 3) * 0.4;
+    } else {
+        r.armR.rotation.x = Math.sin(t * 2) * 0.06;
+        r.armL.rotation.x = -Math.sin(t * 2) * 0.06;
+    }
+}
+
+function setAnim(a) { currentAnim = a; }
+function setMode(m) {
+    mode = m;
+    if (m === 'paint') autoRotate = false;
+    showSuccess(m === 'paint' ? '3D Paint Mode: click/drag on the model to paint' : 'Rotate Mode enabled');
+    setTimeout(hideSuccess, 2000);
+}
+function toggleAutoRotate() { autoRotate = !autoRotate; }
+
+/* ===========================================================
+   CONTROLS (rotate mode only)
+=========================================================== */
 function setupControls(el) {
     el.addEventListener('mousedown', function(e) {
+        if (mode !== 'rotate') return;
         isDragging = true;
         previousMouse = { x: e.clientX, y: e.clientY };
     });
     window.addEventListener('mousemove', function(e) {
-        if (!isDragging) return;
-        targetRotationY += (e.clientX - previousMouse.x) * 0.01;
-        targetRotationX += (e.clientY - previousMouse.y) * 0.01;
-        targetRotationX = Math.max(-1, Math.min(1, targetRotationX));
-        previousMouse = { x: e.clientX, y: e.clientY };
+        if (mode === 'rotate' && isDragging) {
+            targetRotationY += (e.clientX - previousMouse.x) * 0.01;
+            targetRotationX += (e.clientY - previousMouse.y) * 0.01;
+            targetRotationX = Math.max(-1, Math.min(1, targetRotationX));
+            previousMouse = { x: e.clientX, y: e.clientY };
+        }
+        hoverHighlight(e);
     });
     window.addEventListener('mouseup', function() { isDragging = false; });
     el.addEventListener('wheel', function(e) {
@@ -194,13 +265,14 @@ function setupControls(el) {
         camera.position.z = cameraDistance;
     });
     el.addEventListener('touchstart', function(e) {
+        if (mode !== 'rotate') return;
         if (e.touches.length === 1) {
             isDragging = true;
             previousMouse = { x: e.touches[0].clientX, y: e.touches[0].clientY };
         }
     });
     el.addEventListener('touchmove', function(e) {
-        if (!isDragging || e.touches.length !== 1) return;
+        if (mode !== 'rotate' || !isDragging || e.touches.length !== 1) return;
         e.preventDefault();
         targetRotationY += (e.touches[0].clientX - previousMouse.x) * 0.01;
         targetRotationX += (e.touches[0].clientY - previousMouse.y) * 0.01;
@@ -211,15 +283,75 @@ function setupControls(el) {
 }
 
 /* ===========================================================
-   FIXED BOX UV MAPPING (correct orientation, no gaps)
+   PART REFERENCE: HOVER HIGHLIGHT
 =========================================================== */
-function createBox(w, h, d, uvX, uvY, texture, scale, isOverlay, mirrorU) {
-    var geo = new THREE.BoxGeometry(w * scale, h * scale, d * scale);
-    var uvAttr = geo.attributes.uv;
-    var uvArr = uvAttr.array;
+function hoverHighlight(e) {
+    if (!raycaster || mode !== 'rotate') return;
+    var rect = renderer.domElement.getBoundingClientRect();
+    if (e.clientX < rect.left || e.clientX > rect.right || e.clientY < rect.top || e.clientY > rect.bottom) return;
 
-    var tw = texture.image.width;
-    var th = texture.image.height;
+    pointerVec.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+    pointerVec.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+    raycaster.setFromCamera(pointerVec, camera);
+
+    var hits = raycaster.intersectObjects(playerGroup.children, true);
+    var mesh = hits.length ? hits[0].object : null;
+
+    if (hoveredMesh && hoveredMesh !== mesh) hoveredMesh.material.emissive.setHex(0x000000);
+    if (mesh && mesh.userData.name) {
+        mesh.material.emissive.setHex(0x223322);
+        document.getElementById('partLabel').textContent = mesh.userData.name;
+    } else {
+        document.getElementById('partLabel').textContent = '-';
+    }
+    hoveredMesh = mesh;
+}
+
+/* ===========================================================
+   3D PAINT MODE (raycast -> texture pixel)
+=========================================================== */
+function setup3DPaint() {
+    var el = renderer.domElement;
+    el.style.touchAction = 'none';
+
+    el.addEventListener('pointerdown', function(e) {
+        if (mode !== 'paint') return;
+        painting3d = true;
+        paint3D(e);
+    });
+    window.addEventListener('pointermove', function(e) {
+        if (mode === 'paint' && painting3d) paint3D(e);
+    });
+    window.addEventListener('pointerup', function() { painting3d = false; });
+}
+
+function paint3D(e) {
+    if (!raycaster || !editCtx) return;
+    var rect = renderer.domElement.getBoundingClientRect();
+    pointerVec.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+    pointerVec.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+    raycaster.setFromCamera(pointerVec, camera);
+
+    var hits = raycaster.intersectObjects(playerGroup.children, true);
+    if (hits.length && hits[0].uv) {
+        var tw = editCanvas.width, th = editCanvas.height;
+        var px = Math.floor(hits[0].uv.x * tw);
+        var py = Math.floor((1 - hits[0].uv.y) * th);
+        px = Math.max(0, Math.min(tw - 1, px));
+        py = Math.max(0, Math.min(th - 1, py));
+        paintPixel(px, py);
+        threeTexture.needsUpdate = true;
+        drawEditorView();
+    }
+}
+
+/* ===========================================================
+   FIXED BOX UV MAPPING (alphaTest = no artifacts)
+=========================================================== */
+function createBox(w, h, d, uvX, uvY, texture, scale, mirrorU) {
+    var geo = new THREE.BoxGeometry(w * scale, h * scale, d * scale);
+    var uvArr = geo.attributes.uv.array;
+    var tw = texture.image.width, th = texture.image.height;
 
     var faces = [
         { x: uvX,             y: uvY + d, fw: d, fh: h },
@@ -232,106 +364,93 @@ function createBox(w, h, d, uvX, uvY, texture, scale, isOverlay, mirrorU) {
 
     for (var i = 0; i < 6; i++) {
         var f = faces[i];
-        var u1 = f.x / tw;
-        var u2 = (f.x + f.fw) / tw;
-        var vTop = 1 - f.y / th;
-        var vBot = 1 - (f.y + f.fh) / th;
-
+        var u1 = f.x / tw, u2 = (f.x + f.fw) / tw;
+        var vT = 1 - f.y / th, vB = 1 - (f.y + f.fh) / th;
         if (mirrorU) { var t = u1; u1 = u2; u2 = t; }
-
         var o = i * 8;
-        uvArr[o]     = u1; uvArr[o + 1] = vTop;
-        uvArr[o + 2] = u2; uvArr[o + 3] = vTop;
-        uvArr[o + 4] = u1; uvArr[o + 5] = vBot;
-        uvArr[o + 6] = u2; uvArr[o + 7] = vBot;
+        uvArr[o] = u1; uvArr[o + 1] = vT;
+        uvArr[o + 2] = u2; uvArr[o + 3] = vT;
+        uvArr[o + 4] = u1; uvArr[o + 5] = vB;
+        uvArr[o + 6] = u2; uvArr[o + 7] = vB;
     }
+    geo.attributes.uv.needsUpdate = true;
 
-    uvAttr.needsUpdate = true;
-
-    var mat = new THREE.MeshLambertMaterial({ map: texture, transparent: true });
-    if (isOverlay) {
-        mat.polygonOffset = true;
-        mat.polygonOffsetFactor = -1;
-        mat.polygonOffsetUnits = -1;
-    }
-
-    return new THREE.Mesh(geo, mat);
+    return new THREE.Mesh(geo, new THREE.MeshLambertMaterial({ map: texture, alphaTest: 0.1 }));
 }
 
 /* ===========================================================
-   BUILD PLAYER
+   BUILD PLAYER WITH PIVOTS (for animations)
 =========================================================== */
-function buildPlayer(texture) {
+function buildPlayer(texture, slim, mirrorArmL, mirrorLegL) {
     while (playerGroup.children.length > 0) playerGroup.remove(playerGroup.children[0]);
+    rig = {};
 
-    var s = 1, armW = 4;
-    var texH = texture.image.height;
-    var hasOverlays = texH >= 64;
-    var isOld = texH === 32;
+    var armW = slim ? 3 : 4;
+    var hasOv = texture.image.height >= 64;
 
-    var head = createBox(8, 8, 8, 0, 0, texture, s, false, false);
-    head.position.set(0, 10, 0);
-    playerGroup.add(head);
-
-    if (hasOverlays) {
-        var hat = createBox(8, 8, 8, 32, 0, texture, 1.08, true, false);
-        hat.position.set(0, 10, 0);
-        playerGroup.add(hat);
+    function group(name, px, py, pz) {
+        var g = new THREE.Group();
+        g.position.set(px, py, pz);
+        playerGroup.add(g);
+        return g;
+    }
+    function add(g, name, w, h, d, ux, uy, sc, mirror, ly) {
+        var m = createBox(w, h, d, ux, uy, texture, sc, mirror);
+        m.userData.name = name;
+        m.position.set(0, ly, 0);
+        g.add(m);
+        return m;
     }
 
-    var body = createBox(8, 12, 4, 16, 16, texture, s, false, false);
-    playerGroup.add(body);
+    rig.head = group('head', 0, 6, 0);
+    add(rig.head, 'Head', 8, 8, 8, 0, 0, 1, false, 4);
+    if (hasOv) add(rig.head, 'Hat (overlay)', 8, 8, 8, 32, 0, 1.08, false, 4);
 
-    if (hasOverlays) {
-        var jacket = createBox(8, 12, 4, 16, 32, texture, 1.08, true, false);
-        playerGroup.add(jacket);
+    var bodyG = group('body', 0, 0, 0);
+    add(bodyG, 'Body', 8, 12, 4, 16, 16, 1, false, 0);
+    if (hasOv) add(bodyG, 'Jacket (overlay)', 8, 12, 4, 16, 32, 1.08, false, 0);
+
+    rig.armR = group('armR', -(4 + armW / 2), 6, 0);
+    add(rig.armR, 'Right Arm', armW, 12, 4, 40, 16, 1, false, -6);
+    if (hasOv) add(rig.armR, 'Right Sleeve', armW, 12, 4, 40, 32, 1.08, false, -6);
+
+    rig.armL = group('armL', (4 + armW / 2), 6, 0);
+    if (mirrorArmL) {
+        add(rig.armL, 'Left Arm (mirrored)', armW, 12, 4, 40, 16, 1, true, -6);
+    } else {
+        add(rig.armL, 'Left Arm', armW, 12, 4, 32, 48, 1, false, -6);
+        if (hasOv) add(rig.armL, 'Left Sleeve', armW, 12, 4, 48, 48, 1.08, false, -6);
     }
 
-    var rArm = createBox(armW, 12, 4, 40, 16, texture, s, false, false);
-    rArm.position.set(-(4 + armW / 2), 0, 0);
-    playerGroup.add(rArm);
+    rig.legR = group('legR', -2, -6, 0);
+    add(rig.legR, 'Right Leg', 4, 12, 4, 0, 16, 1, false, -6);
+    if (hasOv) add(rig.legR, 'Right Pants', 4, 12, 4, 0, 32, 1.08, false, -6);
 
-    if (hasOverlays) {
-        var rSl = createBox(armW, 12, 4, 40, 32, texture, 1.08, true, false);
-        rSl.position.set(-(4 + armW / 2), 0, 0);
-        playerGroup.add(rSl);
-    }
-
-    var lArmUV = isOld ? [40, 16, true] : [32, 48, false];
-    var lArm = createBox(armW, 12, 4, lArmUV[0], lArmUV[1], texture, s, false, lArmUV[2]);
-    lArm.position.set((4 + armW / 2), 0, 0);
-    playerGroup.add(lArm);
-
-    if (hasOverlays && !isOld) {
-        var lSl = createBox(armW, 12, 4, 48, 48, texture, 1.08, true, false);
-        lSl.position.set((4 + armW / 2), 0, 0);
-        playerGroup.add(lSl);
-    }
-
-    var rLeg = createBox(4, 12, 4, 0, 16, texture, s, false, false);
-    rLeg.position.set(-2, -12, 0);
-    playerGroup.add(rLeg);
-
-    if (hasOverlays) {
-        var rP = createBox(4, 12, 4, 0, 32, texture, 1.08, true, false);
-        rP.position.set(-2, -12, 0);
-        playerGroup.add(rP);
-    }
-
-    var lLegUV = isOld ? [0, 16, true] : [16, 48, false];
-    var lLeg = createBox(4, 12, 4, lLegUV[0], lLegUV[1], texture, s, false, lLegUV[2]);
-    lLeg.position.set(2, -12, 0);
-    playerGroup.add(lLeg);
-
-    if (hasOverlays && !isOld) {
-        var lP = createBox(4, 12, 4, 0, 48, texture, 1.08, true, false);
-        lP.position.set(2, -12, 0);
-        playerGroup.add(lP);
+    rig.legL = group('legL', 2, -6, 0);
+    if (mirrorLegL) {
+        add(rig.legL, 'Left Leg (mirrored)', 4, 12, 4, 0, 16, 1, true, -6);
+    } else {
+        add(rig.legL, 'Left Leg', 4, 12, 4, 16, 48, 1, false, -6);
+        if (hasOv) add(rig.legL, 'Left Pants', 4, 12, 4, 0, 48, 1.08, false, -6);
     }
 }
 
 /* ===========================================================
-   LOAD TEXTURE + EDITOR SETUP
+   SKIN DETECTION (slim / empty left limbs)
+=========================================================== */
+function regionEmpty(x, y, w, h) {
+    var sc = editCanvas.width / 64;
+    try {
+        var data = editCtx.getImageData(x * sc, y * sc, Math.max(1, w * sc), Math.max(1, h * sc)).data;
+        for (var i = 3; i < data.length; i += 4) {
+            if (data[i] > 0) return false;
+        }
+        return true;
+    } catch (e) { return false; }
+}
+
+/* ===========================================================
+   LOAD TEXTURE
 =========================================================== */
 function loadSkinTexture(url) {
     var loader = new THREE.TextureLoader();
@@ -341,19 +460,27 @@ function loadSkinTexture(url) {
         originalImage = tex.image;
         setupEditorCanvas(tex.image);
 
+        var slim = regionEmpty(54, 20, 2, 12);
+        var mirrorArmL = regionEmpty(36, 52, 3, 12);
+        var mirrorLegL = regionEmpty(20, 52, 4, 12);
+
         threeTexture = new THREE.CanvasTexture(editCanvas);
         threeTexture.magFilter = THREE.NearestFilter;
         threeTexture.minFilter = THREE.NearestFilter;
 
-        buildPlayer(threeTexture);
+        buildPlayer(threeTexture, slim, mirrorArmL, mirrorLegL);
 
         document.getElementById('textureSize').textContent = tex.image.width + 'x' + tex.image.height;
-        document.getElementById('skinType').textContent = (tex.image.height === 32) ? 'Classic (Old 64x32)' : 'Modern (Java + Bedrock)';
+        document.getElementById('skinType').textContent =
+            (tex.image.height === 32 ? 'Classic 64x32' : (slim ? 'Slim (Alex)' : 'Classic (Steve)')) + ' • Java + Bedrock';
     }, undefined, function() {
         showError('Failed to load skin texture.');
     });
 }
 
+/* ===========================================================
+   2D EDITOR
+=========================================================== */
 function setupEditorCanvas(img) {
     editCanvas = document.createElement('canvas');
     editCanvas.width = img.width;
@@ -362,317 +489,4 @@ function setupEditorCanvas(img) {
     editCtx.clearRect(0, 0, editCanvas.width, editCanvas.height);
     editCtx.drawImage(img, 0, 0);
 
-    var view = document.getElementById('editorCanvas');
-    var zoom = Math.max(1, Math.floor(512 / img.width));
-    view.width = img.width * zoom;
-    view.height = img.height * zoom;
-    drawEditorView();
-}
-
-function drawEditorView() {
-    var view = document.getElementById('editorCanvas');
-    var ctx = view.getContext('2d');
-    ctx.imageSmoothingEnabled = false;
-    ctx.clearRect(0, 0, view.width, view.height);
-    ctx.drawImage(editCanvas, 0, 0, view.width, view.height);
-}
-
-/* ===========================================================
-   REAL-TIME PAINTING
-=========================================================== */
-function editorPaint(e) {
-    if (!painting || !editCtx) return;
-    e.preventDefault();
-
-    var view = document.getElementById('editorCanvas');
-    var rect = view.getBoundingClientRect();
-    var zoom = view.width / editCanvas.width;
-
-    var px = Math.floor((e.clientX - rect.left) / rect.width * editCanvas.width);
-    var py = Math.floor((e.clientY - rect.top) / rect.height * editCanvas.height);
-    var size = parseInt(document.getElementById('brushSize').value, 10);
-    var off = Math.floor(size / 2);
-
-    if (isEraser) {
-        editCtx.clearRect(px - off, py - off, size, size);
-    } else {
-        editCtx.fillStyle = document.getElementById('colorPicker').value;
-        editCtx.fillRect(px - off, py - off, size, size);
-    }
-
-    if (threeTexture) threeTexture.needsUpdate = true;
-    drawEditorView();
-}
-
-function initEditorEvents() {
-    var view = document.getElementById('editorCanvas');
-    view.addEventListener('pointerdown', function(e) { painting = true; editorPaint(e); });
-    window.addEventListener('pointermove', function(e) { if (painting) editorPaint(e); });
-    window.addEventListener('pointerup', function() { painting = false; });
-}
-
-function setEraser(on) {
-    isEraser = on;
-    showSuccess(on ? 'Eraser enabled' : 'Paint enabled');
-    setTimeout(hideSuccess, 1200);
-}
-
-function toggleEditor() {
-    var p = document.getElementById('editorPanel');
-    p.style.display = (p.style.display === 'none') ? 'block' : 'none';
-}
-
-function resetSkin() {
-    if (!originalImage) return;
-    editCtx.clearRect(0, 0, editCanvas.width, editCanvas.height);
-    editCtx.drawImage(originalImage, 0, 0);
-    if (threeTexture) threeTexture.needsUpdate = true;
-    drawEditorView();
-    showSuccess('Skin reset to original');
-    setTimeout(hideSuccess, 1500);
-}
-
-/* ===========================================================
-   LOAD SKINS
-=========================================================== */
-function loadDefaultSkin() {
-    var url = 'https://minotar.net/skin/MHF_Steve';
-    currentSkinUrl = url;
-    currentUsername = 'Steve';
-    loadSkinTexture(url);
-    document.getElementById('playerName').textContent = 'Steve (Default)';
-    document.getElementById('skinUrlText').textContent = url;
-    enableButtons();
-}
-
-function loadSkin() {
-    var username = document.getElementById('usernameInput').value.trim();
-    if (!username) { showError('Please enter a username'); return; }
-
-    showLoading(true);
-    hideError();
-    hideSuccess();
-
-    var skinUrl = 'https://minotar.net/skin/' + username;
-    var testImg = new Image();
-    testImg.crossOrigin = 'anonymous';
-
-    testImg.onload = function() {
-        currentSkinUrl = skinUrl;
-        currentUsername = username;
-        loadSkinTexture(skinUrl);
-
-        document.getElementById('playerName').textContent = username;
-        document.getElementById('skinUrlText').textContent = skinUrl;
-        enableButtons();
-
-        showSuccess('Skin loaded for ' + username + '!');
-        showLoading(false);
-    };
-
-    testImg.onerror = function() {
-        showError('Player "' + username + '" not found.');
-        showLoading(false);
-    };
-
-    testImg.src = skinUrl;
-}
-
-function quickLoad(n) {
-    document.getElementById('usernameInput').value = n;
-    loadSkin();
-}
-
-function enableButtons() {
-    document.getElementById('downloadBtn').disabled = false;
-    document.getElementById('bedrockBtn').disabled = false;
-    document.getElementById('copyUrlBtn').disabled = false;
-    document.getElementById('openUrlBtn').disabled = false;
-}
-
-/* ===========================================================
-   DOWNLOAD PNG (JAVA + BEDROCK MANUAL IMPORT)
-=========================================================== */
-function downloadSkin() {
-    if (!editCanvas) return;
-    var a = document.createElement('a');
-    a.href = editCanvas.toDataURL('image/png');
-    a.download = (currentUsername || 'skin') + '.png';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    showSuccess('PNG downloaded! Works in Java + Bedrock (Dressing Room).');
-    setTimeout(hideSuccess, 2500);
-}
-
-/* ===========================================================
-   DOWNLOAD .MCPACK (BEDROCK SKIN PACK)
-=========================================================== */
-function uuid() {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-        var r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
-        return v.toString(16);
-    });
-}
-
-function downloadBedrock() {
-    if (!editCanvas || typeof JSZip === 'undefined') {
-        showError('Skin not ready or JSZip failed to load.');
-        return;
-    }
-
-    showLoading(true);
-    var name = currentUsername || 'Custom';
-    var slim = false;
-
-    var manifest = {
-        format_version: 2,
-        header: {
-            name: name + ' Skin Pack',
-            description: 'Generated by Minecraft Skin Viewer',
-            uuid: uuid(),
-            version: [1, 0, 0],
-            min_engine_version: [1, 16, 0]
-        },
-        modules: [{ type: 'skin_pack', uuid: uuid(), version: [1, 0, 0] }]
-    };
-
-    var skinsJson = {
-        format_version: '1.0',
-        geometry: 'geometry.humanoid.custom',
-        skins: [{
-            localization_name: 'player_skin',
-            geometry: slim ? 'geometry.humanoid.customSlim' : 'geometry.humanoid.custom',
-            texture: 'textures/skin.png',
-            type: 'free'
-        }]
-    };
-
-    var zip = new JSZip();
-    zip.file('manifest.json', JSON.stringify(manifest, null, 2));
-    zip.file('skins/skins.json', JSON.stringify(skinsJson, null, 2));
-    zip.file('languages.json', '["en_US"]');
-    zip.file('texts/en_US.lang', 'skinpack.player_skin=' + name + '\nskinpack.name=' + name + ' Skins');
-    zip.file(
-    'textures/skin.png',
-    editCanvas.toDataURL('image/png').split(',')[1],
-    { base64: true }
-);
-
-zip.generateAsync({ type: 'blob' })
-    .then(function(blob) {
-        var url = URL.createObjectURL(blob);
-
-        var a = document.createElement('a');
-        a.href = url;
-        a.download = name + '_SkinPack.mcpack';
-
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-
-        URL.revokeObjectURL(url);
-
-        showSuccess('.mcpack downloaded! Open it to import into Bedrock.');
-        showLoading(false);
-    })
-    .catch(function() {
-        showError('Failed to build .mcpack');
-        showLoading(false);
-    });
-}
-
-/* ===========================================================
-   COPY / OPEN URL
-=========================================================== */
-
-function copySkinUrl() {
-    if (!currentSkinUrl) return;
-
-    if (navigator.clipboard) {
-        navigator.clipboard.writeText(currentSkinUrl)
-            .then(function() {
-                showSuccess('URL copied!');
-                setTimeout(hideSuccess, 2000);
-            });
-    } else {
-        var ta = document.createElement('textarea');
-
-        ta.value = currentSkinUrl;
-
-        document.body.appendChild(ta);
-        ta.select();
-
-        document.execCommand('copy');
-
-        document.body.removeChild(ta);
-
-        showSuccess('URL copied!');
-        setTimeout(hideSuccess, 2000);
-    }
-}
-
-function openSkinUrl() {
-    if (!currentSkinUrl) return;
-
-    window.open(currentSkinUrl, '_blank');
-}
-
-/* ===========================================================
-   UI HELPERS
-=========================================================== */
-
-function showError(m) {
-    document.getElementById('errorMsg').textContent = m;
-    document.getElementById('errorMsg').style.display = 'block';
-    document.getElementById('successMsg').style.display = 'none';
-}
-
-function hideError() {
-    document.getElementById('errorMsg').style.display = 'none';
-}
-
-function showSuccess(m) {
-    document.getElementById('successMsg').textContent = m;
-    document.getElementById('successMsg').style.display = 'block';
-    document.getElementById('errorMsg').style.display = 'none';
-}
-
-function hideSuccess() {
-    document.getElementById('successMsg').style.display = 'none';
-}
-
-function showLoading(s) {
-    document.getElementById('loadingMsg').style.display =
-        s ? 'block' : 'none';
-}
-
-/* ===========================================================
-   START
-=========================================================== */
-
-window.addEventListener('load', function() {
-    hideError();
-    hideSuccess();
-    showLoading(false);
-
-    if (typeof THREE === 'undefined') {
-        showError('Three.js failed to load. Check internet.');
-        return;
-    }
-
-    initThreeJS();
-    initEditorEvents();
-
-    document
-        .getElementById('usernameInput')
-        .addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') {
-                loadSkin();
-            }
-        });
-});
-
-</script>
-</body>
-</html>
+    
