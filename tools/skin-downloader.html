@@ -489,4 +489,567 @@ function setupEditorCanvas(img) {
     editCtx.clearRect(0, 0, editCanvas.width, editCanvas.height);
     editCtx.drawImage(img, 0, 0);
 
-    
+    var view = document.getElementById('editorCanvas');
+
+var zoom = Math.max(
+    1,
+    Math.floor(512 / img.width)
+);
+
+view.width = img.width * zoom;
+view.height = img.height * zoom;
+
+drawEditorView();
+}
+
+function drawEditorView() {
+    var view = document.getElementById('editorCanvas');
+    var ctx = view.getContext('2d');
+
+    ctx.imageSmoothingEnabled = false;
+    ctx.clearRect(0, 0, view.width, view.height);
+
+    ctx.drawImage(
+        editCanvas,
+        0,
+        0,
+        view.width,
+        view.height
+    );
+}
+
+function paintPixel(px, py) {
+    var size = parseInt(
+        document.getElementById('brushSize').value,
+        10
+    );
+
+    var off = Math.floor(size / 2);
+
+    if (isEraser) {
+        editCtx.clearRect(
+            px - off,
+            py - off,
+            size,
+            size
+        );
+    } else {
+        editCtx.fillStyle =
+            document.getElementById('colorPicker').value;
+
+        editCtx.fillRect(
+            px - off,
+            py - off,
+            size,
+            size
+        );
+    }
+}
+
+function editorPaint(e) {
+    if (!painting2d || !editCtx) return;
+
+    e.preventDefault();
+
+    var view = document.getElementById('editorCanvas');
+    var rect = view.getBoundingClientRect();
+
+    var px = Math.floor(
+        (e.clientX - rect.left) /
+        rect.width *
+        editCanvas.width
+    );
+
+    var py = Math.floor(
+        (e.clientY - rect.top) /
+        rect.height *
+        editCanvas.height
+    );
+
+    px = Math.max(
+        0,
+        Math.min(editCanvas.width - 1, px)
+    );
+
+    py = Math.max(
+        0,
+        Math.min(editCanvas.height - 1, py)
+    );
+
+    paintPixel(px, py);
+
+    if (threeTexture) {
+        threeTexture.needsUpdate = true;
+    }
+
+    drawEditorView();
+}
+
+function initEditorEvents() {
+    var view = document.getElementById('editorCanvas');
+
+    view.addEventListener('pointerdown', function(e) {
+        painting2d = true;
+        editorPaint(e);
+    });
+
+    window.addEventListener('pointermove', function(e) {
+        if (painting2d) {
+            editorPaint(e);
+        }
+    });
+
+    window.addEventListener('pointerup', function() {
+        painting2d = false;
+    });
+}
+
+function setEraser(on) {
+    isEraser = on;
+
+    showSuccess(
+        on ? 'Eraser enabled' : 'Paint enabled'
+    );
+
+    setTimeout(hideSuccess, 1200);
+}
+
+function toggleEditor() {
+    var p = document.getElementById('editorPanel');
+
+    p.style.display =
+        (p.style.display === 'none')
+            ? 'block'
+            : 'none';
+}
+
+function resetSkin() {
+    if (!originalImage) return;
+
+    editCtx.clearRect(
+        0,
+        0,
+        editCanvas.width,
+        editCanvas.height
+    );
+
+    editCtx.drawImage(
+        originalImage,
+        0,
+        0
+    );
+
+    if (threeTexture) {
+        threeTexture.needsUpdate = true;
+    }
+
+    drawEditorView();
+
+    showSuccess('Skin reset to original');
+    setTimeout(hideSuccess, 1500);
+}
+
+/* ===========================================================
+   LOAD SKINS
+=========================================================== */
+
+function loadDefaultSkin() {
+    var url = 'https://minotar.net/skin/MHF_Steve';
+
+    currentSkinUrl = url;
+    currentUsername = 'Steve';
+
+    loadSkinTexture(url);
+
+    document.getElementById('playerName').textContent =
+        'Steve (Default)';
+
+    document.getElementById('skinUrlText').textContent =
+        url;
+
+    enableButtons();
+}
+
+function loadSkin() {
+    var username =
+        document.getElementById('usernameInput')
+            .value
+            .trim();
+
+    if (!username) {
+        showError('Please enter a username');
+        return;
+    }
+
+    showLoading(true);
+    hideError();
+    hideSuccess();
+
+    var skinUrl =
+        'https://minotar.net/skin/' + username;
+
+    var testImg = new Image();
+
+    testImg.crossOrigin = 'anonymous';
+
+    testImg.onload = function() {
+        currentSkinUrl = skinUrl;
+        currentUsername = username;
+
+        loadSkinTexture(skinUrl);
+
+        document.getElementById('playerName').textContent =
+            username;
+
+        document.getElementById('skinUrlText').textContent =
+            skinUrl;
+
+        enableButtons();
+
+        showSuccess(
+            'Skin loaded for ' + username + '!'
+        );
+
+        showLoading(false);
+    };
+
+    testImg.onerror = function() {
+        showError(
+            'Player "' + username + '" not found.'
+        );
+
+        showLoading(false);
+    };
+
+    testImg.src = skinUrl;
+}
+
+function quickLoad(n) {
+    document.getElementById('usernameInput').value = n;
+    loadSkin();
+}
+
+function enableButtons() {
+    document.getElementById('downloadBtn').disabled = false;
+    document.getElementById('bedrockBtn').disabled = false;
+    document.getElementById('copyUrlBtn').disabled = false;
+    document.getElementById('openUrlBtn').disabled = false;
+}
+
+/* ===========================================================
+   DOWNLOADS (PNG + BEDROCK MCPACK)
+=========================================================== */
+
+function downloadSkin() {
+    if (!editCanvas) return;
+
+    var a = document.createElement('a');
+
+    a.href = editCanvas.toDataURL('image/png');
+
+    a.download =
+        (currentUsername || 'skin') + '.png';
+
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+
+    showSuccess(
+        'PNG downloaded! Works in Java + Bedrock Dressing Room.'
+    );
+
+    setTimeout(hideSuccess, 2500);
+}
+
+function uuid() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'
+        .replace(/[xy]/g, function(c) {
+            var r = Math.random() * 16 | 0;
+
+            var v =
+                c === 'x'
+                    ? r
+                    : (r & 0x3 | 0x8);
+
+            return v.toString(16);
+        });
+}
+
+function downloadBedrock() {
+    if (
+        !editCanvas ||
+        typeof JSZip === 'undefined'
+    ) {
+        showError('Not ready yet.');
+        return;
+    }
+
+    showLoading(true);
+
+    var name =
+        currentUsername || 'Custom';
+
+    var manifest = {
+        format_version: 2,
+
+        header: {
+            name: name + ' Skin Pack',
+            description:
+                'Generated by Minecraft Skin Studio',
+
+            uuid: uuid(),
+
+            version: [1, 0, 0],
+
+            min_engine_version: [1, 16, 0]
+        },
+
+        modules: [
+            {
+                type: 'skin_pack',
+                uuid: uuid(),
+                version: [1, 0, 0]
+            }
+        ]
+    };
+
+    var skinsJson = {
+        format_version: '1.0',
+
+        geometry:
+            'geometry.humanoid.custom',
+
+        skins: [
+            {
+                localization_name:
+                    'player_skin',
+
+                geometry:
+                    'geometry.humanoid.custom',
+
+                texture:
+                    'textures/skin.png',
+
+                type: 'free'
+            }
+        ]
+    };
+
+    var zip = new JSZip();
+
+    zip.file(
+        'manifest.json',
+        JSON.stringify(
+            manifest,
+            null,
+            2
+        )
+    );
+
+    zip.file(
+        'skins/skins.json',
+        JSON.stringify(
+            skinsJson,
+            null,
+            2
+        )
+    );
+
+    zip.file(
+        'languages.json',
+        '["en_US"]'
+    );
+
+    zip.file(
+        'texts/en_US.lang',
+        'skinpack.player_skin=' +
+        name +
+        '\nskinpack.name=' +
+        name +
+        ' Skins'
+    );
+
+    zip.file(
+        'textures/skin.png',
+        editCanvas
+            .toDataURL('image/png')
+            .split(',')[1],
+        {
+            base64: true
+        }
+    );
+
+    zip.generateAsync({
+        type: 'blob'
+    })
+    .then(function(blob) {
+        var url =
+            URL.createObjectURL(blob);
+
+        var a =
+            document.createElement('a');
+
+        a.href = url;
+
+        a.download =
+            name + '_SkinPack.mcpack';
+
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+
+        URL.revokeObjectURL(url);
+
+        showSuccess(
+            '.mcpack downloaded! Tap it to import into Bedrock.'
+        );
+
+        showLoading(false);
+    })
+    .catch(function() {
+        showError(
+            'Failed to build .mcpack'
+        );
+
+        showLoading(false);
+    });
+}
+
+/* ===========================================================
+   COPY / OPEN URL
+=========================================================== */
+
+function copySkinUrl() {
+    if (!currentSkinUrl) return;
+
+    if (navigator.clipboard) {
+        navigator.clipboard
+            .writeText(currentSkinUrl)
+            .then(function() {
+                showSuccess('URL copied!');
+
+                setTimeout(
+                    hideSuccess,
+                    2000
+                );
+            });
+    } else {
+        var ta =
+            document.createElement('textarea');
+
+        ta.value = currentSkinUrl;
+
+        document.body.appendChild(ta);
+
+        ta.select();
+
+        document.execCommand('copy');
+
+        document.body.removeChild(ta);
+
+        showSuccess('URL copied!');
+
+        setTimeout(
+            hideSuccess,
+            2000
+        );
+    }
+}
+
+function openSkinUrl() {
+    if (currentSkinUrl) {
+        window.open(
+            currentSkinUrl,
+            '_blank'
+        );
+    }
+}
+
+/* ===========================================================
+   UI HELPERS
+=========================================================== */
+
+function showError(m) {
+    document.getElementById(
+        'errorMsg'
+    ).textContent = m;
+
+    document.getElementById(
+        'errorMsg'
+    ).style.display = 'block';
+
+    document.getElementById(
+        'successMsg'
+    ).style.display = 'none';
+}
+
+function hideError() {
+    document.getElementById(
+        'errorMsg'
+    ).style.display = 'none';
+}
+
+function showSuccess(m) {
+    document.getElementById(
+        'successMsg'
+    ).textContent = m;
+
+    document.getElementById(
+        'successMsg'
+    ).style.display = 'block';
+
+    document.getElementById(
+        'errorMsg'
+    ).style.display = 'none';
+}
+
+function hideSuccess() {
+    document.getElementById(
+        'successMsg'
+    ).style.display = 'none';
+}
+
+function showLoading(s) {
+    document.getElementById(
+        'loadingMsg'
+    ).style.display =
+        s ? 'block' : 'none';
+}
+
+/* ===========================================================
+   START
+=========================================================== */
+
+window.addEventListener(
+    'load',
+    function() {
+        hideError();
+        hideSuccess();
+        showLoading(false);
+
+        if (typeof THREE === 'undefined') {
+            showError(
+                'Three.js failed to load.'
+            );
+            return;
+        }
+
+        initThreeJS();
+        initEditorEvents();
+
+        document
+            .getElementById('usernameInput')
+            .addEventListener(
+                'keydown',
+                function(e) {
+                    if (e.key === 'Enter') {
+                        loadSkin();
+                    }
+                }
+            );
+    }
+);
+
+</script>
+</body>
+</html>
