@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minecraft Username Lookup & AI Generator</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+</head>
+<body>
+
+<div class="container">
+
+    <!-- ============ HEADER ============ -->
+    <div class="glass header-card">
+        <h1><i class="fa-solid fa-signature"></i> Minecraft Username Lookup</h1>
+        <p>Check if a name is taken (real data + head avatar) • AI Username Generator</p>
+    </div>
+
+    <!-- ============ SEARCH ============ -->
+    <div class="glass search-card">
+        <label>Search Minecraft Username</label>
+        <input type="text" id="searchInput" placeholder="Enter a name... Example: Dream" maxlength="16">
+        <br><br>
+        <button onclick="lookupName()"><i class="fa-solid fa-magnifying-glass"></i> Check Name</button>
+        <br><br>
+        <div class="quick-names">
+            <span>Try:</span>
+            <button onclick="quickSearch('Notch')">Notch</button>
+            <button onclick="quickSearch('Dream')">Dream</button>
+            <button onclick="quickSearch('Technoblade')">Technoblade</button>
+            <button onclick="quickSearch('Xx_Pro_Gamer_xX')">Xx_Pro_Gamer_xX</button>
+        </div>
+    </div>
+
+    <div id="errorMsg" class="error-msg"></div>
+    <div id="successMsg" class="success-msg"></div>
+    <div id="loadingMsg" class="loading-msg"><i class="fa-solid fa-spinner fa-spin"></i> Checking Mojang records...</div>
+
+    <!-- ============ LOOKUP RESULT ============ -->
+    <div class="glass result-card" id="resultCard">
+        <h2><i class="fa-solid fa-circle-info"></i> Lookup Result</h2>
+        <hr>
+
+        <p><strong>Status</strong></p>
+        <h3 id="statusText">Waiting for search...</h3>
+
+        <div id="avatarRow" style="display:none;">
+            <img id="headAvatar3d" width="100" height="100" alt="3D head" style="image-rendering:pixelated;">
+            <img id="headAvatarFlat" width="100" height="100" alt="face" style="image-rendering:pixelated;">
+        </div>
+
+        <div id="takenDetails" style="display:none;">
+            <p><strong>Exact Username</strong></p>
+            <h3 id="exactName">-</h3>
+            <p><strong>UUID</strong></p>
+            <h3 id="uuidText">-</h3>
+            <p><strong>Name History</strong></p>
+            <div id="historyBox" class="info-box">-</div>
+            <br>
+            <div class="actions">
+                <button onclick="copyUUID()"><i class="fa-solid fa-copy"></i> Copy UUID</button>
+                <button onclick="openNameMC()"><i class="fa-solid fa-arrow-up-right-from-square"></i> NameMC</button>
+                <button onclick="openSkin()"><i class="fa-solid fa-user"></i> View Skin</button>
+            </div>
+        </div>
+
+        <div id="availableDetails" style="display:none;">
+            <p>This name is free! Want similar ideas?</p>
+            <button onclick="generateFromSearch()"><i class="fa-solid fa-wand-magic-sparkles"></i> Generate Similar Names</button>
+        </div>
+    </div>
+
+    <!-- ============ AI GENERATOR ============ -->
+    <div class="glass search-card">
+        <h2><i class="fa-solid fa-wand-magic-sparkles"></i> AI Username Generator</h2>
+        <hr>
+
+        <label>Keyword (optional)</label>
+        <input type="text" id="keywordInput" placeholder="e.g. wolf, blaze, your name...">
+        <br><br>
+
+        <label>Style</label>
+        <select id="styleSelect">
+            <option value="cool">😎 Cool / Edgy</option>
+            <option value="pvp">⚔️ PvP / Sweaty</option>
+            <option value="cute">🌸 Cute</option>
+            <option value="funny">😂 Funny</option>
+            <option value="fantasy">🐉 Fantasy / Lore</option>
+            <option value="mixed">🎲 Mixed (AI Pick)</option>
+        </select>
+        <br><br>
+
+        <div class="quick-names">
+            <label><input type="checkbox" id="optNumbers" checked> Numbers</label>
+            <label><input type="checkbox" id="optSpecial" checked> _ and xX tags</label>
+        </div>
+        <br>
+
+        <button onclick="generateNames()"><i class="fa-solid fa-bolt"></i> Generate Names</button>
+    </div>
+
+    <!-- ============ GENERATED RESULTS ============ -->
+    <div class="glass result-card">
+        <h2><i class="fa-solid fa-list"></i> Generated Names (live availability check)</h2>
+        <hr>
+        <div id="genResults">
+            <p>No names generated yet.</p>
+        </div>
+    </div>
+
+    <!-- ============ FOOTER ============ -->
+    <div class="glass footer-card">
+        <p>Minecraft Username Lookup & AI Generator<br><br>Live data: PlayerDB • Minetools • Mojang • Minotar • MC-Heads</p>
+    </div>
+
+</div>
+
+<script>
+var currentUUID = null;
+var currentName = null;
+
+/* ===========================================================
+   VALIDATION
+=========================================================== */
+function validName(n) {
+    return /^[A-Za-z0-9_]{3,16}$/.test(n);
+}
+
+function dashUUID(id) {
+    if (!id) return '-';
+    var s = id.replace(/-/g, '');
+    if (s.length !== 32) return id;
+    return s.replace(/(.{8})(.{4})(.{4})(.{4})(.{12})/, '$1-$2-$3-$4-$5');
+}
+
+/* ===========================================================
+   REAL LOOKUP (3 API FALLBACKS)
+=========================================================== */
+async function checkName(name) {
+    // 1) PlayerDB (CORS friendly, gives name history)
+    try {
+        var r = await fetch('https://playerdb.co/api/player/minecraft/' + encodeURIComponent(name));
+        var j = await r.json();
+        if (j && j.success && j.data && j.data.player) {
+            var p = j.data.player;
+            return {
+                taken: true,
+                username: p.username,
+                uuid: p.raw_id || p.id,
+                history: (p.meta && p.meta.name_history) ? p.meta.name_history : []
+            };
+        }
+        if (j && j.success === false) return { taken: false };
+    } catch (e) {}
+
+    // 2) Minetools
+    try {
+        var r2 = await fetch('https://api.minetools.eu/uuid/' + encodeURIComponent(name));
+        var j2 = await r2.json();
+        if (j2 && j2.id && j2.id !== 'null') return { taken: true, username: j2.name || name, uuid: j2.id, history: [] };
+        if (j2 && (j2.status === 'ERR' || !j2.id)) return { taken: false };
+    } catch (e) {}
+
+    // 3) Official Mojang
+    try {
+        var r3 = await fetch('https://api.mojang.com/users/profiles/minecraft/' + encodeURIComponent(name));
+        if (r3.status === 200) {
+            var j3 = await r3.json();
+            if (j3 && j3.id) return { taken: true, username: j3.name, uuid: j3.id, history: [] };
+        } else {
+            return { taken: false };
+        }
+    } catch (e) {}
+
+    return null;
+}
+
+/* ===========================================================
+   LOOKUP UI
+=========================================================== */
+async function lookupName() {
+    var name = document.getElementById('searchInput').value.trim();
+
+    if (!name) { showError('Please enter a username'); return; }
+    if (!validName(name)) { showError('Invalid name! 3-16 chars, only letters, numbers, underscore.'); return; }
+
+    showLoading(true); hideError(); hideSuccess();
+    document.getElementById('takenDetails').style.display = 'none';
+    document.getElementById('availableDetails').style.display = 'none';
+    document.getElementById('avatarRow').style.display = 'none';
+
+    var res = await checkName(name);
+    showLoading(false);
+
+    if (res === null) {
+        showError('Could not verify (network/API blocked). Try again.');
+        return;
+    }
+
+    if (res.taken) {
+        currentUUID = dashUUID(res.uuid);
+        currentName = res.username;
+
+        document.getElementById('statusText').innerHTML = '<i class="fa-solid fa-lock" style="color:#f87171;"></i> TAKEN — owned by a real player';
+        document.getElementById('exactName').textContent = res.username;
+        document.getElementById('uuidText').textContent = currentUUID;
+
+        // Head avatars (3D-style + flat face)
+        document.getElementById('headAvatar3d').src = 'https://mc-heads.net/head/' + currentUUID + '/100';
+        document.getElementById('headAvatarFlat').src = 'https://minotar.net/helm/' + currentUUID + '/100';
+        document.getElementById('avatarRow').style.display = 'block';
+
+        // Name history
+        var hist = res.history || [];
+        var box = document.getElementById('historyBox');
+        if (hist.length > 0) {
+            box.innerHTML = hist.map(function(h) {
+                var date = h.changedToAt ? new Date(h.changedToAt).toLocaleDateString() : '(original)';
+                return '<div>• ' + h.name + ' — ' + date + '</div>';
+            }).join('');
+        } else {
+            box.innerHTML = '• ' + res.username + ' — (original name)';
+        }
+
+        document.getElementById('takenDetails').style.display = 'block';
+        showSuccess('Name "' + res.username + '" is taken. Full profile loaded!');
+
+    } else {
+        currentUUID = null;
+        currentName = name;
+        document.getElementById('statusText').innerHTML = '<i class="fa-solid fa-circle-check" style="color:#4ade80;"></i> AVAILABLE — this name is free!';
+        document.getElementById('availableDetails').style.display = 'block';
+        showSuccess('Good news! "' + name + '" is not taken.');
+    }
+}
+
+function quickSearch(n) {
+    document.getElementById('searchInput').value = n;
+    lookupName();
+}
+
+function copyUUID() {
+    if (!currentUUID) return;
+    navigator.clipboard.writeText(currentUUID).then(function() {
+        showSuccess('UUID copied!');
+        setTimeout(hideSuccess, 2000);
+    });
+}
+
+function openNameMC() {
+    if (currentName) window.open('https://namemc.com/profile/' + currentName, '_blank');
+}
+
+function openSkin() {
+    if (currentName) window.open('https://minotar.net/skin/' + currentName, '_blank');
+}
+
+function generateFromSearch() {
+    document.getElementById('keywordInput').value = document.getElementById('searchInput').value.trim();
+    generateNames();
+    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+}
+
+/* ===========================================================
+   AI USERNAME GENERATOR
+=========================================================== */
+var BANKS = {
+    cool: {
+        pre: ['Shadow', 'Blaze', 'Frost', 'Void', 'Crimson', 'Iron', 'Night', 'Ghost', 'Storm', 'Dark', 'Neo', 'Hyper'],
+        core: ['Wolf', 'Blade', 'Fang', 'Reaper', 'Knight', 'Phantom', 'Viper', 'Titan', 'Rogue', 'Fury', 'Strike', 'Havoc'],
+        suf: ['X', 'Z', 'YT', 'HD', 'Pro', 'OP', 'God', 'King', 'Lord', 'Prime', 'Elite', 'Zero']
+    },
+    pvp: {
+        pre: ['xX', 'Its', 'Not', 'The', 'Real', 'Only', ''],
+        core: ['Vex', 'Kyro', 'Nex', 'Rift', 'Blitz', 'Snap', 'Flick', 'Aim', 'Clutch', 'Zap', 'Quake', 'Swift'],
+        suf: ['_Xx', 'xX', '_PvP', '_Aim', 'FPS', '_', 'z', 'x', 'HQ', '']
+    },
+    cute: {
+        pre: ['Peach', 'Mochi', 'Bunny', 'Kitten', 'Berry', 'Cloud', 'Star', 'Honey', 'Panda', 'Cookie', 'Lily', 'Bubble'],
+        core: ['Pie', 'Drop', 'Bean', 'Blossom', 'Cuddle', 'Sprout', 'Puff', 'Cake', 'Bun', 'Petal', 'Milk', 'Bear'],
+        suf: ['UwU', 'OwO', 'Chan', 'Bear', 'Love', 'Xo', '']
+    },
+    funny: {
+        pre: ['Captain', 'Sir', 'Doctor', 'Mister', 'Big', 'Lazy', 'Angry', 'Chunky', 'Sneaky', 'Clumsy'],
+        core: ['Potato', 'Llama', 'Pickle', 'Noob', 'Creeper', 'Toaster', 'Waffle', 'Banana', 'Dirt', 'Pigeon', 'Sock', 'Cheese'],
+        suf: ['Jr', 'III', 'XD', 'Lol', '404', 'Bruh', '']
+    },
+    fantasy: {
+        pre: ['Ender', 'Arcane', 'Rune', 'Mythic', 'Aether', 'Dragon', 'Obsidian', 'Celestial', 'Ancient', 'Shadowbound', 'Stormborn'],
+        core: ['Mage', 'Sage', 'Walker', 'Born', 'Heart', 'Song', 'Weaver', 'Guard', 'Seer', 'Flame', 'Whisper', 'Oath'],
+        suf: ['OfOld', 'TheWise', 'I', 'II', 'us', 'ar', 'ion', '']
+    }
+};
+
+function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+function leet(s) {
+    return s.replace(/o/gi, '0').replace(/i/gi, '1').replace(/e/gi, '3').replace(/a/gi, '4').replace(/s/gi, '5');
+}
+
+function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+function aiScore(n) {
+    var s = 100;
+    if (n.length < 3 || n.length > 16) s -= 1000;
+    if (n.length >= 4 && n.length <= 12) s += 20;
+    var digits = (n.match(/\d/g) || []).length;
+    if (digits > 4) s -= 30;
+    if (/_/.test(n)) s -= 5;
+    if (/[A-Z]/.test(n) && /[a-z]/.test(n)) s += 10;
+    return s + Math.random() * 10;
+}
+
+function buildCandidates(style, keyword, useNum, useSpec) {
+    var styles = style === 'mixed' ? Object.keys(BANKS) : [style];
+    var out = [];
+
+    for (var k = 0; k < 60; k++) {
+        var st = pick(styles);
+        var b = BANKS[st];
+        var pre = pick(b.pre), core = pick(b.core), suf = pick(b.suf);
+        var n = '', roll = Math.random();
+
+        if (keyword && roll < 0.5) {
+            var kw = cap(keyword.replace(/[^A-Za-z0-9_]/g, ''));
+            if (roll < 0.15) n = kw + suf;
+            else if (roll < 0.3) n = pre + kw;
+            else if (roll < 0.4) n = kw + core;
+            else n = leet(kw) + pick(b.suf);
+        } else {
+            if (roll < 0.3) n = pre + core;
+            else if (roll < 0.55) n = pre + core + suf;
+            else if (roll < 0.7) n = core + suf;
+            else if (roll < 0.85) n = leet(pre + core);
+            else n = core + pick(b.suf) + pick(b.pre);
+        }
+
+        if (!useNum) n = n.replace(/\d/g, '');
+        if (!useSpec) n = n.replace(/[_xX]{2,}/g, '').replace(/^xX|xX$/g, '');
+
+        n = n.replace(/[^A-Za-z0-9_]/g, '');
+        if (validName(n)) out.push(n);
+    }
+
+    // unique + scored
+    var seen = {};
+    var scored = [];
+    out.forEach(function(n) {
+        if (!seen[n.toLowerCase()]) {
+            seen[n.toLowerCase()] = true;
+            scored.push({ n: n, s: aiScore(n) });
+        }
+    });
+    scored.sort(function(a, b) { return b.s - a.s; });
+    return scored.slice(0, 8).map(function(x) { return x.n; });
+}
+
+/* ===========================================================
+   GENERATE + LIVE CHECK EACH NAME
+=========================================================== */
+function generateNames() {
+    var keyword = document.getElementById('keywordInput').value.trim();
+    var style = document.getElementById('styleSelect').value;
+    var useNum = document.getElementById('optNumbers').checked;
+    var useSpec = document.getElementById('optSpecial').checked;
+
+    var names = buildCandidates(style, keyword, useNum, useSpec);
+    var box = document.getElementById('genResults');
+    box.innerHTML = '';
+
+    if (names.length === 0) {
+        box.innerHTML = '<p>Could not build names — try a different keyword.</p>';
+        return;
+    }
+
+    names.forEach(function(name, i) {
+        var row = document.createElement('div');
+        row.className = 'info-box';
+        row.id = 'genRow' + i;
+        row.innerHTML =
+            '<img id="genImg' + i + '" width="40" height="40" style="image-rendering:pixelated; display:none; vertical-align:middle;" alt="">' +
+            ' <strong>' + name + '</strong> ' +
+            '<span id="genStatus' + i + '"><i class="fa-solid fa-spinner fa-spin"></i> checking...</span>' +
+            ' <button onclick="copyGenName(\'' + name + '\')"><i class="fa-solid fa-copy"></i></button>' +
+            ' <button onclick="useGenName(\'' + name + '\')"><i class="fa-solid fa-magnifying-glass"></i></button>';
+        box.appendChild(row);
+
+        // live availability check
+        checkName(name).then(function(res) {
+            var st = document.getElementById('genStatus' + i);
+            var img = document.getElementById('genImg' + i);
+            if (res === null) {
+                st.innerHTML = '<i class="fa-solid fa-circle-question"></i> unknown';
+            } else if (res.taken) {
+                st.innerHTML = '<span style="color:#f87171;"><i class="fa-solid fa-lock"></i> TAKEN</span>';
+                img.src = 'https://minotar.net/helm/' + res.username + '/40';
+                img.style.display = 'inline-block';
+            } else {
+                st.innerHTML = '<span style="color:#4ade80;"><i class="fa-solid fa-circle-check"></i> AVAILABLE</span>';
+            }
+        });
+    });
+
+    showSuccess('8 AI names generated with live availability check!');
+    setTimeout(hideSuccess, 2000);
+}
+
+function copyGenName(n) {
+    navigator.clipboard.writeText(n).then(function() {
+        showSuccess('"' + n + '" copied!');
+        setTimeout(hideSuccess, 1500);
+    });
+}
+
+function useGenName(n) {
+    document.getElementById('searchInput').value = n;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    lookupName();
+}
+
+/* ===========================================================
+   UI HELPERS
+=========================================================== */
+function showError(m) {
+    document.getElementById('errorMsg').textContent = m;
+    document.getElementById('errorMsg').style.display = 'block';
+    document.getElementById('successMsg').style.display = 'none';
+}
+function hideError() { document.getElementById('errorMsg').style.display = 'none'; }
+function showSuccess(m) {
+    document.getElementById('successMsg').textContent = m;
+    document.getElementById('successMsg').style.display = 'block';
+    document.getElementById('errorMsg').style.display = 'none';
+}
+function hideSuccess() { document.getElementById('successMsg').style.display = 'none'; }
+function showLoading(s) { document.getElementById('loadingMsg').style.display = s ? 'block' : 'none'; }
+
+window.addEventListener('load', function() {
+    hideError(); hideSuccess(); showLoading(false);
+    document.getElementById('searchInput').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') lookupName();
+    });
+    document.getElementById('keywordInput').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') generateNames();
+    });
+});
+</script>
+
+</body>
+</html>
