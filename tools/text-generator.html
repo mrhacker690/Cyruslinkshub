@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minecraft Server Text Generator</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+</head>
+<body>
+
+<div class="container">
+
+    <div class="glass header-card">
+        <h1><i class="fa-solid fa-font"></i> Minecraft Server Text Generator</h1>
+        <p>MOTD • Signs • Chat / tellraw • Colors • Formats • Live Preview</p>
+    </div>
+
+    <!-- ============ TOOLBAR ============ -->
+    <div class="glass search-card">
+        <h2><i class="fa-solid fa-palette"></i> Formatting Toolbar</h2>
+        <hr>
+        <p class="controls-hint">Click a color/format, then type in any text box below (or click a box first to insert at cursor)</p>
+        <div id="colorBar" class="quick-names"></div>
+        <br>
+        <div class="quick-names" id="formatBar"></div>
+        <br>
+        <div class="quick-names">
+            <button onclick="switchTab('motd')" id="tabMotd"><i class="fa-solid fa-server"></i> MOTD</button>
+            <button onclick="switchTab('sign')" id="tabSign"><i class="fa-solid fa-signs-post"></i> Sign</button>
+            <button onclick="switchTab('chat')" id="tabChat"><i class="fa-solid fa-comment"></i> Chat / tellraw</button>
+        </div>
+        <br>
+        <label>Templates</label>
+        <select id="templateSelect"></select>
+        <button onclick="applyTemplate()"><i class="fa-solid fa-wand-magic-sparkles"></i> Apply Template</button>
+        <button onclick="clearAll()"><i class="fa-solid fa-eraser"></i> Clear</button>
+    </div>
+
+    <!-- ============ MOTD PANEL ============ -->
+    <div class="glass result-card" id="motdPanel">
+        <h2><i class="fa-solid fa-server"></i> Server MOTD (2 lines)</h2>
+        <hr>
+        <label>Line 1</label>
+        <input type="text" id="motd1" oninput="updateAll()" placeholder="&b&lSKY&f&lBLOCK &8| &aSeason 5">
+        <p class="controls-hint" id="motd1Count">0 / 59 chars</p>
+        <label>Line 2</label>
+        <input type="text" id="motd2" oninput="updateAll()" placeholder="&7Join now &eplay.server.com">
+        <p class="controls-hint" id="motd2Count">0 / 59 chars</p>
+
+        <p><strong>Server List Preview</strong></p>
+        <div id="motdPreview" style="background:#000;border:2px solid #555;padding:10px;font-family:monospace;color:#fff;"></div>
+
+        <br>
+        <p><strong>& Codes (plugins / Paper)</strong></p>
+        <div class="info-box" id="motdAmpOut">-</div>
+        <button onclick="copyText('motdAmp')"><i class="fa-solid fa-copy"></i> Copy & Codes</button>
+
+        <p><strong>§ Codes (server.properties / vanilla)</strong></p>
+        <div class="info-box" id="motdSecOut">-</div>
+        <button onclick="copyText('motdSec')"><i class="fa-solid fa-copy"></i> Copy § Codes</button>
+    </div>
+
+    <!-- ============ SIGN PANEL ============ -->
+    <div class="glass result-card" id="signPanel" style="display:none;">
+        <h2><i class="fa-solid fa-signs-post"></i> Sign Text (4 lines, max 15 chars)</h2>
+        <hr>
+        <input type="text" id="sign1" oninput="updateAll()" maxlength="60" placeholder="&1&lSKYBLOCK">
+        <p class="controls-hint" id="sign1Count">0 / 15</p>
+        <input type="text" id="sign2" oninput="updateAll()" maxlength="60" placeholder="&aWelcome!">
+        <p class="controls-hint" id="sign2Count">0 / 15</p>
+        <input type="text" id="sign3" oninput="updateAll()" maxlength="60" placeholder="&7/warp shop">
+        <p class="controls-hint" id="sign3Count">0 / 15</p>
+        <input type="text" id="sign4" oninput="updateAll()" maxlength="60" placeholder="&6Vote daily">
+        <p class="controls-hint" id="sign4Count">0 / 15</p>
+
+        <p><strong>Sign Preview</strong></p>
+        <div id="signPreview" style="background:#b08b57;border:4px solid #7a5c33;padding:14px;text-align:center;font-family:monospace;"></div>
+
+        <br>
+        <p><strong>§ Codes Output</strong></p>
+        <div class="info-box" id="signSecOut">-</div>
+        <button onclick="copyText('signSec')"><i class="fa-solid fa-copy"></i> Copy § Codes</button>
+    </div>
+
+    <!-- ============ CHAT PANEL ============ -->
+    <div class="glass result-card" id="chatPanel" style="display:none;">
+        <h2><i class="fa-solid fa-comment"></i> Chat / tellraw JSON</h2>
+        <hr>
+        <label>Sender (optional)</label>
+        <input type="text" id="chatSender" oninput="updateAll()" placeholder="Server">
+        <label>Message</label>
+        <input type="text" id="chatMsg" oninput="updateAll()" placeholder="&6&lWelcome &a%player% &7to the server!">
+
+        <p><strong>Chat Preview</strong></p>
+        <div id="chatPreview" style="background:rgba(0,0,0,0.7);border:2px solid #333;padding:10px;font-family:monospace;color:#fff;"></div>
+
+        <br>
+        <p><strong>& Codes</strong></p>
+        <div class="info-box" id="chatAmpOut">-</div>
+        <button onclick="copyText('chatAmp')"><i class="fa-solid fa-copy"></i> Copy & Codes</button>
+
+        <p><strong>§ Codes</strong></p>
+        <div class="info-box" id="chatSecOut">-</div>
+        <button onclick="copyText('chatSec')"><i class="fa-solid fa-copy"></i> Copy § Codes</button>
+
+        <p><strong>/tellraw JSON (1.16+ colors supported)</strong></p>
+        <div class="info-box" id="chatJsonOut">-</div>
+        <button onclick="copyText('chatJson')"><i class="fa-solid fa-copy"></i> Copy tellraw Command</button>
+    </div>
+
+    <div id="successMsg" class="success-msg"></div>
+    <div id="errorMsg" class="error-msg"></div>
+
+    <div class="glass footer-card">
+        <p>Minecraft Server Text Generator<br><br>MOTD • Signs • Chat • tellraw JSON • 16 Colors • 6 Formats</p>
+    </div>
+
+</div>
+
+<script>
+/* ===========================================================
+   MINECRAFT COLOR + FORMAT DATA
+=========================================================== */
+var COLOR_HEX = {
+    '0': '#000000', '1': '#0000AA', '2': '#00AA00', '3': '#00AAAA',
+    '4': '#AA0000', '5': '#AA00AA', '6': '#FFAA00', '7': '#AAAAAA',
+    '8': '#555555', '9': '#5555FF', 'a': '#55FF55', 'b': '#55FFFF',
+    'c': '#FF5555', 'd': '#FF55FF', 'e': '#FFFF55', 'f': '#FFFFFF'
+};
+var COLOR_NAME = {
+    '0': 'black', '1': 'dark_blue', '2': 'dark_green', '3': 'dark_aqua',
+    '4': 'dark_red', '5': 'dark_purple', '6': 'gold', '7': 'gray',
+    '8': 'dark_gray', '9': 'blue', 'a': 'green', 'b': 'aqua',
+    'c': 'red', 'd': 'light_purple', 'e': 'yellow', 'f': 'white'
+};
+var COLOR_LABEL = {
+    '0': 'Black', '1': 'Dark Blue', '2': 'Dark Green', '3': 'Dark Aqua',
+    '4': 'Dark Red', '5': 'Dark Purple', '6': 'Gold', '7': 'Gray',
+    '8': 'Dark Gray', '9': 'Blue', 'a': 'Green', 'b': 'Aqua',
+    'c': 'Red', 'd': 'Light Purple', 'e': 'Yellow', 'f': 'White'
+};
+var FORMATS = [
+    { code: '&l', label: 'B', title: 'Bold', style: 'font-weight:bold;' },
+    { code: '&o', label: 'I', title: 'Italic', style: 'font-style:italic;' },
+    { code: '&n', label: 'U', title: 'Underline', style: 'text-decoration:underline;' },
+    { code: '&m', label: 'S', title: 'Strikethrough', style: 'text-decoration:line-through;' },
+    { code: '&k', label: '▒', title: 'Obfuscated (magic)', style: '' },
+    { code: '&r', label: 'R', title: 'Reset', style: '' }
+];
+
+var currentTab = 'motd';
+var activeInput = null;
+var outputs = {};
+
+/* ===========================================================
+   BUILD TOOLBAR
+=========================================================== */
+function buildToolbar() {
+    var bar = document.getElementById('colorBar');
+    Object.keys(COLOR_HEX).forEach(function(code) {
+        var b = document.createElement('button');
+        b.textContent = code;
+        b.title = COLOR_LABEL[code] + ' &' + code;
+        b.style.background = COLOR_HEX[code];
+        b.style.color = (['7', '8', 'e', 'f', 'a', 'b', 'c', 'd', '6', '9'].indexOf(code) > -1) ? '#000' : '#fff';
+        b.style.border = '1px solid #888';
+        b.onclick = function() { insertCode('&' + code); };
+        bar.appendChild(b);
+    });
+
+    var fbar = document.getElementById('formatBar');
+    FORMATS.forEach(function(f) {
+        var b = document.createElement('button');
+        b.innerHTML = f.label;
+        b.title = f.title;
+        b.style.cssText = f.style;
+        b.onclick = function() { insertCode(f.code); };
+        fbar.appendChild(b);
+    });
+}
+
+/* ===========================================================
+   INSERT CODE AT CURSOR
+=========================================================== */
+function insertCode(code) {
+    var el = activeInput;
+    if (!el || el.tagName !== 'INPUT' || el.style.display === 'none' || el.offsetParent === null) {
+        el = firstVisibleInput();
+    }
+    if (!el) return;
+    var s = el.selectionStart || 0, e = el.selectionEnd || 0;
+    el.value = el.value.slice(0, s) + code + el.value.slice(e);
+    el.focus();
+    el.selectionStart = el.selectionEnd = s + code.length;
+    updateAll();
+}
+
+function firstVisibleInput() {
+    var ids = currentTab === 'motd' ? ['motd1', 'motd2'] :
+              currentTab === 'sign' ? ['sign1', 'sign2', 'sign3', 'sign4'] :
+              ['chatMsg'];
+    return document.getElementById(ids[0]);
+}
+
+/* ===========================================================
+   PARSE & CODES INTO SEGMENTS
+=========================================================== */
+function parseSegments(text) {
+    var state = { color: 'f', bold: false, italic: false, under: false, strike: false, obf: false };
+    var segs = [], cur = '';
+
+    function flush() {
+        if (cur) {
+            segs.push({ text: cur, color: state.color, bold: state.bold, italic: state.italic, under: state.under, strike: state.strike, obf: state.obf });
+            cur = '';
+        }
+    }
+
+    var i = 0;
+    while (i < text.length) {
+        var ch = text.charAt(i);
+        var nx = text.charAt(i + 1).toLowerCase();
+        if ((ch === '&' || ch === '§') && nx && (COLOR_HEX.hasOwnProperty(nx) || 'klmnor'.indexOf(nx) > -1)) {
+            flush();
+            if (COLOR_HEX.hasOwnProperty(nx)) {
+                state = { color: nx, bold: false, italic: false, under: false, strike: false, obf: false };
+            } else if (nx === 'l') state.bold = true;
+            else if (nx === 'o') state.italic = true;
+            else if (nx === 'n') state.under = true;
+            else if (nx === 'm') state.strike = true;
+            else if (nx === 'k') state.obf = true;
+            else if (nx === 'r') state = { color: 'f', bold: false, italic: false, under: false, strike: false, obf: false };
+            i += 2;
+        } else {
+            cur += ch; i++;
+        }
+    }
+    flush();
+    return segs;
+}
+
+/* ===========================================================
+   RENDER PREVIEW SPANS (Minecraft style)
+=========================================================== */
+function renderSpans(container, text, defaultHex) {
+    container.innerHTML = '';
+    var segs = parseSegments(text);
+    if (segs.length === 0) {
+        container.innerHTML = '<span style="opacity:0.4;">(empty)</span>';
+        return;
+    }
+    segs.forEach(function(s) {
+        var span = document.createElement('span');
+        var dec = [];
+        if (s.under) dec.push('underline');
+        if (s.strike) dec.push('line-through');
+        span.style.color = COLOR_HEX[s.color];
+        span.style.fontWeight = s.bold ? 'bold' : 'normal';
+        span.style.fontStyle = s.italic ? 'italic' : 'normal';
+        span.style.textDecoration = dec.join(' ') || 'none';
+        span.style.textShadow = '2px 2px rgba(0,0,0,0.6)';
+        if (s.obf) {
+            span.setAttribute('data-obf', s.text.length);
+            span.textContent = scramble(s.text.length);
+        } else {
+            span.textContent = s.text;
+        }
+        container.appendChild(span);
+    });
+}
+
+function scramble(len) {
+    var chars = '!<>-_\\/[]{}=+*^?#';
+    var out = '';
+    for (var i = 0; i < len; i++) out += chars.charAt(Math.floor(Math.random() * chars.length));
+    return out;
+}
+
+setInterval(function() {
+    var els = document.querySelectorAll('[data-obf]');
+    for (var i = 0; i < els.length; i++) {
+        els[i].textContent = scramble(parseInt(els[i].getAttribute('data-obf'), 10));
+    }
+}, 80);
+
+/* ===========================================================
+   OUTPUTS
+=========================================================== */
+function toAmp(t) { return t.replace(/§/g, '&'); }
+function toSec(t) { return t.replace(/&/g, '§'); }
+function stripCodes(t) { return t.replace(/([&§])[0-9a-fk-or]/gi, ''); }
+
+function toJSON(text) {
+    var segs = parseSegments(text);
+    var arr = [''];
+    segs.forEach(function(s) {
+        var o = { text: s.text };
+        if (s.color !== 'f') o.color = COLOR_NAME[s.color];
+        if (s.bold) o.bold = true;
+        if (s.italic) o.italic = true;
+        if (s.under) o.underlined = true;
+        if (s.strike) o.strikethrough = true;
+        if (s.obf) o.obfuscated = true;
+        arr.push(o);
+    });
+    return JSON.stringify(arr);
+}
+
+/* ===========================================================
+   UPDATE ALL PREVIEWS + OUTPUTS
+=========================================================== */
+function updateAll() {
+    if (currentTab === 'motd') {
+        var m1 = document.getElementById('motd1').value;
+        var m2 = document.getElementById('motd2').value;
+
+        counter('motd1Count', m1, 59);
+        counter('motd2Count', m2, 59);
+
+        var prev = document.getElementById('motdPreview');
+        prev.innerHTML =
+            '<div style="display:flex;gap:10px;align-items:center;">' +
+            '<div style="width:48px;height:48px;background:#3c8527;border:2px solid #1e4213;flex:none;display:flex;align-items:center;justify-content:center;font-size:22px;">⛏</div>' +
+            '<div style="flex:1;min-width:0;">' +
+            '<div style="color:#fff;">play.myserver.com</div>' +
+            '<div id="mp1"></div><div id="mp2"></div>' +
+            '</div>' +
+            '<div style="text-align:right;color:#aaa;flex:none;">' +
+            '<div>128/500</div>' +
+            '<div style="color:#55FF55;">▂▄▆█</div>' +
+            '</div></div>';
+        renderSpans(document.getElementById('mp1'), m1, '#fff');
+        renderSpans(document.getElementById('mp2'), m2, '#fff');
+
+        outputs.motdAmp = toAmp(m1) + '\n' + toAmp(m2);
+        outputs.motdSec = toSec(m1) + '\n' + toSec(m2);
+        document.getElementById('motdAmpOut').textContent = outputs.motdAmp;
+        document.getElementById('motdSecOut').textContent = outputs.motdSec;
+    }
+
+    if (currentTab === 'sign') {
+        var lines = [];
+        for (var i = 1; i <= 4; i++) {
+            var v = document.getElementById('sign' + i).value;
+            lines.push(v);
+            counter('sign' + i + 'Count', v, 15);
+        }
+        var sp = document.getElementById('signPreview');
+        sp.innerHTML = '';
+        lines.forEach(function(l) {
+            var row = document.createElement('div');
+            renderSpans(row, l, '#2b2b2b');
+            sp.appendChild(row);
+        });
+
+        outputs.signSec = lines.map(toSec).join('\n');
+        document.getElementById('signSecOut').textContent = outputs.signSec;
+    }
+
+    if (currentTab === 'chat') {
+        var sender = document.getElementById('chatSender').value;
+        var msg = document.getElementById('chatMsg').value;
+        var cp = document.getElementById('chatPreview');
+        cp.innerHTML = '';
+        if (sender) {
+            var pre = document.createElement('span');
+            pre.style.color = '#fff';
+            pre.style.textShadow = '2px 2px rgba(0,0,0,0.6)';
+            pre.textContent = '<' + sender + '> ';
+            cp.appendChild(pre);
+        }
+        renderSpansInto(cp, msg);
+
+        outputs.chatAmp = toAmp(msg);
+        outputs.chatSec = toSec(msg);
+        outputs.chatJson = '/tellraw @a ' + toJSON(msg);
+        document.getElementById('chatAmpOut').textContent = outputs.chatAmp;
+        document.getElementById('chatSecOut').textContent = outputs.chatSec;
+        document.getElementById('chatJsonOut').textContent = outputs.chatJson;
+    }
+}
+
+function renderSpansInto(container, text) {
+    var segs = parseSegments(text);
+    if (segs.length === 0) return;
+    segs.forEach(function(s) {
+        var span = document.createElement('span');
+        var dec = [];
+        if (s.under) dec.push('underline');
+        if (s.strike) dec.push('line-through');
+        span.style.color = COLOR_HEX[s.color];
+        span.style.fontWeight = s.bold ? 'bold' : 'normal';
+        span.style.fontStyle = s.italic ? 'italic' : 'normal';
+        span.style.textDecoration = dec.join(' ') || 'none';
+        span.style.textShadow = '2px 2px rgba(0,0,0,0.6)';
+        if (s.obf) {
+            span.setAttribute('data-obf', s.text.length);
+            span.textContent = scramble(s.text.length);
+        } else span.textContent = s.text;
+        container.appendChild(span);
+    });
+}
+
+function counter(id, text, max) {
+    var len = stripCodes(text).length;
+    var el = document.getElementById(id);
+    el.textContent = len + ' / ' + max + ' chars' + (len > max ? ' — TOO LONG!' : '');
+    el.style.color = len > max ? '#f87171' : '';
+}
+
+/* ===========================================================
+   TABS
+=========================================================== */
+function switchTab(tab) {
+    currentTab = tab;
+    document.getElementById('motdPanel').style.display = tab === 'motd' ? 'block' : 'none';
+    document.getElementById('signPanel').style.display = tab === 'sign' ? 'block' : 'none';
+    document.getElementById('chatPanel').style.display = tab === 'chat' ? 'block' : 'none';
+    buildTemplates();
+    updateAll();
+}
+
+/* ===========================================================
+   TEMPLATES
+=========================================================== */
+var TEMPLATES = {
+    motd: [
+        ['Skyblock', ['&b&lSKY&f&lBLOCK &8| &aSeason 5 &8| &6Custom Enchants', '&7Join now &8→ &eplay.server.com &8[1.21]']],
+        ['PvP / Lifesteal', ['&c&lLIFE&4&lSTEAL &8» &fSeason 3 &8« &6Kits &8• &dCrates', '&eDouble XP weekend &7- &ajoin now!']],
+        ['Prison', ['&6&lGOLD&f&lPRISON &8| &aRankups &8| &bMines &8| &dGangs', '&7Start at &eA &7→ finish at &c&lZ &7- &f/warp mines']],
+        ['Anarchy', ['&8[&4&lANARCHY&8] &7no rules &7no resets &7no mercy', '&k!!! &c1.21 &k!!! &7tpa off &7grief on']],
+        ['Minigames', ['&a&lMEGA&b&lGAMES &8» &f12 minigames &8» &6parties', '&bBedWars &8• &cSkyWars &8• &aBuildBattle &8• &eSpleef']]
+    ],
+    sign: [
+        ['Shop sign', ['&2&lSHOP', '&aBuy &7& sell', '&6/warp shop', '&eOpen 24/7']],
+        ['Welcome', ['&1&lSKYBLOCK', '&aWelcome!', '&7take a kit', '&6/vote']],
+        ['Warning', ['&4&lDANGER', '&cLAVA AHEAD', '&7wear boots', '&k!!!!']],
+        ['Info', ['&b&lINFO', '&fRules:', '&7no grief', '&7no scams']]
+    ],
+    chat: [
+        ['Welcome', '&6&lWELCOME &8» &a&l%player% &7joined the server! &e(%online% online)'],
+        ['Restart', '&c&l[!] &eServer restarting in &65 &eminutes. Please log out safely!'],
+        ['Rankup', '&6&lRANKUP &8» &a%player% &7ranked up to &d&lVIP&7! &d✦'],
+        ['Crate key', '&b&lCRATE &8» &7You found a &b&lRARE KEY &7at &6/warp crates&7!'],
+        ['Vote reminder', '&a&lVOTE &8» &7Vote daily for &2crate keys &7& &2coins&a! &evote.myserver.com'],
+        ['Sale', '&e&lSALE &8» &650% OFF &7everything at &6/shop &7this weekend only!'],
+        ['Rules', '&c&lRULES &8» &7No griefing &8• &7No hacking &8• &7Be respectful &8• &7No spam'],
+        ['Magic tease', '&d&lMYSTERY &8» &7Something &kawesome &d comes &ksoon&7...']]
+    ]
+};
+
+function buildTemplates() {
+    var sel = document.getElementById('templateSelect');
+    sel.innerHTML = '';
+    TEMPLATES[currentTab].forEach(function(t, i) {
+        var o = document.createElement('option');
+        o.value = i;
+        
