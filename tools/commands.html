@@ -1420,4 +1420,298 @@ function buildSetblock() {
 
     var cmd =
         '/setblock
-      
+      function buildEffect(){
+    var t = document.getElementById('effectType').value;
+    var d = document.getElementById('effectDur').value;
+    var a = document.getElementById('effectAmp').value;
+    var h = document.getElementById('effectHide').value;
+    var cmd = '/effect give @p '+t+' '+d+' '+a+' '+h;
+    outputs.effect = cmd;
+    document.getElementById('effectOutput').textContent = cmd;
+}
+
+function buildBossbar(){
+    var id = document.getElementById('bbId').value || 'custom:bar';
+    var n = document.getElementById('bbName').value || 'Boss';
+    var c = document.getElementById('bbColor').value;
+    var st = document.getElementById('bbStyle').value;
+    var mx = document.getElementById('bbMax').value;
+    var v = document.getElementById('bbVal').value;
+
+    var cmds = [
+        '/bossbar add '+id+' '+JSON.stringify({text:n}),
+        '/bossbar set '+id+' color '+c,
+        '/bossbar set '+id+' style '+st,
+        '/bossbar set '+id+' max '+mx,
+        '/bossbar set '+id+' value '+v,
+        '/bossbar set '+id+' players @a'
+    ];
+
+    var out = cmds.join('\n');
+    outputs.bossbar = out;
+    document.getElementById('bossbarOutput').textContent = out;
+}
+
+function buildPlaysound(){
+    var s = document.getElementById('soundType').value;
+    var src = document.getElementById('soundSource').value;
+    var v = document.getElementById('soundVol').value;
+    var p = document.getElementById('soundPitch').value;
+
+    var cmd = '/playsound '+s+' '+src+' @a ~ ~ ~ '+v+' '+p;
+    outputs.playsound = cmd;
+    document.getElementById('playsoundOutput').textContent = cmd;
+}
+
+function buildAttribute(){
+    var t = document.getElementById('attrType').value;
+    var v = document.getElementById('attrVal').value;
+
+    var cmd = '/attribute @p minecraft:'+t+' base set '+v;
+    outputs.attribute = cmd;
+    document.getElementById('attributeOutput').textContent = cmd;
+}
+
+/* ============ OP PRESETS ============ */
+
+function loadOP(type){
+    var cmd = '';
+    var cmds = [];
+
+    switch(type){
+
+        case 'godkit':
+            cmds = [
+                '/give @p netherite_sword[Enchantments:[{id:"sharpness",lvl:255},{id:"fire_aspect",lvl:10},{id:"looting",lvl:10},{id:"unbreaking",lvl:10},{id:"mending",lvl:1}]]{display:{Name:\'{"text":"§6§lGOD SWORD","italic":false}\'}}',
+                '/give @p netherite_helmet[Enchantments:[{id:"protection",lvl:255},{id:"unbreaking",lvl:10},{id:"mending",lvl:1}]]',
+                '/give @p netherite_chestplate[Enchantments:[{id:"protection",lvl:255},{id:"unbreaking",lvl:10},{id:"mending",lvl:1}]]',
+                '/give @p netherite_leggings[Enchantments:[{id:"protection",lvl:255},{id:"unbreaking",lvl:10},{id:"mending",lvl:1}]]',
+                '/give @p netherite_boots[Enchantments:[{id:"protection",lvl:255},{id:"unbreaking",lvl:10},{id:"mending",lvl:1}]]',
+                '/give @p golden_apple 64',
+                '/give @p enchanted_golden_apple 64',
+                '/effect give @p strength 9999 255 true',
+                '/effect give @p speed 9999 5 true',
+                '/effect give @p regeneration 9999 10 true'
+            ];
+
+            cmd = cmds.join('\n');
+            break;
+
+        case 'maxsword':
+            cmd = '/give @p netherite_sword[Enchantments:[{id:"sharpness",lvl:255},{id:"fire_aspect",lvl:10},{id:"looting",lvl:10},{id:"knockback",lvl:10},{id:"sweeping_edge",lvl:10},{id:"unbreaking",lvl:10},{id:"mending",lvl:1}]]{display:{Name:\'{"text":"§4§lMAX SWORD","italic":false}\''';
+            break;
+
+        case 'maxarmor':
+            cmds = [
+                '/give @p netherite_helmet[Enchantments:[{id:"protection",lvl:255},{id:"unbreaking",lvl:10},{id:"mending",lvl:1},{id:"thorns",lvl:10},{id:"respiration",lvl:10},{id:"aqua_affinity",lvl:1}]]',
+                '/give @p netherite_chestplate[Enchantments:[{id:"protection",lvl:255},{id:"unbreaking",lvl:10},{id:"mending",lvl:1},{id:"thorns",lvl:10}]]',
+                '/give @p netherite_leggings[Enchantments:[{id:"protection",lvl:255},{id:"unbreaking",lvl:10},{id:"mending",lvl:1},{id:"thorns",lvl:10},{id:"swift_sneak",lvl:10}]]',
+                '/give @p netherite_boots[Enchantments:[{id:"protection",lvl:255},{id:"unbreaking",lvl:10},{id:"mending",lvl:1},{id:"thorns",lvl:10},{id:"feather_falling",lvl:10},{id:"soul_speed",lvl:10},{id:"depth_strider",lvl:10},{id:"frost_walker",lvl:10}]]'
+            ];
+
+            cmd = cmds.join('\n');
+            break;
+
+        case 'fly':
+            cmd = '/gamemode creative @p';
+            break;
+
+        case 'speed':
+            cmd = '/effect give @p speed 999999 10 true';
+            break;
+
+        case 'strength':
+            cmd = '/effect give @p strength 999999 255 true';
+            break;
+
+        case 'regen':
+            cmd = '/effect give @p regeneration 999999 255 true';
+            break;
+
+        case 'invisible':
+            cmd = '/effect give @p invisibility 999999 1 true';
+            break;
+
+        case 'onehit':
+            cmd = '/attribute @p minecraft:generic.attack_damage base set 10000';
+            break;
+
+        case 'boss':
+            cmd = '/summon zombie ~ ~ ~ {CustomName:\'{"text":"§c§lBOSS","italic":false}\',CustomNameVisible:1b,Health:1000f,Attributes:[{Name:"generic.max_health",Base:1000},{Name:"generic.movement_speed",Base:0.5},{Name:"generic.attack_damage",Base:50},{Name:"generic.knockback_resistance",Base:1}],HandItems:[{id:"netherite_sword",Count:1b,components:{"minecraft:enchantments":{levels:{"minecraft:sharpness":10}}}}],ArmorItems:[{id:"netherite_boots",Count:1b},{id:"netherite_leggings",Count:1b},{id:"netherite_chestplate",Count:1b},{id:"netherite_helmet",Count:1b}],Glowing:1b}';
+            break;
+
+        case 'witherstorm':
+            cmds = [];
+
+            for(var i=0;i<10;i++){
+                cmds.push('/summon wither ~'+i+' ~'+i+' ~'+i+' {Health:300f,Invulnerable:1b}');
+            }
+
+            cmd = cmds.join('\n');
+            break;
+
+        case 'dragonstack':
+            cmd = '/summon ender_dragon ~ ~ ~ {Passengers:[{id:"ender_dragon",Passengers:[{id:"ender_dragon",Passengers:[{id:"ender_dragon"}]}]}]}';
+            break;
+
+        case 'creeperarmy':
+            cmds = [];
+
+            for(var i=0;i<20;i++){
+                var x = Math.floor(Math.random()*20)-10;
+                var z = Math.floor(Math.random()*20)-10;
+
+                cmds.push(
+                    '/summon creeper ~'+x+' ~ ~'+z+' {powered:1b,Fuse:0,ExplosionRadius:10}'
+                );
+            }
+
+            cmd = cmds.join('\n');
+            break;
+
+        case 'giant':
+            cmd = '/summon giant ~ ~ ~ {CustomName:\'{"text":"§4§lGIANT","italic":false}\',CustomNameVisible:1b,Health:200f,Glowing:1b}';
+            break;
+
+        case 'food':
+            cmd = '/effect give @p saturation 999999 255 true';
+            break;
+
+        case 'tpall':
+            cmd = '/tp @a @p';
+            break;
+
+        case 'killall':
+            cmd = '/kill @e[type=!player]';
+            break;
+
+        case 'nuke':
+            cmds = [];
+
+            for(var x=-5;x<=5;x++){
+                for(var y=-2;y<=2;y++){
+                    for(var z=-5;z<=5;z++){
+                        cmds.push('/summon tnt ~'+x+' ~'+y+' ~'+z);
+                    }
+                }
+            }
+
+            cmd = cmds.join('\n');
+            break;
+
+        case 'godmode':
+            cmds = [
+                '/effect give @p resistance 999999 255 true',
+                '/effect give @p regeneration 999999 255 true',
+                '/effect give @p fire_resistance 999999 1 true',
+                '/effect give @p water_breathing 999999 1 true',
+                '/effect give @p night_vision 999999 1 true',
+                '/effect give @p saturation 999999 255 true'
+            ];
+
+            cmd = cmds.join('\n');
+            break;
+
+        case 'creative':
+            cmd = '/gamemode creative @a';
+            break;
+    }
+
+    outputs.op = cmd;
+    document.getElementById('opOutput').textContent = cmd;
+
+    showSuccess('Loaded preset: '+type);
+    setTimeout(hideSuccess,1500);
+}
+
+/* ============ COPY ============ */
+
+function copyOutput(key){
+    var t = outputs[key];
+
+    if(!t) return;
+
+    if(navigator.clipboard && navigator.clipboard.writeText){
+
+        navigator.clipboard.writeText(t).then(function(){
+            showSuccess('Copied!');
+            setTimeout(hideSuccess,1500);
+        });
+
+    } else {
+
+        var ta = document.createElement('textarea');
+        ta.value = t;
+
+        document.body.appendChild(ta);
+        ta.select();
+
+        try{
+            document.execCommand('copy');
+            showSuccess('Copied!');
+        }catch(e){
+            showError('Copy failed');
+        }
+
+        document.body.removeChild(ta);
+
+        setTimeout(hideSuccess,1500);
+    }
+}
+
+/* ============ UI ============ */
+
+function showError(m){
+    document.getElementById('errorMsg').textContent=m;
+    document.getElementById('errorMsg').style.display='block';
+    document.getElementById('successMsg').style.display='none';
+}
+
+function showSuccess(m){
+    document.getElementById('successMsg').textContent=m;
+    document.getElementById('successMsg').style.display='block';
+    document.getElementById('errorMsg').style.display='none';
+}
+
+function hideSuccess(){
+    document.getElementById('successMsg').style.display='none';
+}
+
+function rebuildAll(){
+    populate('giveItem', ITEMS);
+    populate('summonEntity', ENTITIES);
+    populate('setblockBlock', BLOCKS);
+    populate('fillBlock', BLOCKS);
+    populate('itemReplace', ITEMS);
+    populate('spawnerEnt', ENTITIES);
+    populate('particleType', PARTICLES);
+    populate('effectType', EFFECTS);
+    populate('soundType', SOUNDS);
+
+    buildEnchantBox();
+    buildGive();
+    buildSummon();
+    buildSetblock();
+    buildFill();
+    buildItem();
+    buildData();
+    buildExecute();
+    buildSpawner();
+    buildTellraw();
+    buildTitle();
+    buildParticle();
+    buildEffect();
+    buildBossbar();
+    buildPlaysound();
+    buildAttribute();
+}
+
+/* ============ INIT ============ */
+
+window.addEventListener('load', function(){
+    rebuildAll();
+    switchMod('give');
+});
+    </script>
+</body>
+</html>
