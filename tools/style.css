@@ -661,3 +661,54 @@ button i, .btn i, .open-tool i, a i {
 .ic-green  { color: var(--green);  text-shadow: 0 0 14px var(--green), 0 0 35px rgba(0,255,157,.5); }
 .ic-yellow { color: var(--yellow); text-shadow: 0 0 14px var(--yellow), 0 0 35px rgba(255,230,0,.5); }
 .ic-purple { color: #b06bff;       text-shadow: 0 0 14px var(--purple), 0 0 35px rgba(138,43,255,.6); }
+/* ===========================================================
+   NAVBAR v2 — Discord right of logo + scrollable menu
+=========================================================== */
+
+.navbar, nav {
+    display: block;
+    padding: 14px 20px 8px;
+}
+
+/* Row 1: logo left, discord exact right */
+.nav-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+.nav-top .logo {
+    margin-right: auto;
+    flex: 0 0 auto;
+}
+.nav-top .btn-discord {
+    margin-left: auto;
+    flex: 0 0 auto;
+    padding: 10px 18px;
+    font-size: 0.75rem;
+}
+
+/* Row 2: horizontal scrollable menu (no wrapping) */
+.nav-links, .menu, .nav-menu {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    gap: 8px;
+    margin: 12px -20px 0;
+    padding: 4px 20px 12px;
+    scrollbar-width: none;          /* Firefox: hide scrollbar */
+    -ms-overflow-style: none;
+}
+.nav-links::-webkit-scrollbar { display: none; }  /* Chrome/Android: hide scrollbar */
+
+.nav-links a, .menu a {
+    flex: 0 0 auto;                 /* never shrink */
+    white-space: nowrap;            /* stay in one line */
+}
+
+/* small phones: show only Discord icon */
+@media (max-width: 480px) {
+    .nav-top .btn-discord span { display: none; }
+    .nav-top .btn-discord { padding: 10px 14px; font-size: 1rem; }
+   }
