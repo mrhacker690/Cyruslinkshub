@@ -9,13 +9,20 @@
 </head>
 <body>
 
-<!-- NAVBAR (no flash logo) -->
+<!-- ============ NAVBAR v2 ============ -->
 <nav class="navbar">
-    <a href="index.html" class="logo">cyruslinkshub</a>
+    <!-- Row 1: Logo left + Discord exact right -->
+    <div class="nav-top">
+        <a href="index.html" class="logo">cyruslinkshub</a>
+        <a href="https://discord.gg/" class="btn-discord" target="_blank">
+            <i class="fa-brands fa-discord"></i> <span>Join Discord</span>
+        </a>
+    </div>
+
+    <!-- Row 2: Scrollable menu -->
     <div class="nav-links">
-        <a href="https://discord.gg/" class="btn-discord" target="_blank"><i class="fa-brands fa-discord"></i> Join Discord</a>
-        <a href="index.html">Home</a>
-        <a href="tools.html" class="active">Tools</a>
+        <a href="index.html" class="active">Home</a>
+        <a href="tools.html">Tools</a>
         <a href="games.html">Games</a>
         <a href="apk.html">APK</a>
         <a href="movies.html">Movies</a>
@@ -26,19 +33,20 @@
 
 <main class="container">
 
-    <!-- HERO -->
+    <!-- ============ HERO ============ -->
     <section class="glass hero">
         <p class="tagline">Web Utilities • Real-time Resolvers • Minecraft Helpers</p>
         <h1>ONLINE HUB UTILITIES</h1>
         <p>Execute fast, premium server checks and instant resource conversions right from your browser.</p>
     </section>
 
-    <!-- MINECRAFT TOOLS -->
+    <!-- ============ MINECRAFT TOOLS ============ -->
     <section class="glass">
         <h2>🎮 Minecraft Tools</h2>
         <p>Advanced diagnostic layers, custom color asset designers, and game asset download tools.</p>
 
         <div class="tools-grid">
+
             <div class="tool-card">
                 <i class="fa-solid fa-server tool-icon ic-green"></i>
                 <h3>Minecraft Server Status</h3>
@@ -122,15 +130,17 @@
                 <p>Generate colorful Minecraft fireworks and flight commands.</p>
                 <a href="firework-generator.html" class="open-tool">Open Tool <i class="fa-solid fa-arrow-right"></i></a>
             </div>
+
         </div>
     </section>
 
-    <!-- UTILITIES -->
+    <!-- ============ UTILITIES ============ -->
     <section class="glass">
         <h2>🛠️ Utilities</h2>
         <p>Web configuration decoders, cryptography tools, and data formatters.</p>
 
         <div class="tools-grid">
+
             <div class="tool-card">
                 <i class="fa-solid fa-key tool-icon ic-yellow"></i>
                 <h3>Password Generator</h3>
@@ -214,19 +224,22 @@
                 <p>Generate random numbers, names, and custom elements.</p>
                 <a href="random-generator.html" class="open-tool">Open Tool <i class="fa-solid fa-arrow-right"></i></a>
             </div>
+
         </div>
     </section>
 
-    <!-- CTA -->
-    <section class="cta">
+    <!-- ============ CTA ============ -->
+    <section class="cta" id="about">
         <h2>Need a custom tool or resource?</h2>
         <p>Submit diagnostic update suggestions or software requests directly within our developer interaction forums.</p>
-        <a href="https://discord.gg/" class="discord-cta" target="_blank"><i class="fa-brands fa-discord"></i> Request Tool On Discord</a>
+        <a href="https://discord.gg/" class="discord-cta" target="_blank">
+            <i class="fa-brands fa-discord"></i> Request Tool On Discord
+        </a>
     </section>
 
 </main>
 
-<!-- FOOTER -->
+<!-- ============ FOOTER ============ -->
 <footer>
     <div class="footer-grid">
         <div class="footer-col">
@@ -257,4 +270,4 @@
 </footer>
 
 </body>
-                </html>
+    </html>
