@@ -1,395 +1,236 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CyrusLinksHub | Advanced Online Tools</title>
-    <meta name="description" content="Premium web tools, Minecraft generators, server checkers, and digital utilities by CyrusLinksHub.">
-    <link rel="stylesheet" href="style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CyrusLinksHub | Advanced Online Tools</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 </head>
-
 <body>
 
-    <canvas id="particles"></canvas>
+<!-- NAVBAR -->
+<nav class="navbar">
+    <a href="index.html" class="logo">⚡ cyruslinkshub</a>
+    <div class="nav-links">
+        <a href="https://discord.gg/" class="btn-discord" target="_blank"><i class="fa-brands fa-discord"></i> Join Discord</a>
+        <a href="index.html">Home</a>
+        <a href="tools.html" class="active">Tools</a>
+        <a href="games.html">Games</a>
+        <a href="apk.html">APK</a>
+        <a href="movies.html">Movies</a>
+        <a href="music.html">Music</a>
+        <a href="index.html#about">About</a>
+    </div>
+</nav>
 
-    <div class="bg-glow glow-left"></div>
-    <div class="bg-glow glow-right"></div>
-    <div class="bg-glow glow-bottom"></div>
+<main class="container">
 
-    <header class="header">
-        <div class="container">
-            <!-- Top Row: Animated Brand Title & Discord Button -->
-            <div class="brand-bar">
-                <a href="index.html" class="brand-text">cyruslinkshub</a>
-                <a href="https://discord.gg/" target="_blank" class="discord-btn">
-                    <i class="fab fa-discord"></i> Join Discord
-                </a>
+    <!-- HERO -->
+    <section class="glass hero">
+        <p class="tagline">Web Utilities • Real-time Resolvers • Minecraft Helpers</p>
+        <h1>ONLINE HUB UTILITIES</h1>
+        <p>Execute fast, premium server checks and instant resource conversions right from your browser.</p>
+    </section>
+
+    <!-- MINECRAFT TOOLS -->
+    <section class="glass">
+        <h2>🎮 Minecraft Tools</h2>
+        <p>Advanced diagnostic layers, custom color asset designers, and game asset download tools.</p>
+
+        <div class="tools-grid">
+            <div class="tool-card">
+                <h3>Minecraft Server Status</h3>
+                <p>Check live Minecraft server status, online players, version, MOTD and ping instantly.</p>
+                <a href="minecraft-status-checker.html" class="open-tool">Open Tool <i class="fa-solid fa-arrow-right"></i></a>
             </div>
-            
-            <!-- Bottom Row: Scrollable Glowing Navbar -->
-            <nav class="navbar">
-                <ul class="nav-links">
-                    <li>
-                        <a href="index.html">
-                            <i class="fa-solid fa-house"></i> Home
-                        </a>
-                    </li>
-                    <li>
-                        <a class="active" href="tools.html">
-                            <i class="fa-solid fa-screwdriver-wrench"></i> Tools
-                        </a>
-                    </li>
-                    <li>
-                        <a href="games.html">
-                            <i class="fa-solid fa-gamepad"></i> Games
-                        </a>
-                    </li>
-                    <li>
-                        <a href="apk.html">
-                            <i class="fa-solid fa-mobile-screen-button"></i> APK
-                        </a>
-                    </li>
-                    <li>
-                        <a href="movies.html">
-                            <i class="fa-solid fa-film"></i> Movies
-                        </a>
-                    </li>
-                    <li>
-                        <a href="music.html">
-                            <i class="fa-solid fa-music"></i> Music
-                        </a>
-                    </li>
-                    <li>
-                        <a href="index.html#about">
-                            <i class="fa-solid fa-circle-info"></i> About
-                        </a>
-                    </li>
-                </ul>
-            </nav>
-        </div>
-    </header>
 
-    <main>
-        <!-- HERO HEAD SECTION -->
-        <section class="hero">
-            <div class="container">
-                <div class="hero-content">
-                    <div class="hero-badge">
-                        <i class="fas fa-toolbox"></i> Web Utilities • Real-time Resolvers • Minecraft Helpers
-                    </div>
-                    <h1>ONLINE HUB <span>UTILITIES</span></h1>
-                    <p class="hero-subtitle">Execute fast, premium server checks and instant resource conversions right from your browser.</p>
-                </div>
+            <div class="tool-card">
+                <h3>PaperMC Build Checker</h3>
+                <p>Check the latest PaperMC versions, builds and download links directly from PaperMC.</p>
+                <a href="paper-checker.html" class="open-tool">Open Tool <i class="fa-solid fa-arrow-right"></i></a>
             </div>
-        </section>
 
-        <!-- SECTION 1: MINECRAFT TOOLS -->
-        <section class="features-section" style="padding-top: 0;">
-            <div class="container">
-                <div class="section-title">
-                    <h2>🎮 Minecraft Tools</h2>
-                    <p>Advanced diagnostic layers, custom color asset designers, and game asset download tools.</p>
-                </div>
-                <div class="feature-grid">
-                    
-                    <div class="glass-card feature-card">
-                        <div class="feature-icon" style="color: #1be7ff;"><i class="fa-solid fa-server"></i></div>
-                        <h3>Minecraft Server Status</h3>
-                        <p>Check live Minecraft server status, online players, version, MOTD and ping instantly.</p>
-                        <a href="minecraft-status checker.html" class="card-btn">Open Tool <i class="fas fa-arrow-right"></i></a>
-                    </div>
-
-                    <div class="glass-card feature-card">
-                        <div class="feature-icon" style="color: #6e6bff;"><i class="fa-solid fa-box-open"></i></div>
-                        <h3>PaperMC Build Checker</h3>
-                        <p>Check the latest PaperMC versions, builds and download links directly from PaperMC.</p>
-                        <a href="paper-cheker.html" class="card-btn">Open Tool <i class="fas fa-arrow-right"></i></a>
-                    </div>
-
-                    <div class="glass-card feature-card">
-                        <div class="feature-icon" style="color: #ff4d94;"><i class="fa-solid fa-download"></i></div>
-                        <h3>Skin Downloader</h3>
-                        <p>Download Minecraft skins, preview them and fetch Usernames easily.</p>
-                        <a href="#" class="card-btn">Open Tool <i class="fas fa-arrow-right"></i></a>
-                    </div>
-
-                    <div class="glass-card feature-card">
-                        <div class="feature-icon" style="color: #1be7ff;"><i class="fa-solid fa-user-search"></i></div>
-                        <h3>Username Lookup</h3>
-                        <p>Lookup Minecraft names, history, UUIDs and skin text account information.</p>
-                        <a href="#" class="card-btn">Open Tool <i class="fas fa-arrow-right"></i></a>
-                    </div>
-
-                    <div class="glass-card feature-card">
-                        <div class="feature-icon" style="color: #6e6bff;"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
-                        <h3>Nickname Generator</h3>
-                        <p>Generate cool, aesthetic and RPG style Minecraft nicknames.</p>
-                        <a href="#" class="card-btn">Open Tool <i class="fas fa-arrow-right"></i></a>
-                    </div>
-
-                    <div class="glass-card feature-card">
-                        <div class="feature-icon" style="color: #ff4d94;"><i class="fa-solid fa-font"></i></div>
-                        <h3>Minecraft Text Generator</h3>
-                        <p>Create beautiful Minecraft styled text with formatting and preview.</p>
-                        <a href="#" class="card-btn">Open Tool <i class="fas fa-arrow-right"></i></a>
-                    </div>
-
-                    <div class="glass-card feature-card">
-                        <div class="feature-icon" style="color: #1be7ff;"><i class="fa-solid fa-palette"></i></div>
-                        <h3>Color Codes</h3>
-                        <p>Complete Minecraft color codes and formatting reference guide.</p>
-                        <a href="#" class="card-btn">Open Tool <i class="fas fa-arrow-right"></i></a>
-                    </div>
-
-                    <div class="glass-card feature-card">
-                        <div class="feature-icon" style="color: #6e6bff;"><i class="fa-solid fa-terminal"></i></div>
-                        <h3>Command Generator</h3>
-                        <p>Generate Minecraft commands quickly with syntax assistance.</p>
-                        <a href="#" class="card-btn">Open Tool <i class="fas fa-arrow-right"></i></a>
-                    </div>
-
-                    <div class="glass-card feature-card">
-                        <div class="feature-icon" style="color: #ff4d94;"><i class="fa-solid fa-book-skull"></i></div>
-                        <h3>Enchantment Guide</h3>
-                        <p>Browse every enchantment, max levels and compatible items.</p>
-                        <a href="#" class="card-btn">Open Tool <i class="fas fa-arrow-right"></i></a>
-                    </div>
-
-                    <div class="glass-card feature-card">
-                        <div class="feature-icon" style="color: #1be7ff;"><i class="fa-solid fa-flask"></i></div>
-                        <h3>Potion Guide</h3>
-                        <p>Potion recipes, effects, durations and brewing guide.</p>
-                        <a href="#" class="card-btn">Open Tool <i class="fas fa-arrow-right"></i></a>
-                    </div>
-
-                    <div class="glass-card feature-card">
-                        <div class="feature-icon" style="color: #6e6bff;"><i class="fa-solid fa-flag"></i></div>
-                        <h3>Banner Generator</h3>
-                        <p>Create custom Minecraft banners with pattern previews.</p>
-                        <a href="#" class="card-btn">Open Tool <i class="fas fa-arrow-right"></i></a>
-                    </div>
-
-                    <div class="glass-card feature-card">
-                        <div class="feature-icon" style="color: #ff4d94;"><i class="fa-solid fa-fireworks"></i></div>
-                        <h3>Firework Generator</h3>
-                        <p>Generate colorful Minecraft fireworks and flight commands.</p>
-                        <a href="#" class="card-btn">Open Tool <i class="fas fa-arrow-right"></i></a>
-                    </div>
-
-                </div>
+            <div class="tool-card">
+                <h3>Skin Downloader</h3>
+                <p>Download Minecraft skins, preview them and fetch Usernames easily.</p>
+                <a href="skin-downloader.html" class="open-tool">Open Tool <i class="fa-solid fa-arrow-right"></i></a>
             </div>
-        </section>
 
-        <!-- SECTION 2: UTILITIES -->
-        <section class="features-section" style="padding-top: 20px;">
-            <div class="container">
-                <div class="section-title">
-                    <h2>🛠️ Utilities</h2>
-                    <p>Web configuration decoders, cryptography tools, and data formatters.</p>
-                </div>
-                <div class="feature-grid">
-                    
-                    <div class="glass-card feature-card">
-                        <div class="feature-icon" style="color: #1be7ff;"><i class="fa-solid fa-key"></i></div>
-                        <h3>Password Generator</h3>
-                        <p>Generate strong, secure passwords with letters, numbers, and symbols instantly.</p>
-                        <a href="#" class="card-btn">Open Tool <i class="fas fa-arrow-right"></i></a>
-                    </div>
-
-                    <div class="glass-card feature-card">
-                        <div class="feature-icon" style="color: #6e6bff;"><i class="fa-solid fa-qrcode"></i></div>
-                        <h3>QR Code Generator</h3>
-                        <p>Generate QR codes for links, text, WiFi and more layout options.</p>
-                        <a href="#" class="card-btn">Open Tool <i class="fas fa-arrow-right"></i></a>
-                    </div>
-
-                    <div class="glass-card feature-card">
-                        <div class="feature-icon" style="color: #ff4d94;"><i class="fa-solid fa-globe"></i></div>
-                        <h3>Website Status Checker</h3>
-                        <p>Check if a website is online or offline instantly with tracking.</p>
-                        <a href="#" class="card-btn">Open Tool <i class="fas fa-arrow-right"></i></a>
-                    </div>
-
-                    <div class="glass-card feature-card">
-                        <div class="feature-icon" style="color: #1be7ff;"><i class="fa-solid fa-bolt"></i></div>
-                        <h3>Website Ping Checker</h3>
-                        <p>Measure website response time and latency checking.</p>
-                        <a href="#" class="card-btn">Open Tool <i class="fas fa-arrow-right"></i></a>
-                    </div>
-
-                    <div class="glass-card feature-card">
-                        <div class="feature-icon" style="color: #6e6bff;"><i class="fa-solid fa-fingerprint"></i></div>
-                        <h3>UUID Generator</h3>
-                        <p>Generate random v4 UUIDs conforming to security standards.</p>
-                        <a href="#" class="card-btn">Open Tool <i class="fas fa-arrow-right"></i></a>
-                    </div>
-
-                    <div class="glass-card feature-card">
-                        <div class="feature-icon" style="color: #ff4d94;"><i class="fa-solid fa-arrow-right-left"></i></div>
-                        <h3>Base64 Encoder/Decoder</h3>
-                        <p>Encode and decode base64 strings quickly and safely.</p>
-                        <a href="#" class="card-btn">Open Tool <i class="fas fa-arrow-right"></i></a>
-                    </div>
-
-                    <div class="glass-card feature-card">
-                        <div class="feature-icon" style="color: #1be7ff;"><i class="fa-solid fa-link"></i></div>
-                        <h3>URL Encoder/Decoder</h3>
-                        <p>Format and decode URLs safely for web use structures.</p>
-                        <a href="#" class="card-btn">Open Tool <i class="fas fa-arrow-right"></i></a>
-                    </div>
-
-                    <div class="glass-card feature-card">
-                        <div class="feature-icon" style="color: #6e6bff;"><i class="fa-solid fa-code"></i></div>
-                        <h3>JSON Formatter</h3>
-                        <p>Beautify, validate and minify JSON data structures format.</p>
-                        <a href="#" class="card-btn">Open Tool <i class="fas fa-arrow-right"></i></a>
-                    </div>
-
-                    <div class="glass-card feature-card">
-                        <div class="feature-icon" style="color: #ff4d94;"><i class="fa-solid fa-calculator"></i></div>
-                        <h3>Word Counter</h3>
-                        <p>Count words, characters, sentences, and paragraphs in real time.</p>
-                        <a href="#" class="card-btn">Open Tool <i class="fas fa-arrow-right"></i></a>
-                    </div>
-
-                    <div class="glass-card feature-card">
-                        <div class="feature-icon" style="color: #1be7ff;"><i class="fa-solid fa-eye-dropper"></i></div>
-                        <h3>Color Generator</h3>
-                        <p>Generate HEX, RGB, and HSL colors instantly with palette options.</p>
-                        <a href="#" class="card-btn">Open Tool <i class="fas fa-arrow-right"></i></a>
-                    </div>
-
-                    <div class="glass-card feature-card">
-                        <div class="feature-icon" style="color: #6e6bff;"><i class="fa-solid fa-calendar-days"></i></div>
-                        <h3>Timestamp Converter</h3>
-                        <p>Convert UNIX timestamps to readable local date and time.</p>
-                        <a href="#" class="card-btn">Open Tool <i class="fas fa-arrow-right"></i></a>
-                    </div>
-
-                    <div class="glass-card feature-card">
-                        <div class="feature-icon" style="color: #ff4d94;"><i class="fa-solid fa-dice"></i></div>
-                        <h3>Random Generator</h3>
-                        <p>Generate random numbers, names, and custom elements.</p>
-                        <a href="#" class="card-btn">Open Tool <i class="fas fa-arrow-right"></i></a>
-                    </div>
-
-                </div>
+            <div class="tool-card">
+                <h3>Username Lookup</h3>
+                <p>Lookup Minecraft names, history, UUIDs and skin text account information.</p>
+                <a href="username-lookup.html" class="open-tool">Open Tool <i class="fa-solid fa-arrow-right"></i></a>
             </div>
-        </section>
 
-        <!-- DISCORD SUBSECTION CALL OUT MODULE -->
-        <section class="cta-section">
-            <div class="container">
-                <div class="glass-card cta-card">
-                    <div>
-                        <h2>Need a custom tool or resource?</h2>
-                        <p>Submit diagnostic update suggestions or software requests directly within our developer interaction forums.</p>
-                    </div>
-                    <div class="cta-buttons">
-                        <a href="https://discord.gg/" target="_blank" class="btn btn-primary">
-                            <i class="fab fa-discord"></i> Request Tool On Discord
-                        </a>
-                    </div>
-                </div>
+            <div class="tool-card">
+                <h3>Nickname Generator</h3>
+                <p>Generate cool, aesthetic and RPG style Minecraft nicknames.</p>
+                <a href="nickname-generator.html" class="open-tool">Open Tool <i class="fa-solid fa-arrow-right"></i></a>
             </div>
-        </section>
-    </main>
 
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-grid">
-                <div class="footer-column">
-                    <div class="footer-brand">
-                        <span class="footer-brand-text">cyruslinkshub</span>
-                    </div>
-                </div>
-                <div class="footer-column">
-                    <h4>Navigation</h4>
-                    <ul>
-                        <li><a href="index.html">Home</a></li>
-                        <li><a href="tools.html">Tools</a></li>
-                        <li><a href="games.html">Games</a></li>
-                        <li><a href="index.html#about">About</a></li>
-                    </ul>
-                </div>
-                <div class="footer-column">
-                    <h4>Resources</h4>
-                    <ul>
-                        <li><a href="apk.html">APK</a></li>
-                        <li><a href="movies.html">Movies</a></li>
-                        <li><a href="music.html">Music</a></li>
-                    </ul>
-                </div>
-                <div class="footer-column">
-                    <h4>Community</h4>
-                    <ul>
-                        <li><a href="https://discord.gg/" target="_blank">Discord</a></li>
-                        <li><a href="https://github.com/" target="_blank">GitHub</a></li>
-                        <li><a href="https://youtube.com/" target="_blank">YouTube</a></li>
-                    </ul>
-                </div>
+            <div class="tool-card">
+                <h3>Minecraft Text Generator</h3>
+                <p>Create beautiful Minecraft styled text with formatting and preview.</p>
+                <a href="text-generator.html" class="open-tool">Open Tool <i class="fa-solid fa-arrow-right"></i></a>
             </div>
-            <div class="footer-bottom">
-                <p>© 2026 CyrusLinksHub. All Rights Reserved.</p>
+
+            <div class="tool-card">
+                <h3>Color Codes</h3>
+                <p>Complete Minecraft color codes and formatting reference guide.</p>
+                <a href="color-codes.html" class="open-tool">Open Tool <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+
+            <div class="tool-card">
+                <h3>Command Generator</h3>
+                <p>Generate Minecraft commands quickly with syntax assistance.</p>
+                <a href="command-generator.html" class="open-tool">Open Tool <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+
+            <div class="tool-card">
+                <h3>Enchantment Guide</h3>
+                <p>Browse every enchantment, max levels and compatible items.</p>
+                <a href="enchantment-guide.html" class="open-tool">Open Tool <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+
+            <div class="tool-card">
+                <h3>Potion Guide</h3>
+                <p>Potion recipes, effects, durations and brewing guide.</p>
+                <a href="potion-guide.html" class="open-tool">Open Tool <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+
+            <div class="tool-card">
+                <h3>Banner Generator</h3>
+                <p>Create custom Minecraft banners with pattern previews.</p>
+                <a href="banner-generator.html" class="open-tool">Open Tool <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+
+            <div class="tool-card">
+                <h3>Firework Generator</h3>
+                <p>Generate colorful Minecraft fireworks and flight commands.</p>
+                <a href="firework-generator.html" class="open-tool">Open Tool <i class="fa-solid fa-arrow-right"></i></a>
             </div>
         </div>
-    </footer>
+    </section>
 
-    <button id="topBtn">
-        <i class="fas fa-arrow-up"></i>
-    </button>
+    <!-- UTILITIES -->
+    <section class="glass">
+        <h2>🛠️ Utilities</h2>
+        <p>Web configuration decoders, cryptography tools, and data formatters.</p>
 
-    <script>
-        // Floating arrow logic
-        const topBtn = document.getElementById("topBtn");
-        window.addEventListener("scroll", () => { topBtn.style.display = window.scrollY > 300 ? "flex" : "none"; });
-        topBtn.onclick = () => { window.scrollTo({ top: 0, behavior: "smooth" }); };
+        <div class="tools-grid">
+            <div class="tool-card">
+                <h3>Password Generator</h3>
+                <p>Generate strong, secure passwords with letters, numbers, and symbols instantly.</p>
+                <a href="password-generator.html" class="open-tool">Open Tool <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
 
-        // Neon ambient particle configuration background matrix loop setup
-        const canvas = document.getElementById("particles");
-        const ctx = canvas.getContext("2d");
-        function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-        resize();
-        window.addEventListener("resize", resize);
+            <div class="tool-card">
+                <h3>QR Code Generator</h3>
+                <p>Generate QR codes for links, text, WiFi and more layout options.</p>
+                <a href="qr-generator.html" class="open-tool">Open Tool <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
 
-        const particles = [];
-        for (let i = 0; i < 180; i++) {
-            particles.push({
-                x: Math.random() * canvas.width,
-                y: Math.random() * canvas.height,
-                r: Math.random() * 2 + 0.6,
-                dx: (Math.random() - 0.5) * 0.25,
-                dy: (Math.random() - 0.5) * 0.25
-            });
-        }
+            <div class="tool-card">
+                <h3>Website Status Checker</h3>
+                <p>Check if a website is online or offline instantly with tracking.</p>
+                <a href="website-status.html" class="open-tool">Open Tool <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
 
-        function animate() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            particles.forEach(p => {
-                p.x += p.dx; p.y += p.dy;
-                if (p.x < 0) p.x = canvas.width;
-                if (p.x > canvas.width) p.x = 0;
-                if (p.y < 0) p.y = canvas.height;
-                if (p.y > canvas.height) p.y = 0;
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-                ctx.fillStyle = "#26F4FF";
-                ctx.shadowColor = "#26F4FF";
-                ctx.shadowBlur = 12;
-                ctx.fill();
-            });
-            requestAnimationFrame(animate);
-        }
-        animate();
-    </script>
+            <div class="tool-card">
+                <h3>Website Ping Checker</h3>
+                <p>Measure website response time and latency checking.</p>
+                <a href="website-ping.html" class="open-tool">Open Tool <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
 
-    <!-- Content Protection Script Hook Attachment Layer -->
-    <script src="protection.js"></script>
+            <div class="tool-card">
+                <h3>UUID Generator</h3>
+                <p>Generate random v4 UUIDs conforming to security standards.</p>
+                <a href="uuid-generator.html" class="open-tool">Open Tool <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+
+            <div class="tool-card">
+                <h3>Base64 Encoder/Decoder</h3>
+                <p>Encode and decode base64 strings quickly and safely.</p>
+                <a href="base64.html" class="open-tool">Open Tool <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+
+            <div class="tool-card">
+                <h3>URL Encoder/Decoder</h3>
+                <p>Format and decode URLs safely for web use structures.</p>
+                <a href="url-encoder.html" class="open-tool">Open Tool <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+
+            <div class="tool-card">
+                <h3>JSON Formatter</h3>
+                <p>Beautify, validate and minify JSON data structures format.</p>
+                <a href="json-formatter.html" class="open-tool">Open Tool <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+
+            <div class="tool-card">
+                <h3>Word Counter</h3>
+                <p>Count words, characters, sentences, and paragraphs in real time.</p>
+                <a href="word-counter.html" class="open-tool">Open Tool <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+
+            <div class="tool-card">
+                <h3>Color Generator</h3>
+                <p>Generate HEX, RGB, and HSL colors instantly with palette options.</p>
+                <a href="color-generator.html" class="open-tool">Open Tool <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+
+            <div class="tool-card">
+                <h3>Timestamp Converter</h3>
+                <p>Convert UNIX timestamps to readable local date and time.</p>
+                <a href="timestamp.html" class="open-tool">Open Tool <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+
+            <div class="tool-card">
+                <h3>Random Generator</h3>
+                <p>Generate random numbers, names, and custom elements.</p>
+                <a href="random-generator.html" class="open-tool">Open Tool <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta">
+        <h2>Need a custom tool or resource?</h2>
+        <p>Submit diagnostic update suggestions or software requests directly within our developer interaction forums.</p>
+        <a href="https://discord.gg/" class="btn-discord" target="_blank"><i class="fa-brands fa-discord"></i> Request Tool On Discord</a>
+    </section>
+
+</main>
+
+<!-- FOOTER -->
+<footer>
+    <div class="footer-grid">
+        <div class="footer-col">
+            <div class="footer-brand">cyruslinkshub</div>
+            <p style="color: var(--muted); font-size: 0.9rem;">Your ultimate online hub for tools, games, and entertainment.</p>
+        </div>
+        <div class="footer-col">
+            <h4>Navigation</h4>
+            <a href="index.html">Home</a>
+            <a href="tools.html">Tools</a>
+            <a href="games.html">Games</a>
+            <a href="index.html#about">About</a>
+        </div>
+        <div class="footer-col">
+            <h4>Resources</h4>
+            <a href="apk.html">APK</a>
+            <a href="movies.html">Movies</a>
+            <a href="music.html">Music</a>
+        </div>
+        <div class="footer-col">
+            <h4>Community</h4>
+            <a href="https://discord.gg/" target="_blank">Discord</a>
+            <a href="https://github.com/" target="_blank">GitHub</a>
+            <a href="https://youtube.com/" target="_blank">YouTube</a>
+        </div>
+    </div>
+    <div class="copyright">© 2026 CyrusLinksHub. All Rights Reserved.</div>
+</footer>
 
 </body>
-</html>
+                                                                                         </html>
