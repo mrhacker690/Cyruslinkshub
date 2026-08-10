@@ -9,22 +9,16 @@
 </head>
 <body>
 
-<!-- ============ NAVBAR v3 ============ -->
+<!-- ============ NAVBAR ============ -->
 <nav class="navbar">
-    <!-- Discord badge (curved rectangle) + glitched thunder logo -->
     <div class="nav-top">
-        <div class="brand-wrap">
-            <a href="https://discord.gg/" target="_blank" class="discord-badge" title="Join Discord">
-                <i class="fa-brands fa-discord"></i>
-            </a>
-            <a href="index.html" class="logo glitch" data-text="cyruslinkshub">cyruslinkshub</a>
-        </div>
+        <a href="index.html" class="logo glitch" data-text="cyruslinkshub">cyruslinkshub</a>
+        <!-- Avatar + username shows here when logged in (hidden otherwise) -->
+        <div class="profile-area" id="profileArea"></div>
     </div>
-
-    <!-- Scrollable menu -->
     <div class="nav-links">
-        <a href="index.html" class="active">Home</a>
-        <a href="tools.html">Tools</a>
+        <a href="index.html">Home</a>
+        <a href="tools.html" class="active">Tools</a>
         <a href="games.html">Games</a>
         <a href="apk.html">APK</a>
         <a href="movies.html">Movies</a>
@@ -48,91 +42,78 @@
         <p>Advanced diagnostic layers, custom color asset designers, and game asset download tools.</p>
 
         <div class="tools-grid">
-
             <div class="tool-card">
                 <i class="fa-solid fa-server tool-icon ic-green"></i>
                 <h3>Minecraft Server Status</h3>
                 <p>Check live Minecraft server status, online players, version, MOTD and ping instantly.</p>
                 <a href="minecraft-status-checker.html" class="open-tool">Open Tool <i class="fa-solid fa-arrow-right"></i></a>
             </div>
-
             <div class="tool-card">
                 <i class="fa-solid fa-cubes tool-icon ic-cyan"></i>
                 <h3>PaperMC Build Checker</h3>
                 <p>Check the latest PaperMC versions, builds and download links directly from PaperMC.</p>
                 <a href="paper-checker.html" class="open-tool">Open Tool <i class="fa-solid fa-arrow-right"></i></a>
             </div>
-
             <div class="tool-card">
                 <i class="fa-solid fa-user-astronaut tool-icon ic-pink"></i>
                 <h3>Skin Downloader</h3>
                 <p>Download Minecraft skins, preview them and fetch Usernames easily.</p>
                 <a href="skin-downloader.html" class="open-tool">Open Tool <i class="fa-solid fa-arrow-right"></i></a>
             </div>
-
             <div class="tool-card">
                 <i class="fa-solid fa-magnifying-glass tool-icon ic-yellow"></i>
                 <h3>Username Lookup</h3>
                 <p>Lookup Minecraft names, history, UUIDs and skin text account information.</p>
                 <a href="username-lookup.html" class="open-tool">Open Tool <i class="fa-solid fa-arrow-right"></i></a>
             </div>
-
             <div class="tool-card">
                 <i class="fa-solid fa-wand-magic-sparkles tool-icon ic-purple"></i>
                 <h3>Nickname Generator</h3>
                 <p>Generate cool, aesthetic and RPG style Minecraft nicknames.</p>
                 <a href="nickname-generator.html" class="open-tool">Open Tool <i class="fa-solid fa-arrow-right"></i></a>
             </div>
-
             <div class="tool-card">
                 <i class="fa-solid fa-font tool-icon ic-cyan"></i>
                 <h3>Minecraft Text Generator</h3>
                 <p>Create beautiful Minecraft styled text with formatting and preview.</p>
                 <a href="text-generator.html" class="open-tool">Open Tool <i class="fa-solid fa-arrow-right"></i></a>
             </div>
-
             <div class="tool-card">
                 <i class="fa-solid fa-palette tool-icon ic-pink"></i>
                 <h3>Color Codes</h3>
                 <p>Complete Minecraft color codes and formatting reference guide.</p>
                 <a href="color-codes.html" class="open-tool">Open Tool <i class="fa-solid fa-arrow-right"></i></a>
             </div>
-
             <div class="tool-card">
                 <i class="fa-solid fa-terminal tool-icon ic-green"></i>
                 <h3>Command Generator</h3>
                 <p>Generate Minecraft commands quickly with syntax assistance.</p>
                 <a href="command-generator.html" class="open-tool">Open Tool <i class="fa-solid fa-arrow-right"></i></a>
             </div>
-
             <div class="tool-card">
                 <i class="fa-solid fa-hat-wizard tool-icon ic-purple"></i>
                 <h3>Enchantment Guide</h3>
                 <p>Browse every enchantment, max levels and compatible items.</p>
                 <a href="enchantment-guide.html" class="open-tool">Open Tool <i class="fa-solid fa-arrow-right"></i></a>
             </div>
-
             <div class="tool-card">
                 <i class="fa-solid fa-flask tool-icon ic-green"></i>
                 <h3>Potion Guide</h3>
                 <p>Potion recipes, effects, durations and brewing guide.</p>
                 <a href="potion-guide.html" class="open-tool">Open Tool <i class="fa-solid fa-arrow-right"></i></a>
             </div>
-
             <div class="tool-card">
                 <i class="fa-solid fa-flag tool-icon ic-yellow"></i>
                 <h3>Banner Generator</h3>
                 <p>Create custom Minecraft banners with pattern previews.</p>
                 <a href="banner-generator.html" class="open-tool">Open Tool <i class="fa-solid fa-arrow-right"></i></a>
             </div>
-
             <div class="tool-card">
                 <i class="fa-solid fa-rocket tool-icon ic-pink"></i>
                 <h3>Firework Generator</h3>
                 <p>Generate colorful Minecraft fireworks and flight commands.</p>
                 <a href="firework-generator.html" class="open-tool">Open Tool <i class="fa-solid fa-arrow-right"></i></a>
             </div>
-
         </div>
     </section>
 
@@ -142,91 +123,78 @@
         <p>Web configuration decoders, cryptography tools, and data formatters.</p>
 
         <div class="tools-grid">
-
             <div class="tool-card">
                 <i class="fa-solid fa-key tool-icon ic-yellow"></i>
                 <h3>Password Generator</h3>
                 <p>Generate strong, secure passwords with letters, numbers, and symbols instantly.</p>
                 <a href="password-generator.html" class="open-tool">Open Tool <i class="fa-solid fa-arrow-right"></i></a>
             </div>
-
             <div class="tool-card">
                 <i class="fa-solid fa-qrcode tool-icon ic-cyan"></i>
                 <h3>QR Code Generator</h3>
                 <p>Generate QR codes for links, text, WiFi and more layout options.</p>
                 <a href="qr-generator.html" class="open-tool">Open Tool <i class="fa-solid fa-arrow-right"></i></a>
             </div>
-
             <div class="tool-card">
                 <i class="fa-solid fa-heart-pulse tool-icon ic-green"></i>
                 <h3>Website Status Checker</h3>
                 <p>Check if a website is online or offline instantly with tracking.</p>
                 <a href="website-status.html" class="open-tool">Open Tool <i class="fa-solid fa-arrow-right"></i></a>
             </div>
-
             <div class="tool-card">
                 <i class="fa-solid fa-gauge-high tool-icon ic-cyan"></i>
                 <h3>Website Ping Checker</h3>
                 <p>Measure website response time and latency checking.</p>
                 <a href="website-ping.html" class="open-tool">Open Tool <i class="fa-solid fa-arrow-right"></i></a>
             </div>
-
             <div class="tool-card">
                 <i class="fa-solid fa-fingerprint tool-icon ic-pink"></i>
                 <h3>UUID Generator</h3>
                 <p>Generate random v4 UUIDs conforming to security standards.</p>
                 <a href="uuid-generator.html" class="open-tool">Open Tool <i class="fa-solid fa-arrow-right"></i></a>
             </div>
-
             <div class="tool-card">
                 <i class="fa-solid fa-shuffle tool-icon ic-purple"></i>
                 <h3>Base64 Encoder/Decoder</h3>
                 <p>Encode and decode base64 strings quickly and safely.</p>
                 <a href="base64.html" class="open-tool">Open Tool <i class="fa-solid fa-arrow-right"></i></a>
             </div>
-
             <div class="tool-card">
                 <i class="fa-solid fa-link tool-icon ic-cyan"></i>
                 <h3>URL Encoder/Decoder</h3>
                 <p>Format and decode URLs safely for web use structures.</p>
                 <a href="url-encoder.html" class="open-tool">Open Tool <i class="fa-solid fa-arrow-right"></i></a>
             </div>
-
             <div class="tool-card">
                 <i class="fa-solid fa-code tool-icon ic-green"></i>
                 <h3>JSON Formatter</h3>
                 <p>Beautify, validate and minify JSON data structures format.</p>
                 <a href="json-formatter.html" class="open-tool">Open Tool <i class="fa-solid fa-arrow-right"></i></a>
             </div>
-
             <div class="tool-card">
                 <i class="fa-solid fa-calculator tool-icon ic-yellow"></i>
                 <h3>Word Counter</h3>
                 <p>Count words, characters, sentences, and paragraphs in real time.</p>
                 <a href="word-counter.html" class="open-tool">Open Tool <i class="fa-solid fa-arrow-right"></i></a>
             </div>
-
             <div class="tool-card">
                 <i class="fa-solid fa-eye-dropper tool-icon ic-pink"></i>
                 <h3>Color Generator</h3>
                 <p>Generate HEX, RGB, and HSL colors instantly with palette options.</p>
                 <a href="color-generator.html" class="open-tool">Open Tool <i class="fa-solid fa-arrow-right"></i></a>
             </div>
-
             <div class="tool-card">
                 <i class="fa-solid fa-clock tool-icon ic-cyan"></i>
                 <h3>Timestamp Converter</h3>
                 <p>Convert UNIX timestamps to readable local date and time.</p>
                 <a href="timestamp.html" class="open-tool">Open Tool <i class="fa-solid fa-arrow-right"></i></a>
             </div>
-
             <div class="tool-card">
                 <i class="fa-solid fa-dice tool-icon ic-purple"></i>
                 <h3>Random Generator</h3>
                 <p>Generate random numbers, names, and custom elements.</p>
                 <a href="random-generator.html" class="open-tool">Open Tool <i class="fa-solid fa-arrow-right"></i></a>
             </div>
-
         </div>
     </section>
 
@@ -234,9 +202,7 @@
     <section class="cta" id="about">
         <h2>Need a custom tool or resource?</h2>
         <p>Submit diagnostic update suggestions or software requests directly within our developer interaction forums.</p>
-        <a href="https://discord.gg/" class="discord-cta" target="_blank">
-            <i class="fa-brands fa-discord"></i> Request Tool On Discord
-        </a>
+        <a href="https://discord.gg/" class="discord-cta" target="_blank"><i class="fa-brands fa-discord"></i> Request Tool On Discord</a>
     </section>
 
 </main>
@@ -270,6 +236,53 @@
     </div>
     <div class="copyright">© 2026 CyrusLinksHub. All Rights Reserved.</div>
 </footer>
+
+<!-- ============ PROFILE CHIP (avatar + name right of logo) ============ -->
+<script>
+(function () {
+    var area = document.getElementById('profileArea');
+    if (!area) return;
+    var p = null;
+    try { p = JSON.parse(localStorage.getItem('clh_profile')); } catch (e) {}
+
+    /* Not logged in → spot stays hidden */
+    if (!p) { area.style.display = 'none'; return; }
+
+    var chip = document.createElement('div');
+    chip.className = 'profile-chip';
+
+    var img = document.createElement('img');
+    img.className = 'avatar-img';
+    img.alt = p.name || '';
+    img.src = p.avatar || '';
+    img.onerror = function () {
+        img.onerror = null;
+        img.src = 'https://api.dicebear.com/9.x/initials/svg?seed=' + encodeURIComponent(p.name || 'player');
+    };
+
+    var nm = document.createElement('span');
+    nm.className = 'profile-name';
+    nm.textContent = p.name || '';
+
+    var menu = document.createElement('div');
+    menu.className = 'profile-menu';
+    menu.innerHTML =
+        '<div class="pm-head"><i class="fa-solid fa-circle-check"></i> ' + (p.provider || '') + ' account</div>' +
+        '<button id="clhOut"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>';
+
+    chip.appendChild(img);
+    chip.appendChild(nm);
+    chip.appendChild(menu);
+    chip.onclick = function () { menu.classList.toggle('show'); };
+    area.appendChild(chip);
+
+    menu.querySelector('#clhOut').onclick = function (e) {
+        e.stopPropagation();
+        localStorage.removeItem('clh_profile');
+        location.href = 'index.html';
+    };
+})();
+</script>
 
 </body>
     </html>
