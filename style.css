@@ -798,3 +798,49 @@ button i, .btn i, .open-tool i, a i {
     71% { opacity: 0.6; }
     72% { opacity: 1; text-shadow: 0 0 16px #fff, 0 0 55px var(--cyan), 0 0 110px rgba(0,240,255,1); }
    }
+/* ===========================================================
+   SCROLL ANIMATIONS — progress bar + reveal effects
+=========================================================== */
+
+/* Neon scroll progress bar */
+#scrollProgress {
+    position: fixed; top: 0; left: 0;
+    height: 3px; width: 0;
+    background: linear-gradient(90deg, var(--cyan), var(--pink), var(--purple));
+    box-shadow: 0 0 14px var(--cyan), 0 0 30px rgba(255,43,214,.5);
+    z-index: 1000;
+    border-radius: 0 3px 3px 0;
+}
+
+/* Navbar glow when scrolled */
+.navbar.scrolled, nav.scrolled {
+    background: rgba(5, 1, 13, 0.97);
+    box-shadow: 0 6px 35px rgba(0, 240, 255, 0.18);
+}
+
+/* Reveal states (hidden before scroll) */
+.reveal, .reveal-left, .reveal-right, .reveal-zoom, .reveal-flip {
+    animation: none !important; /* override load animation */
+    will-change: transform, opacity;
+    transition: opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+                transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.reveal       { opacity: 0; transform: translateY(45px); }
+.reveal-left  { opacity: 0; transform: translateX(-70px); }
+.reveal-right { opacity: 0; transform: translateX(70px); }
+.reveal-zoom  { opacity: 0; transform: scale(0.75); }
+.reveal-flip  { opacity: 0; transform: perspective(700px) rotateX(14deg) translateY(40px); }
+
+.reveal.active, .reveal-left.active, .reveal-right.active,
+.reveal-zoom.active, .reveal-flip.active {
+    opacity: 1; transform: none;
+}
+
+/* Back-to-top neon button */
+.back-top {
+    position: fixed; right: 22px; bottom: 22px; z-index: 900;
+    width: 48px; height: 48px; border-radius: 12px;
+    opacity: 0; pointer-events: none; transform: translateY(20px);
+    transition: 0.4s;
+}
+.back-top.show { opacity: 1; pointer-events: auto; transform: none; }
