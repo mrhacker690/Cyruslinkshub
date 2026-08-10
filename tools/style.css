@@ -712,3 +712,89 @@ button i, .btn i, .open-tool i, a i {
     .nav-top .btn-discord span { display: none; }
     .nav-top .btn-discord { padding: 10px 14px; font-size: 1rem; }
    }
+/* ===========================================================
+   BRAND v3 — Discord badge (curved rectangle) + Glitch Thunder Logo
+=========================================================== */
+
+/* Row layout: badge + logo side by side */
+.brand-wrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* Discord logo in curved rectangle — sits where old ⚡ logo was */
+.discord-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 46px;
+    height: 40px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--discord), var(--purple));
+    color: #fff;
+    font-size: 1.25rem;
+    box-shadow: 0 0 16px rgba(88, 101, 242, 0.65), inset 0 0 10px rgba(255,255,255,0.15);
+    transition: 0.3s;
+    flex: 0 0 auto;
+}
+.discord-badge:hover {
+    transform: scale(1.12) rotate(-5deg);
+    box-shadow: 0 0 30px rgba(88, 101, 242, 0.95);
+    color: #fff;
+    text-shadow: none;
+}
+
+/* Glitched thundering shining logo */
+.logo.glitch {
+    position: relative;
+    z-index: 1;
+    display: inline-block;
+    animation: thunder 3.5s infinite;
+}
+
+/* RGB split glitch layers */
+.logo.glitch::before,
+.logo.glitch::after {
+    content: attr(data-text);
+    position: absolute;
+    left: 0; top: 0;
+    width: 100%; height: 100%;
+    z-index: -1;
+    opacity: 0.85;
+}
+.logo.glitch::before {
+    color: var(--pink);
+    clip-path: inset(0 0 55% 0);
+    animation: glitchA 2.4s infinite steps(2, end);
+}
+.logo.glitch::after {
+    color: var(--cyan);
+    clip-path: inset(55% 0 0 0);
+    animation: glitchB 3.1s infinite steps(2, end);
+}
+
+@keyframes glitchA {
+    0%, 86%, 100% { transform: translate(0);        clip-path: inset(0 0 55% 0); }
+    88% { transform: translate(-3px, -2px); clip-path: inset(10% 0 40% 0); }
+    92% { transform: translate(3px, 1px);   clip-path: inset(0 0 70% 0); }
+    96% { transform: translate(-2px, 2px);  clip-path: inset(30% 0 20% 0); }
+}
+@keyframes glitchB {
+    0%, 84%, 100% { transform: translate(0);        clip-path: inset(55% 0 0 0); }
+    87% { transform: translate(3px, 2px);   clip-path: inset(40% 0 10% 0); }
+    91% { transform: translate(-3px, -1px); clip-path: inset(70% 0 0 0); }
+    95% { transform: translate(2px, -2px);  clip-path: inset(20% 0 30% 0); }
+}
+
+/* Thunder flicker + electric shine */
+@keyframes thunder {
+    0%, 100% { text-shadow: 0 0 6px #fff, 0 0 15px var(--cyan), 0 0 40px rgba(0,240,255,0.8); opacity: 1; }
+    6%  { opacity: 0.35; }
+    7%  { opacity: 1; text-shadow: 0 0 12px #fff, 0 0 45px var(--cyan), 0 0 90px var(--cyan); }
+    38% { opacity: 1; }
+    39% { opacity: 0.5; }
+    40% { opacity: 1; text-shadow: 0 0 14px #fff, 0 0 50px var(--pink), 0 0 100px var(--cyan); }
+    71% { opacity: 0.6; }
+    72% { opacity: 1; text-shadow: 0 0 16px #fff, 0 0 55px var(--cyan), 0 0 110px rgba(0,240,255,1); }
+   }
