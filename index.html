@@ -7,7 +7,10 @@
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 
-<!-- Small styles only for the profile chip (can also be moved into style.css) -->
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+
 <style>
 .profile-area { margin-left: auto; display: flex; align-items: center; }
 .profile-chip { position: relative; display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 6px 12px; border: 1px solid var(--border); border-radius: 999px; background: rgba(0,240,255,.07); box-shadow: 0 0 14px rgba(0,240,255,.15); }
@@ -22,7 +25,7 @@
 </head>
 <body>
 
-<!-- ============ NAVBAR (same as tools.html) ============ -->
+<!-- ============ NAVBAR ============ -->
 <nav class="navbar">
     <div class="nav-top">
         <a href="index.html" class="logo glitch" data-text="cyruslinkshub">cyruslinkshub</a>
@@ -178,7 +181,7 @@
 
 </main>
 
-<!-- ============ FOOTER (same as tools.html) ============ -->
+<!-- ============ FOOTER ============ -->
 <footer>
     <div class="footer-grid">
         <div class="footer-col">
@@ -210,50 +213,6 @@
 
 <!-- ============ PROFILE CHIP + COUNTERS + FAQ ============ -->
 <script>
-/* Profile avatar + name at right of logo (same as tools.html) */
-(function () {
-    var area = document.getElementById('profileArea');
-    if (!area) return;
-    var p = null;
-    try { p = JSON.parse(localStorage.getItem('clh_profile')); } catch (e) {}
-
-    if (!p) { area.style.display = 'none'; return; }
-
-    var chip = document.createElement('div');
-    chip.className = 'profile-chip';
-
-    var img = document.createElement('img');
-    img.className = 'avatar-img';
-    img.alt = p.name || '';
-    img.src = p.avatar || '';
-    img.onerror = function () {
-        img.onerror = null;
-        img.src = 'https://api.dicebear.com/9.x/initials/svg?seed=' + encodeURIComponent(p.name || 'player');
-    };
-
-    var nm = document.createElement('span');
-    nm.className = 'profile-name';
-    nm.textContent = p.name || '';
-
-    var menu = document.createElement('div');
-    menu.className = 'profile-menu';
-    menu.innerHTML =
-        '<div class="pm-head"><i class="fa-solid fa-circle-check"></i> ' + (p.provider || '') + ' account</div>' +
-        '<button id="clhOut"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>';
-
-    chip.appendChild(img);
-    chip.appendChild(nm);
-    chip.appendChild(menu);
-    chip.onclick = function () { menu.classList.toggle('show'); };
-    area.appendChild(chip);
-
-    menu.querySelector('#clhOut').onclick = function (e) {
-        e.stopPropagation();
-        localStorage.removeItem('clh_profile');
-        location.href = 'index.html';
-    };
-})();
-
 /* Animated stat counters */
 function countUp(id, target) {
     var el = document.getElementById(id);
@@ -274,7 +233,10 @@ function toggleFaq(id) {
     el.style.display = (el.style.display === 'none') ? 'block' : 'none';
 }
 </script>
-<script src="scroll.js"></script>
+
+<script src="auth-firebase.js"></script>
 <script src="profile-chip.js"></script>
+<script src="scroll.js"></script>
+    
 </body>
-        </html>
+                                             </html>
