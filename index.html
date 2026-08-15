@@ -6,30 +6,27 @@
 <title>CyrusLinksHub | Home</title>
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
-
-<!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-
 <style>
-.profile-area { margin-left: auto; display: flex; align-items: center; }
-.profile-chip { position: relative; display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 6px 12px; border: 1px solid var(--border); border-radius: 999px; background: rgba(0,240,255,.07); box-shadow: 0 0 14px rgba(0,240,255,.15); }
-.avatar-img { width: 38px; height: 38px; border-radius: 50%; border: 2px solid var(--cyan); box-shadow: 0 0 12px var(--cyan); object-fit: cover; background: #000; }
-.profile-name { font-family: 'Orbitron', sans-serif; font-size: .72rem; color: var(--cyan); max-width: 110px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.profile-menu { position: absolute; top: 115%; right: 0; background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 10px; display: none; min-width: 170px; z-index: 300; box-shadow: 0 0 25px rgba(0,240,255,.25); }
-.profile-menu.show { display: block; }
-.pm-head { font-size: .68rem; color: var(--muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
-.profile-menu button { width: 100%; background: rgba(255,0,80,.15); color: #ff5588; box-shadow: none; }
-@media (max-width: 480px) { .profile-name { display: none; } }
+.profile-area{margin-left:auto;display:flex;align-items:center;gap:10px}
+.profile-chip{position:relative;display:flex;align-items:center;gap:10px;cursor:pointer;padding:6px 12px;border:1px solid rgba(0,240,255,.25);border-radius:999px;background:rgba(0,240,255,.07);box-shadow:0 0 14px rgba(0,240,255,.15)}
+.avatar-img{width:38px;height:38px;border-radius:50%;border:2px solid var(--cyan);box-shadow:0 0 12px var(--cyan);object-fit:cover;background:#000}
+.profile-name{font-family:'Orbitron',sans-serif;font-size:.72rem;color:var(--cyan);max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.profile-menu{position:absolute;top:115%;right:0;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:10px;display:none;min-width:170px;z-index:300;box-shadow:0 0 25px rgba(0,240,255,.25)}
+.profile-menu.show{display:block}
+.pm-head{font-size:.68rem;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px}
+.profile-menu button{width:100%;background:rgba(255,0,80,.15);color:#ff5588;box-shadow:none;border:none;border-radius:8px;padding:10px;cursor:pointer;font-family:'Orbitron',sans-serif}
+.btn-guest{background:transparent;border:1px solid var(--cyan);color:var(--cyan);box-shadow:none;font-size:.7rem;padding:10px 16px;border-radius:999px}
+.btn-guest:hover{background:rgba(0,240,255,.1)}
+@media(max-width:480px){.profile-name{display:none}}
 </style>
 </head>
 <body>
 
-<!-- ============ NAVBAR ============ -->
 <nav class="navbar">
     <div class="nav-top">
         <a href="index.html" class="logo glitch" data-text="cyruslinkshub">cyruslinkshub</a>
-        <!-- Avatar + username shows here when logged in (hidden otherwise) -->
         <div class="profile-area" id="profileArea"></div>
     </div>
     <div class="nav-links">
@@ -45,7 +42,6 @@
 
 <main class="container">
 
-    <!-- ============ HERO ============ -->
     <section class="glass hero">
         <p class="tagline">Powerful • Fast • Secure • Community Driven</p>
         <h1>WELCOME TO CYRUSLINKSHUB</h1>
@@ -56,7 +52,6 @@
         </div>
     </section>
 
-    <!-- ============ WHY CHOOSE ============ -->
     <section class="glass">
         <h2>Why Choose CyrusLinksHub</h2>
         <p class="tagline">Your Modern Gaming & Utility Platform</p>
@@ -65,51 +60,19 @@
         <p>Our mission is to build one powerful hub where everyone can discover useful tools, downloads, tutorials and an active community.</p>
     </section>
 
-    <!-- ============ WHAT WE OFFER ============ -->
     <section class="glass">
         <h2>What We Offer</h2>
         <p>Everything in one place.</p>
         <div class="tools-grid">
-            <div class="tool-card">
-                <span class="tool-icon">🛠️</span>
-                <h3>Online Tools</h3>
-                <p>Minecraft utilities, generators, server checkers and developer tools.</p>
-                <a href="tools.html" class="open-tool">Explore <i class="fa-solid fa-arrow-right"></i></a>
-            </div>
-            <div class="tool-card">
-                <span class="tool-icon">🎮</span>
-                <h3>Gaming</h3>
-                <p>Gaming resources, mods, downloads, guides and much more.</p>
-                <a href="games.html" class="open-tool">Explore <i class="fa-solid fa-arrow-right"></i></a>
-            </div>
-            <div class="tool-card">
-                <span class="tool-icon">📱</span>
-                <h3>APK Collection</h3>
-                <p>Safe Android applications, utilities and premium apps.</p>
-                <a href="apk.html" class="open-tool">Explore <i class="fa-solid fa-arrow-right"></i></a>
-            </div>
-            <div class="tool-card">
-                <span class="tool-icon">🎬</span>
-                <h3>Movies</h3>
-                <p>Entertainment resources, movie collections and updates.</p>
-                <a href="movies.html" class="open-tool">Explore <i class="fa-solid fa-arrow-right"></i></a>
-            </div>
-            <div class="tool-card">
-                <span class="tool-icon">🎵</span>
-                <h3>Music</h3>
-                <p>Music streaming, albums and entertainment resources.</p>
-                <a href="music.html" class="open-tool">Explore <i class="fa-solid fa-arrow-right"></i></a>
-            </div>
-            <div class="tool-card">
-                <span class="tool-icon">💬</span>
-                <h3>Community</h3>
-                <p>Join our growing Discord community, events and announcements.</p>
-                <a href="https://discord.gg/" target="_blank" class="open-tool">Join <i class="fa-solid fa-arrow-right"></i></a>
-            </div>
+            <div class="tool-card"><span class="tool-icon">🛠️</span><h3>Online Tools</h3><p>Minecraft utilities, generators, server checkers and developer tools.</p><a href="tools.html" class="open-tool">Explore <i class="fa-solid fa-arrow-right"></i></a></div>
+            <div class="tool-card"><span class="tool-icon">🎮</span><h3>Gaming</h3><p>Gaming resources, mods, downloads, guides and much more.</p><a href="games.html" class="open-tool">Explore <i class="fa-solid fa-arrow-right"></i></a></div>
+            <div class="tool-card"><span class="tool-icon">📱</span><h3>APK Collection</h3><p>Safe Android applications, utilities and premium apps.</p><a href="apk.html" class="open-tool">Explore <i class="fa-solid fa-arrow-right"></i></a></div>
+            <div class="tool-card"><span class="tool-icon">🎬</span><h3>Movies</h3><p>Entertainment resources, movie collections and updates.</p><a href="movies.html" class="open-tool">Explore <i class="fa-solid fa-arrow-right"></i></a></div>
+            <div class="tool-card"><span class="tool-icon">🎵</span><h3>Music</h3><p>Music streaming, albums and entertainment resources.</p><a href="music.html" class="open-tool">Explore <i class="fa-solid fa-arrow-right"></i></a></div>
+            <div class="tool-card"><span class="tool-icon">💬</span><h3>Community</h3><p>Join our growing Discord community, events and announcements.</p><a href="https://discord.gg/" target="_blank" class="open-tool">Join <i class="fa-solid fa-arrow-right"></i></a></div>
         </div>
     </section>
 
-    <!-- ============ WHY CHOOSE FEATURES ============ -->
     <section class="glass">
         <h2>Why Choose CyrusLinksHub?</h2>
         <p>Designed with performance and simplicity.</p>
@@ -121,7 +84,6 @@
         </div>
     </section>
 
-    <!-- ============ COMMUNITY ============ -->
     <section class="glass">
         <h2>Join Our Community</h2>
         <p>Become part of the CyrusLinksHub family.</p>
@@ -137,7 +99,6 @@
         <a href="https://discord.gg/" target="_blank"><button class="btn-discord"><i class="fa-brands fa-discord"></i> Join Discord</button></a>
     </section>
 
-    <!-- ============ STATISTICS ============ -->
     <section class="glass">
         <h2>Platform Statistics</h2>
         <div class="hero-stats">
@@ -148,30 +109,15 @@
         </div>
     </section>
 
-    <!-- ============ FAQ ============ -->
     <section class="glass">
         <h2>Frequently Asked Questions</h2>
         <p>Everything you need to know.</p>
-
-        <div class="faq-item">
-            <button class="faq-q" onclick="toggleFaq('f1')">What is CyrusLinksHub? <i class="fa-solid fa-chevron-down"></i></button>
-            <div class="faq-a" id="f1" style="display:none;">CyrusLinksHub is an all-in-one platform for gaming tools, Minecraft resources, APK downloads, entertainment, utilities and community content.</div>
-        </div>
-        <div class="faq-item">
-            <button class="faq-q" onclick="toggleFaq('f2')">Are all tools free? <i class="fa-solid fa-chevron-down"></i></button>
-            <div class="faq-a" id="f2" style="display:none;">Yes. Almost every tool on CyrusLinksHub is completely free to use directly from your browser.</div>
-        </div>
-        <div class="faq-item">
-            <button class="faq-q" onclick="toggleFaq('f3')">How often is the website updated? <i class="fa-solid fa-chevron-down"></i></button>
-            <div class="faq-a" id="f3" style="display:none;">We regularly add new tools, features, games, downloads and improvements.</div>
-        </div>
-        <div class="faq-item">
-            <button class="faq-q" onclick="toggleFaq('f4')">Can I suggest new tools? <i class="fa-solid fa-chevron-down"></i></button>
-            <div class="faq-a" id="f4" style="display:none;">Absolutely! Join our Discord server and submit your ideas.</div>
-        </div>
+        <div class="faq-item"><button class="faq-q" onclick="toggleFaq('f1')">What is CyrusLinksHub? <i class="fa-solid fa-chevron-down"></i></button><div class="faq-a" id="f1" style="display:none;">CyrusLinksHub is an all-in-one platform for gaming tools, Minecraft resources, APK downloads, entertainment, utilities and community content.</div></div>
+        <div class="faq-item"><button class="faq-q" onclick="toggleFaq('f2')">Are all tools free? <i class="fa-solid fa-chevron-down"></i></button><div class="faq-a" id="f2" style="display:none;">Yes. Almost every tool on CyrusLinksHub is completely free to use directly from your browser.</div></div>
+        <div class="faq-item"><button class="faq-q" onclick="toggleFaq('f3')">How often is the website updated? <i class="fa-solid fa-chevron-down"></i></button><div class="faq-a" id="f3" style="display:none;">We regularly add new tools, features, games, downloads and improvements.</div></div>
+        <div class="faq-item"><button class="faq-q" onclick="toggleFaq('f4')">Can I suggest new tools? <i class="fa-solid fa-chevron-down"></i></button><div class="faq-a" id="f4" style="display:none;">Absolutely! Join our Discord server and submit your ideas.</div></div>
     </section>
 
-    <!-- ============ CTA ============ -->
     <section class="cta" id="about">
         <h2>Ready To Explore?</h2>
         <p>Discover premium tools, downloads, gaming resources and become part of the community. Enjoy!</p>
@@ -181,43 +127,101 @@
 
 </main>
 
-<!-- ============ FOOTER ============ -->
 <footer>
     <div class="footer-grid">
-        <div class="footer-col">
-            <div class="footer-brand">cyruslinkshub</div>
-            <p>Your ultimate online hub for tools, games, and entertainment.</p>
-        </div>
-        <div class="footer-col">
-            <h4>Navigation</h4>
-            <a href="index.html">Home</a>
-            <a href="tools.html">Tools</a>
-            <a href="games.html">Games</a>
-            <a href="index.html#about">About</a>
-        </div>
-        <div class="footer-col">
-            <h4>Resources</h4>
-            <a href="apk.html">APK</a>
-            <a href="movies.html">Movies</a>
-            <a href="music.html">Music</a>
-        </div>
-        <div class="footer-col">
-            <h4>Community</h4>
-            <a href="https://discord.gg/" target="_blank">Discord</a>
-            <a href="https://github.com/" target="_blank">GitHub</a>
-            <a href="https://youtube.com/" target="_blank">YouTube</a>
-        </div>
+        <div class="footer-col"><div class="footer-brand">cyruslinkshub</div><p>Your ultimate online hub for tools, games, and entertainment.</p></div>
+        <div class="footer-col"><h4>Navigation</h4><a href="index.html">Home</a><a href="tools.html">Tools</a><a href="games.html">Games</a><a href="index.html#about">About</a></div>
+        <div class="footer-col"><h4>Resources</h4><a href="apk.html">APK</a><a href="movies.html">Movies</a><a href="music.html">Music</a></div>
+        <div class="footer-col"><h4>Community</h4><a href="https://discord.gg/" target="_blank">Discord</a><a href="https://github.com/" target="_blank">GitHub</a><a href="https://youtube.com/" target="_blank">YouTube</a></div>
     </div>
     <div class="copyright">© 2026 CyrusLinksHub. All Rights Reserved.</div>
 </footer>
 
-<!-- ============ PROFILE CHIP + COUNTERS + FAQ ============ -->
 <script>
-/* Animated stat counters */
+/* ===========================================================
+   BUILT-IN SESSION ENGINE (works on www + dash automatically)
+   - NO bounce on landing (kills the loop)
+   - Cookie + URL handoff = profile visible on dash
+   - Logout clears BOTH domains
+=========================================================== */
+(function () {
+    var COOKIE = 'clh_cookie';
+    var LANDING = 'https://www.cyruslinkshub.com';
+    var LOGIN = LANDING + '/login.html';
+
+    function setCookie(p) {
+        var v = encodeURIComponent(JSON.stringify(p));
+        document.cookie = COOKIE + '=' + v + ';path=/;domain=.cyruslinkshub.com;max-age=31536000';
+        document.cookie = COOKIE + '=' + v + ';path=/;max-age=31536000';
+    }
+    function readCookie() {
+        var m = document.cookie.match(new RegExp('(?:^|;\\s*)' + COOKIE + '=([^;]+)'));
+        if (!m) return null;
+        try { return JSON.parse(decodeURIComponent(m[1])); } catch (e) { return null; }
+    }
+    function readLS() { try { return JSON.parse(localStorage.getItem('clh_profile')); } catch (e) { return null; } }
+
+    /* 1) Receive profile handoff from login (?clh=...) */
+    var hm = location.search.match(/[?&]clh=([^&]+)/);
+    if (hm) {
+        try {
+            var hp = JSON.parse(decodeURIComponent(hm[1]));
+            setCookie(hp);
+            localStorage.setItem('clh_profile', JSON.stringify(hp));
+            location.replace(location.pathname);
+            return;
+        } catch (e) {}
+    }
+
+    var p = readLS() || readCookie();
+    if (p) { try { localStorage.setItem('clh_profile', JSON.stringify(p)); } catch (e) {} setCookie(p); }
+
+    var isDash = location.hostname.indexOf('dash.') === 0;
+
+    /* 2) Dash protection — ONE redirect only, loop-breaker ?out=1 */
+    if (isDash && !p) { location.replace(LOGIN + '?out=1'); return; }
+
+    /* 3) Logout — clears everything on both domains */
+    window.clhLogout = function () {
+        localStorage.removeItem('clh_profile');
+        document.cookie = COOKIE + '=;path=/;domain=.cyruslinkshub.com;expires=Thu, 01 Jan 1970 00:00:00 GMT';
+        document.cookie = COOKIE + '=;path=/;expires=Thu, 01 Jan 1970 00:00:00 GMT';
+        document.cookie = COOKIE + '=;path=/;domain=www.cyruslinkshub.com;expires=Thu, 01 Jan 1970 00:00:00 GMT';
+        document.cookie = COOKIE + '=;path=/;domain=dash.cyruslinkshub.com;expires=Thu, 01 Jan 1970 00:00:00 GMT';
+        var done = function () { location.href = LANDING; };
+        if (typeof firebase !== 'undefined' && firebase.auth) firebase.auth().signOut().then(done, done);
+        else done();
+    };
+
+    /* 4) Render chip or guest button */
+    function render() {
+        var area = document.getElementById('profileArea');
+        if (!area) return;
+        area.innerHTML = '';
+        if (!p) {
+            area.innerHTML = '<a href="' + LOGIN + '"><button class="btn-guest"><i class="fa-solid fa-right-to-bracket"></i> SIGN IN</button></a>';
+            return;
+        }
+        var chip = document.createElement('div'); chip.className = 'profile-chip';
+        var img = document.createElement('img'); img.className = 'avatar-img'; img.alt = p.name || '';
+        img.src = p.avatar || '';
+        img.onerror = function () { img.onerror = null; img.src = 'https://api.dicebear.com/9.x/initials/svg?seed=' + encodeURIComponent(p.name || 'player'); };
+        var nm = document.createElement('span'); nm.className = 'profile-name'; nm.textContent = p.name || '';
+        var menu = document.createElement('div'); menu.className = 'profile-menu';
+        menu.innerHTML = '<div class="pm-head"><i class="fa-solid fa-circle-check"></i> ' + (p.provider || '') + ' account</div><button><i class="fa-solid fa-right-from-bracket"></i> Logout</button>';
+        chip.appendChild(img); chip.appendChild(nm); chip.appendChild(menu);
+        chip.onclick = function () { menu.classList.toggle('show'); };
+        area.appendChild(chip);
+        menu.querySelector('button').onclick = function (e) { e.stopPropagation(); clhLogout(); };
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', render);
+    else render();
+})();
+
+/* Stats counters */
 function countUp(id, target) {
-    var el = document.getElementById(id);
-    var cur = 0;
-    var step = Math.max(1, Math.floor(target / 60));
+    var el = document.getElementById(id); if (!el) return;
+    var cur = 0, step = Math.max(1, Math.floor(target / 60));
     var t = setInterval(function () {
         cur += step;
         if (cur >= target) { cur = target; clearInterval(t); }
@@ -233,10 +237,5 @@ function toggleFaq(id) {
     el.style.display = (el.style.display === 'none') ? 'block' : 'none';
 }
 </script>
-
-<script src="auth-firebase.js"></script>
-<script src="profile-chip.js"></script>
-<script src="scroll.js"></script>
-    
 </body>
-                                             </html>
+                                                                           </html>
